@@ -1,380 +1,163 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Check list de Louis</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Check List">
+<link rel="apple-touch-icon" href="https://mulysse.github.io/Check-List/icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <style>
-  :root {
-    --bg:           #F0F3F1;
-    --white:        #FFFFFF;
-    --g900:         #0A1F15;
-    --g800:         #0F2D1E;
-    --g700:         #164228;
-    --g600:         #1E5C38;
-    --g500:         #267A49;
-    --g200:         #AECFBC;
-    --g100:         #D4E9DC;
-    --g50:          #EDF5F0;
-    --text:         #0A1F15;
-    --text-mid:     #3A5446;
-    --text-muted:   #7A9E8A;
-    --border:       #C8DDD2;
-    --border-light: #E2EDE8;
-    --stripe-a:     #FFFFFF;
-    --stripe-b:     #F5FAF7;
-    --red:    #C0392B;  --red-bg: #FBEEEC;
-    --grn:    #1A6B3A;  --grn-bg: #E8F5EE;
-    --blu:    #1A4A7A;  --blu-bg: #E8EFF8;
-  }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    padding: 28px 16px 60px;
-  }
-
-  .card {
-    max-width: 940px;
-    margin: 0 auto;
-    background: var(--white);
-    border-radius: 6px;
-    box-shadow: 0 1px 4px rgba(10,31,21,.06), 0 10px 36px rgba(10,31,21,.12);
-    overflow: hidden;
-    border: 1px solid var(--border);
-  }
-
-  /* ── HEADER ── */
-  .header {
-    background: var(--g900);
-    padding: 18px 24px 16px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 20px;
-  }
-
-  .header-left { display: flex; align-items: center; gap: 12px; }
-
-  .header-title {
-    font-size: 24px;
-    font-weight: 800;
-    color: #FFFFFF;
-    letter-spacing: -0.02em;
-    line-height: 1;
-  }
-
-  /* Sync indicator */
-  .sync-dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    background: #6EE7A8;
-    flex-shrink: 0;
-    transition: background .3s;
-  }
-  .sync-dot.syncing { background: #F0C040; animation: pulse .8s infinite; }
-  .sync-dot.error   { background: var(--red); }
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
-
-  .header-right {
-    display: flex; flex-direction: column;
-    align-items: flex-end; gap: 7px; flex-shrink: 0;
-  }
-
-  .progress-label {
-    font-size: 14px; font-weight: 600;
-    color: var(--white); letter-spacing: 0.01em;
-  }
-  .progress-label em { font-style: normal; color: #6EE7A8; font-weight: 800; }
-
-  .gauge-track { display: flex; gap: 3px; width: 180px; }
-  .gauge-seg {
-    flex: 1; height: 6px; border-radius: 2px;
-    background: rgba(255,255,255,.14);
-    transition: background .25s;
-  }
-  .gauge-seg.on { background: #6EE7A8; }
-
-  /* ── TABS ── */
-  .tabs-wrapper {
-    background: var(--g800);
-    border-bottom: 1px solid rgba(255,255,255,.07);
-    overflow-x: auto; scrollbar-width: none;
-  }
-  .tabs-wrapper::-webkit-scrollbar { display: none; }
-  .tabs { display: flex; padding: 0 10px; min-width: max-content; }
-
-  .tab {
-    font-size: 12px; font-weight: 700;
-    letter-spacing: 0.12em; text-transform: uppercase;
-    color: rgba(255,255,255,.4);
-    padding: 10px 14px; cursor: pointer;
-    border-bottom: 2.5px solid transparent;
-    transition: color .15s, border-color .15s;
-    white-space: nowrap; user-select: none;
-    display: flex; align-items: center; gap: 6px;
-  }
-  .tab:hover { color: rgba(255,255,255,.72); }
-  .tab.active { color: #FFFFFF; border-bottom-color: #6EE7A8; }
-
-  .tab-badge {
-    font-size: 9px; font-weight: 700;
-    background: rgba(255,255,255,.1); color: rgba(255,255,255,.45);
-    border-radius: 9px; padding: 1px 6px; line-height: 1.7;
-  }
-  .tab.active .tab-badge { background: #6EE7A8; color: var(--g900); }
-
-  /* ── TABLE HEAD ── */
-  .table-head {
-    display: grid;
-    grid-template-columns: 38px 140px 1fr 116px;
-    background: var(--g700);
-    padding: 7px 16px; gap: 8px;
-  }
-  .th {
-    font-size: 9px; font-weight: 700;
-    letter-spacing: 0.15em; text-transform: uppercase; color: var(--g200);
-  }
-  .th-uml {
-    display: grid; grid-template-columns: 28px 28px 28px 18px;
-    gap: 3px; align-items: center;
-  }
-  .th-uml span {
-    font-size: 9px; font-weight: 700; letter-spacing: 0.15em;
-    text-transform: uppercase; color: var(--g200); text-align: center;
-  }
-
-  /* ── SEPARATORS ── */
-  .prio-sep {
-    display: flex; align-items: center; gap: 8px;
-    background: var(--g50); padding: 3px 16px 3px 54px;
-    border-top: 1.5px solid var(--border);
-    border-bottom: 1px solid var(--border-light);
-  }
-  .prio-sep-dot { width: 7px; height: 7px; border-radius: 2px; flex-shrink: 0; }
-  .prio-sep-label { font-size: 9.5px; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; }
-  .prio-sep.sep-U .prio-sep-dot  { background: var(--red); }
-  .prio-sep.sep-U .prio-sep-label { color: var(--red); }
-  .prio-sep.sep-M .prio-sep-dot  { background: var(--grn); }
-  .prio-sep.sep-M .prio-sep-label { color: var(--grn); }
-  .prio-sep.sep-L .prio-sep-dot  { background: var(--blu); }
-  .prio-sep.sep-L .prio-sep-label { color: var(--blu); }
-
-  .category-sep {
-    background: var(--g50); padding: 4px 16px 4px 54px;
-    border-top: 2px solid var(--g200);
-    border-bottom: 1px solid var(--border-light);
-    font-size: 9.5px; font-weight: 800;
-    letter-spacing: 0.16em; text-transform: uppercase; color: var(--g600);
-  }
-  .category-group:first-child .category-sep { border-top: 1px solid var(--border-light); }
-
-  /* ── TASK ROW ── */
-  .task-row {
-    display: grid;
-    grid-template-columns: 38px 140px 1fr 116px;
-    align-items: center; padding: 0 16px; gap: 8px;
-    min-height: 44px; border-bottom: 1px solid var(--border-light);
-    transition: background .1s, opacity .2s;
-  }
-  .task-row.stripe-a { background: var(--stripe-a); }
-  .task-row.stripe-b { background: var(--stripe-b); }
-  .task-row:hover    { background: #E8F2EC !important; }
-  .task-row.saving   { opacity: .55; pointer-events: none; }
-  .task-row.done .task-text { text-decoration: line-through; color: var(--text-muted); }
-  .task-row.done .cat-label { color: var(--text-muted); }
-
-  .check-wrap { display: flex; align-items: center; justify-content: center; }
-  .task-check {
-    appearance: none; -webkit-appearance: none;
-    width: 15px; height: 15px;
-    border: 1.5px solid var(--border); border-radius: 3px;
-    cursor: pointer; position: relative; transition: all .15s; flex-shrink: 0;
-  }
-  .task-check:hover { border-color: var(--g500); }
-  .task-check:checked { background: var(--g600); border-color: var(--g600); }
-  .task-check:checked::after {
-    content: ''; position: absolute;
-    left: 2px; top: 1px; width: 8px; height: 5px;
-    border-left: 2px solid white; border-bottom: 2px solid white;
-    transform: rotate(-45deg);
-  }
-
-  .cat-label { font-size: 13px; font-weight: 600; color: var(--text-mid); }
-
-  .task-text-wrap { display: flex; align-items: center; gap: 5px; padding: 8px 0; }
-  .task-text { font-size: 15px; font-weight: 400; color: var(--text); line-height: 1.4; flex: 1; }
-  .task-text-input {
-    font-family: 'Plus Jakarta Sans', sans-serif; font-size: 15px; color: var(--text);
-    border: 1.5px solid var(--g500); border-radius: 4px; padding: 4px 8px;
-    flex: 1; outline: none; background: white;
-  }
-  .edit-btn {
-    background: none; border: none; cursor: pointer; font-size: 12px;
-    color: var(--border); padding: 2px 3px; border-radius: 3px;
-    opacity: 0; transition: opacity .12s, color .12s;
-  }
-  .task-row:hover .edit-btn { opacity: 1; }
-  .edit-btn:hover { color: var(--g600); }
-  .save-btn {
-    background: var(--g600); color: white; border: none;
-    cursor: pointer; font-size: 11px; font-weight: 700;
-    padding: 3px 9px; border-radius: 3px;
-  }
-
-  /* ── ACTIONS CELL ── */
-  .actions-cell {
-    display: grid; grid-template-columns: 28px 28px 28px 18px;
-    align-items: center; gap: 3px; justify-items: center;
-  }
-  .prio-btn {
-    font-size: 10.5px; font-weight: 800; letter-spacing: 0.03em;
-    width: 28px; height: 26px; border-radius: 5px; border: 1.5px solid;
-    cursor: pointer; display: flex; align-items: center; justify-content: center;
-    transition: all .12s; background: transparent; flex-shrink: 0;
-  }
-  .prio-btn.U { border-color: #EAB5AF; color: #C0392B; }
-  .prio-btn.U.active { background: var(--red); border-color: var(--red); color: white; }
-  .prio-btn.U:not(.active):hover { background: var(--red-bg); }
-  .prio-btn.M { border-color: #8EC4A4; color: #1A6B3A; }
-  .prio-btn.M.active { background: var(--grn); border-color: var(--grn); color: white; }
-  .prio-btn.M:not(.active):hover { background: var(--grn-bg); }
-  .prio-btn.L { border-color: #9FBAD4; color: #1A4A7A; }
-  .prio-btn.L.active { background: var(--blu); border-color: var(--blu); color: white; }
-  .prio-btn.L:not(.active):hover { background: var(--blu-bg); }
-
-  .del-btn {
-    background: none; border: none; color: var(--border);
-    font-size: 11px; cursor: pointer; padding: 2px; border-radius: 3px;
-    opacity: 0; transition: opacity .12s, color .12s;
-    width: 18px; text-align: center;
-  }
-  .task-row:hover .del-btn { opacity: 1; }
-  .del-btn:hover { color: var(--red); }
-
-  /* ── LOADING / EMPTY ── */
-  .loading-state, .empty-state {
-    padding: 44px 20px; text-align: center;
-  }
-  .loading-icon { font-size: 24px; margin-bottom: 8px; animation: spin 1s linear infinite; display: inline-block; }
-  @keyframes spin { from{transform:rotate(0)} to{transform:rotate(360deg)} }
-  .empty-icon { font-size: 28px; margin-bottom: 8px; opacity: .2; }
-  .empty-text, .loading-text { font-size: 13px; font-weight: 500; color: var(--text-muted); }
-
-  /* ── ADD FORM ── */
-  .add-form {
-    display: flex; gap: 8px;
-    padding: 12px 16px;
-    background: var(--g50);
-    border-top: 2px solid var(--g100);
-    flex-wrap: wrap; align-items: center;
-  }
-  .add-form input[type="text"] {
-    font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px;
-    border: 1.5px solid var(--border); border-radius: 4px;
-    padding: 7px 11px; background: white; outline: none;
-    color: var(--text); transition: border-color .15s; height: 34px;
-  }
-  .add-form input[type="text"]:focus { border-color: var(--g500); }
-  .add-form input[type="text"]::placeholder { color: #AECFBC; }
-  #new-cat  { width: 148px; }
-  #new-task { flex: 1; min-width: 180px; }
-
-  .add-prio-group { display: flex; gap: 4px; }
-  .add-prio-btn {
-    font-size: 10.5px; font-weight: 800; letter-spacing: 0.03em;
-    width: 34px; height: 34px; border-radius: 5px; border: 1.5px solid;
-    cursor: pointer; transition: all .12s; background: transparent;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .add-prio-btn.U { border-color: #EAB5AF; color: #C0392B; }
-  .add-prio-btn.U.sel { background: var(--red); border-color: var(--red); color: white; }
-  .add-prio-btn.M { border-color: #8EC4A4; color: #1A6B3A; }
-  .add-prio-btn.M.sel { background: var(--grn); border-color: var(--grn); color: white; }
-  .add-prio-btn.L { border-color: #9FBAD4; color: #1A4A7A; }
-  .add-prio-btn.L.sel { background: var(--blu); border-color: var(--blu); color: white; }
-
-  .add-btn {
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 11px; font-weight: 800;
-    letter-spacing: 0.10em; text-transform: uppercase;
-    background: var(--g900); color: white;
-    border: none; border-radius: 4px;
-    padding: 0 18px; height: 34px;
-    cursor: pointer; transition: background .15s, opacity .15s;
-    white-space: nowrap;
-  }
-  .add-btn:hover { background: var(--g700); }
-  .add-btn:disabled { opacity: .5; cursor: not-allowed; }
-
-  /* ── CONFIG BANNER (shown when keys not set) ── */
-  .config-banner {
-    background: #FEF3C7; border-bottom: 2px solid #F0C040;
-    padding: 12px 20px;
-    font-size: 13px; font-weight: 600; color: #7A4F00;
-    display: none;
-  }
-  .config-banner.visible { display: block; }
-  .config-banner code {
-    background: rgba(0,0,0,.08); padding: 2px 6px;
-    border-radius: 3px; font-size: 12px;
-  }
+:root {
+  --bg:#F0F3F1; --white:#FFFFFF;
+  --g900:#0A1F15; --g800:#0F2D1E; --g700:#164228; --g600:#1E5C38; --g500:#267A49;
+  --g200:#AECFBC; --g100:#D4E9DC; --g50:#EDF5F0;
+  --text:#0A1F15; --text-mid:#3A5446; --text-muted:#7A9E8A;
+  --border:#C8DDD2; --border-light:#E2EDE8;
+  --stripe-a:#FFFFFF; --stripe-b:#F5FAF7;
+  --red:#C0392B; --red-bg:#FBEEEC;
+  --grn:#1A6B3A; --grn-bg:#E8F5EE;
+  --blu:#1A4A7A; --blu-bg:#E8EFF8;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 28px 16px 60px; }
+.card { max-width: 940px; margin: 0 auto; background: var(--white); border-radius: 6px; box-shadow: 0 1px 4px rgba(10,31,21,.06), 0 10px 36px rgba(10,31,21,.12); overflow: hidden; border: 1px solid var(--border); }
+.header { background: var(--g900); padding: 18px 24px 16px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.header-left { display: flex; align-items: center; gap: 12px; }
+.header-title { font-size: 24px; font-weight: 800; color: #FFF; letter-spacing: -.02em; line-height: 1; }
+.sync-dot { width: 8px; height: 8px; border-radius: 50%; background: #6EE7A8; flex-shrink: 0; transition: background .3s; }
+.sync-dot.syncing { background: #F0C040; animation: pulse .8s infinite; }
+.sync-dot.error { background: var(--red); }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+.header-right { display: flex; flex-direction: column; align-items: flex-end; gap: 7px; flex-shrink: 0; }
+.progress-label { font-size: 14px; font-weight: 600; color: #FFF; letter-spacing: .01em; }
+.progress-label em { font-style: normal; color: #6EE7A8; font-weight: 800; }
+.gauge-track { display: flex; gap: 3px; width: 180px; }
+.gauge-seg { flex: 1; height: 6px; border-radius: 2px; background: rgba(255,255,255,.14); transition: background .25s; }
+.gauge-seg.on { background: #6EE7A8; }
+.tabs-wrapper { background: var(--g800); border-bottom: 1px solid rgba(255,255,255,.07); overflow-x: auto; scrollbar-width: none; }
+.tabs-wrapper::-webkit-scrollbar { display: none; }
+.tabs { display: flex; padding: 0 10px; min-width: max-content; }
+.tab { font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: rgba(255,255,255,.4); padding: 10px 14px; cursor: pointer; border-bottom: 2.5px solid transparent; transition: color .15s, border-color .15s; white-space: nowrap; user-select: none; display: flex; align-items: center; gap: 6px; }
+.tab:hover { color: rgba(255,255,255,.72); }
+.tab.active { color: #FFF; border-bottom-color: #6EE7A8; }
+.tab-badge { font-size: 9px; font-weight: 700; background: rgba(255,255,255,.1); color: rgba(255,255,255,.45); border-radius: 9px; padding: 1px 6px; line-height: 1.7; }
+.tab.active .tab-badge { background: #6EE7A8; color: var(--g900); }
+.table-head { display: grid; grid-template-columns: 38px 140px 1fr 116px; background: var(--g700); padding: 7px 16px; gap: 8px; }
+.th { font-size: 9px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; color: var(--g200); }
+.th-uml { display: grid; grid-template-columns: 28px 28px 28px 18px; gap: 3px; align-items: center; }
+.th-uml span { font-size: 9px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; color: var(--g200); text-align: center; }
+.prio-sep { display: flex; align-items: center; gap: 8px; background: var(--g50); padding: 3px 16px 3px 54px; border-top: 1.5px solid var(--border); border-bottom: 1px solid var(--border-light); }
+.prio-sep-dot { width: 7px; height: 7px; border-radius: 2px; flex-shrink: 0; }
+.prio-sep-label { font-size: 9.5px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; }
+.prio-sep.sep-U .prio-sep-dot { background: var(--red); } .prio-sep.sep-U .prio-sep-label { color: var(--red); }
+.prio-sep.sep-M .prio-sep-dot { background: var(--grn); } .prio-sep.sep-M .prio-sep-label { color: var(--grn); }
+.prio-sep.sep-L .prio-sep-dot { background: var(--blu); } .prio-sep.sep-L .prio-sep-label { color: var(--blu); }
+.category-sep { background: var(--g50); padding: 4px 16px 4px 54px; border-top: 2px solid var(--g200); border-bottom: 1px solid var(--border-light); font-size: 9.5px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: var(--g600); }
+.category-group:first-child .category-sep { border-top: 1px solid var(--border-light); }
+.task-row { display: grid; grid-template-columns: 38px 140px 1fr 116px; align-items: center; padding: 0 16px; gap: 8px; min-height: 44px; border-bottom: 1px solid var(--border-light); transition: background .1s, opacity .2s; }
+.task-row.stripe-a { background: var(--stripe-a); } .task-row.stripe-b { background: var(--stripe-b); }
+.task-row:hover { background: #E8F2EC !important; }
+.task-row.saving { opacity: .55; pointer-events: none; }
+.task-row.done .task-text { text-decoration: line-through; color: var(--text-muted); }
+.task-row.done .cat-label { color: var(--text-muted); }
+.check-wrap { display: flex; align-items: center; justify-content: center; }
+.task-check { appearance: none; -webkit-appearance: none; width: 15px; height: 15px; border: 1.5px solid var(--border); border-radius: 3px; cursor: pointer; position: relative; transition: all .15s; flex-shrink: 0; }
+.task-check:hover { border-color: var(--g500); }
+.task-check:checked { background: var(--g600); border-color: var(--g600); }
+.task-check:checked::after { content: ''; position: absolute; left: 2px; top: 1px; width: 8px; height: 5px; border-left: 2px solid white; border-bottom: 2px solid white; transform: rotate(-45deg); }
+.cat-label { font-size: 13px; font-weight: 600; color: var(--text-mid); }
+.task-text-wrap { display: flex; align-items: center; gap: 5px; padding: 8px 0; }
+.task-text { font-size: 15px; font-weight: 400; color: var(--text); line-height: 1.4; flex: 1; }
+.task-text-input { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 15px; color: var(--text); border: 1.5px solid var(--g500); border-radius: 4px; padding: 4px 8px; flex: 1; outline: none; background: white; }
+.edit-btn { background: none; border: none; cursor: pointer; font-size: 12px; color: var(--border); padding: 2px 3px; border-radius: 3px; opacity: 0; transition: opacity .12s, color .12s; }
+.task-row:hover .edit-btn { opacity: 1; } .edit-btn:hover { color: var(--g600); }
+.save-btn { background: var(--g600); color: white; border: none; cursor: pointer; font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 3px; }
+.actions-cell { display: grid; grid-template-columns: 28px 28px 28px 18px; align-items: center; gap: 3px; justify-items: center; }
+.prio-btn { font-size: 10.5px; font-weight: 800; letter-spacing: .03em; width: 28px; height: 26px; border-radius: 5px; border: 1.5px solid; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .12s; background: transparent; flex-shrink: 0; }
+.prio-btn.U { border-color: #EAB5AF; color: #C0392B; } .prio-btn.U.active { background: var(--red); border-color: var(--red); color: white; } .prio-btn.U:not(.active):hover { background: var(--red-bg); }
+.prio-btn.M { border-color: #8EC4A4; color: #1A6B3A; } .prio-btn.M.active { background: var(--grn); border-color: var(--grn); color: white; } .prio-btn.M:not(.active):hover { background: var(--grn-bg); }
+.prio-btn.L { border-color: #9FBAD4; color: #1A4A7A; } .prio-btn.L.active { background: var(--blu); border-color: var(--blu); color: white; } .prio-btn.L:not(.active):hover { background: var(--blu-bg); }
+.del-btn { background: none; border: none; color: var(--border); font-size: 11px; cursor: pointer; padding: 2px; border-radius: 3px; opacity: 0; transition: opacity .12s, color .12s; width: 18px; text-align: center; }
+.task-row:hover .del-btn { opacity: 1; } .del-btn:hover { color: var(--red); }
+.loading-state, .empty-state { padding: 44px 20px; text-align: center; }
+.loading-icon { font-size: 24px; margin-bottom: 8px; animation: spin 1s linear infinite; display: inline-block; }
+@keyframes spin { from{transform:rotate(0)} to{transform:rotate(360deg)} }
+.empty-icon { font-size: 28px; margin-bottom: 8px; opacity: .2; }
+.empty-text, .loading-text { font-size: 13px; font-weight: 500; color: var(--text-muted); }
+.add-form { display: flex; gap: 8px; padding: 12px 16px; background: var(--g50); border-top: 2px solid var(--g100); flex-wrap: wrap; align-items: center; }
+.add-form input[type="text"] { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; border: 1.5px solid var(--border); border-radius: 4px; padding: 7px 11px; background: white; outline: none; color: var(--text); transition: border-color .15s; height: 34px; }
+.add-form input[type="text"]:focus { border-color: var(--g500); }
+.add-form input[type="text"]::placeholder { color: #AECFBC; }
+#new-cat { width: 148px; } #new-task { flex: 1; min-width: 180px; }
+.add-prio-group { display: flex; gap: 4px; }
+.add-prio-btn { font-size: 10.5px; font-weight: 800; letter-spacing: .03em; width: 34px; height: 34px; border-radius: 5px; border: 1.5px solid; cursor: pointer; transition: all .12s; background: transparent; display: flex; align-items: center; justify-content: center; }
+.add-prio-btn.U { border-color: #EAB5AF; color: #C0392B; } .add-prio-btn.U.sel { background: var(--red); border-color: var(--red); color: white; }
+.add-prio-btn.M { border-color: #8EC4A4; color: #1A6B3A; } .add-prio-btn.M.sel { background: var(--grn); border-color: var(--grn); color: white; }
+.add-prio-btn.L { border-color: #9FBAD4; color: #1A4A7A; } .add-prio-btn.L.sel { background: var(--blu); border-color: var(--blu); color: white; }
+.add-btn { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 11px; font-weight: 800; letter-spacing: .10em; text-transform: uppercase; background: var(--g900); color: white; border: none; border-radius: 4px; padding: 0 18px; height: 34px; cursor: pointer; transition: background .15s, opacity .15s; white-space: nowrap; }
+.add-btn:hover { background: var(--g700); } .add-btn:disabled { opacity: .5; cursor: not-allowed; }
+@media (max-width: 640px) {
+  body { padding: 0 0 60px; }
+  .card { border-radius: 0; border-left: none; border-right: none; }
+  .header { padding: 14px 16px 12px; gap: 12px; }
+  .header-title { font-size: 19px; white-space: nowrap; }
+  .gauge-track { width: 110px; } .progress-label { font-size: 12px; }
+  .table-head { grid-template-columns: 36px 1fr 100px; }
+  .table-head .th:nth-child(2) { display: none; }
+  .task-row { grid-template-columns: 36px 1fr 100px; min-height: 48px; padding: 0 12px; }
+  .task-row .cat-label { display: none; }
+  .task-text { font-size: 13.5px; }
+  .actions-cell { grid-template-columns: 26px 26px 26px 16px; gap: 2px; }
+  .prio-btn { width: 26px; height: 24px; font-size: 10px; }
+  .th-uml { grid-template-columns: 26px 26px 26px 16px; gap: 2px; }
+  .category-sep { padding: 4px 12px 4px 48px; }
+  .prio-sep { padding: 3px 12px 3px 48px; }
+  .add-form { padding: 10px 12px; gap: 6px; }
+  #new-cat { width: 120px; }
+  .add-form input[type="text"] { font-size: 13px; padding: 6px 9px; height: 32px; }
+  .add-prio-btn { width: 32px; height: 32px; }
+  .add-btn { padding: 0 12px; height: 32px; font-size: 10.5px; }
+  .tabs { padding: 0 6px; }
+  .tab { padding: 9px 10px; font-size: 10.5px; letter-spacing: .08em; }
+}
 </style>
 </head>
 <body>
 <div class="card">
-
-  <!-- CONFIG BANNER -->
-  <div class="config-banner" id="config-banner">
-    ⚠️ Remplace <code> https://xvwfxmzdjmnyewunvtxk.supabase.co </code> et <code> eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh2d2Z4bXpkam1ueWV3dW52dHhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5Nzg5MzQsImV4cCI6MjA5MDU1NDkzNH0.3yn_kqynOjAmiX_QFMG12nNDrJ73QQZLPm3ObqqF8d0 </code> dans le fichier pour connecter Supabase.
-  </div>
-
-  <!-- HEADER -->
   <div class="header">
     <div class="header-left">
       <div class="header-title">Check list de Louis</div>
-      <div class="sync-dot" id="sync-dot" title="Synchronisé"></div>
+      <div class="sync-dot" id="sync-dot" title="Synchronise"></div>
     </div>
     <div class="header-right">
       <div class="progress-label"><em id="done-count">0</em> / <span id="total-count">0</span> faites</div>
       <div class="gauge-track" id="gauge"></div>
     </div>
   </div>
-
-  <!-- TABS -->
-  <div class="tabs-wrapper">
-    <div class="tabs" id="tabs"></div>
-  </div>
-
-  <!-- TABLE HEAD -->
+  <div class="tabs-wrapper"><div class="tabs" id="tabs"></div></div>
   <div class="table-head">
     <div class="th"></div>
-    <div class="th">Catégorie</div>
-    <div class="th">Tâche</div>
+    <div class="th">Categorie</div>
+    <div class="th">Tache</div>
     <div class="th-uml"><span>U</span><span>M</span><span>L</span><span></span></div>
   </div>
-
-  <!-- TASKS -->
   <div id="task-list">
     <div class="loading-state">
-      <div class="loading-icon">⟳</div>
-      <div class="loading-text">Connexion à Supabase…</div>
+      <div class="loading-icon">&#8635;</div>
+      <div class="loading-text">Connexion a Supabase...</div>
     </div>
   </div>
-
-  <!-- ADD FORM -->
   <div class="add-form">
-    <input type="text" id="new-cat" list="cat-list" placeholder="Catégorie..." autocomplete="off">
+    <input type="text" id="new-cat" list="cat-list" placeholder="Categorie..." autocomplete="off">
     <datalist id="cat-list"></datalist>
-    <input type="text" id="new-task" placeholder="Nouvelle tâche..." autocomplete="off">
+    <input type="text" id="new-task" placeholder="Nouvelle tache..." autocomplete="off">
     <div class="add-prio-group">
       <button class="add-prio-btn U" data-p="U" onclick="selectNewPrio(this)">U</button>
       <button class="add-prio-btn M sel" data-p="M" onclick="selectNewPrio(this)">M</button>
@@ -382,333 +165,239 @@
     </div>
     <button class="add-btn" id="add-btn" onclick="addTask()">+ Ajouter</button>
   </div>
-
 </div>
-
 <script>
-// ════════════════════════════════════════════════════════════
-//  ① COLLE ICI TES DEUX VALEURS SUPABASE
-// ════════════════════════════════════════════════════════════
-const SUPABASE_URL = 'https://xvwfxmzdjmnyewunvtxk.supabase.co';       // ex: https://xxxx.supabase.co
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh2d2Z4bXpkam1ueWV3dW52dHhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5Nzg5MzQsImV4cCI6MjA5MDU1NDkzNH0.3yn_kqynOjAmiX_QFMG12nNDrJ73QQZLPm3ObqqF8d0';   // clé anon publique
-// ════════════════════════════════════════════════════════════
+// ════════════════════════════════════════
+//  COLLE ICI TES DEUX VALEURS SUPABASE
+var SUPABASE_URL = 'COLLE_TON_URL_ICI';
+var SUPABASE_KEY = 'COLLE_TA_ANON_KEY_ICI';
+// ════════════════════════════════════════
 
-// ── INIT ──────────────────────────────────────────────────
-const CONFIGURED = !SUPABASE_URL.includes('COLLE') && !SUPABASE_KEY.includes('COLLE');
-if (!CONFIGURED) document.getElementById('config-banner').classList.add('visible');
+var CONFIGURED = SUPABASE_URL.indexOf('COLLE') === -1 && SUPABASE_KEY.indexOf('COLLE') === -1;
+var db = CONFIGURED ? supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 
-const db = CONFIGURED
-  ? supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
-  : null;
+var tasks = [];
+var activeTab = 'All';
+var newPrio = 'M';
 
-// ── STATE ─────────────────────────────────────────────────
-let tasks      = [];
-let activeTab  = 'All';
-let newPrio    = 'M';
+var TAB_ORDER = ['All','Urgent','Onoris','Sovereign','Logistique'];
+var PRIO_ORDER = {U:0,M:1,L:2};
+var PRIO_LABEL = {U:'Urgent',M:'Mid-term',L:'Long term'};
+var CAT_PRIORITY_ORDER = ['Onoris','Sovereign','Logistique','EDHEC'];
 
-const TAB_ORDER        = ['All','Urgent','Onoris','Sovereign','Logistique'];
-const PRIO_ORDER       = { U:0, M:1, L:2 };
-const PRIO_LABEL       = { U:'Urgent', M:'Mid-term', L:'Long term' };
-const CAT_PRIORITY_ORDER = ['Onoris','Sovereign','Logistique','EDHEC'];
-const SPECIAL_TABS     = new Set(['All','Urgent','Completed']);
-
-// Seed tasks (inserted once if the table is empty on first use)
-const SEED_TASKS = [
-  { cat:'IHEDN',      text:'Article IHEDN',                                                          prio:'M', done:false },
-  { cat:'Logistique', text:'Créer une appli check list disponible en ligne gratuitement',             prio:'U', done:false },
-  { cat:'Logistique', text:'Faire la MAJ WebCatalog',                                                 prio:'U', done:false },
-  { cat:'Logistique', text:'Trouver un moyen de réparer le clavier de mon ordinateur',                prio:'U', done:false },
-  { cat:'Manhattan',  text:'Chercher des profils "target to follow" (Chertok, Pigasse, etc.)',        prio:'M', done:false },
-  { cat:'Manhattan',  text:'Inclure projets secondaires : livre, PhD, MSc, média, parti politique…', prio:'L', done:false },
-  { cat:'Sovereign',  text:'Ajouter toutes les personnes de mon réseau LinkedIn dans mon bloc notes', prio:'M', done:false },
-  { cat:'Sovereign',  text:'Contacter Rodolphe !',                                                    prio:'U', done:false },
-  { cat:'Wish List',  text:'Faire des recherches sur un bon défroisseur',                             prio:'L', done:false },
-  { cat:'Coiffeur',   text:"Prendre RDV aujourd'hui",                                                 prio:'U', done:true  },
-  { cat:'Onoris',     text:"Finaliser l'article Dubai Resilience",                                    prio:'U', done:false },
-  { cat:'Onoris',     text:'Publier la rubrique Sovereign Advisory',                                  prio:'M', done:false },
+var SEED = [
+  {cat:'IHEDN',text:'Article IHEDN',prio:'M',done:false},
+  {cat:'Logistique',text:'Creer une appli check list disponible en ligne gratuitement',prio:'U',done:false},
+  {cat:'Logistique',text:'Faire la MAJ WebCatalog',prio:'U',done:false},
+  {cat:'Logistique',text:'Trouver un moyen de reparer le clavier de mon ordinateur',prio:'U',done:false},
+  {cat:'Manhattan',text:'Chercher des profils target to follow (Chertok, Pigasse, etc.)',prio:'M',done:false},
+  {cat:'Manhattan',text:'Inclure projets secondaires : livre, PhD, MSc, media, parti politique',prio:'L',done:false},
+  {cat:'Sovereign',text:'Ajouter toutes les personnes de mon reseau LinkedIn dans mon bloc notes',prio:'M',done:false},
+  {cat:'Sovereign',text:'Contacter Rodolphe !',prio:'U',done:false},
+  {cat:'Wish List',text:'Faire des recherches sur un bon defroisseur',prio:'L',done:false},
+  {cat:'Onoris',text:"Finaliser l'article Dubai Resilience",prio:'U',done:false},
+  {cat:'Onoris',text:'Publier la rubrique Sovereign Advisory',prio:'M',done:false}
 ];
 
-// ── SUPABASE HELPERS ──────────────────────────────────────
-function setSyncing(on) {
-  const dot = document.getElementById('sync-dot');
-  dot.className = 'sync-dot' + (on ? ' syncing' : '');
-}
-
-function setError() {
-  document.getElementById('sync-dot').className = 'sync-dot error';
-}
+function setSyncing(on) { document.getElementById('sync-dot').className = 'sync-dot' + (on ? ' syncing' : ''); }
+function setError() { document.getElementById('sync-dot').className = 'sync-dot error'; }
 
 async function loadTasks() {
   if (!CONFIGURED) { tasks = []; render(); prefillCat(); return; }
   setSyncing(true);
-  const { data, error } = await db.from('tasks').select('*').order('created_at', { ascending: true });
+  var result = await db.from('tasks').select('*').order('created_at', {ascending: true});
   setSyncing(false);
-  if (error) { console.error(error); setError(); return; }
-  tasks = data || [];
+  if (result.error) { console.error(result.error); setError(); return; }
+  tasks = result.data || [];
   if (tasks.length === 0) await seedTasks();
-  render();
-  prefillCat();
+  render(); prefillCat();
 }
 
 async function seedTasks() {
-  const { error } = await db.from('tasks').insert(SEED_TASKS);
-  if (error) { console.error('Seed error:', error); return; }
-  const { data } = await db.from('tasks').select('*').order('created_at', { ascending: true });
-  tasks = data || [];
+  var result = await db.from('tasks').insert(SEED);
+  if (result.error) { console.error(result.error); return; }
+  var r2 = await db.from('tasks').select('*').order('created_at', {ascending: true});
+  tasks = r2.data || [];
 }
 
-// ── REALTIME — any change on any device → reload ──────────
 if (CONFIGURED) {
   db.channel('tasks-live')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'tasks' }, () => {
-      loadTasks();
-    })
+    .on('postgres_changes', {event: '*', schema: 'public', table: 'tasks'}, function() { loadTasks(); })
     .subscribe();
 }
 
-// ── SORT HELPER ───────────────────────────────────────────
 function sortByCat(a, b) {
-  const ai = CAT_PRIORITY_ORDER.indexOf(a.cat);
-  const bi = CAT_PRIORITY_ORDER.indexOf(b.cat);
+  var ai = CAT_PRIORITY_ORDER.indexOf(a.cat), bi = CAT_PRIORITY_ORDER.indexOf(b.cat);
   if (ai === -1 && bi === -1) return a.cat.localeCompare(b.cat);
-  if (ai === -1) return 1; if (bi === -1) return -1;
-  return ai - bi;
+  if (ai === -1) return 1; if (bi === -1) return -1; return ai - bi;
 }
 
-// ── TABS ──────────────────────────────────────────────────
 function getOrderedTabs() {
-  const cats = [...new Set(tasks.map(t => t.cat))];
-  const ordered = [...TAB_ORDER];
-  cats.forEach(c => { if (!ordered.includes(c) && c !== 'Completed') ordered.push(c); });
+  var cats = Array.from(new Set(tasks.map(function(t){return t.cat})));
+  var ordered = TAB_ORDER.slice();
+  cats.forEach(function(c) { if (ordered.indexOf(c) === -1 && c !== 'Completed') ordered.push(c); });
   ordered.push('Completed');
   return ordered;
 }
 
 function getVisibleTabs() {
-  return getOrderedTabs().filter(tab => {
-    if (tab === 'All')       return true;
-    if (tab === 'Urgent')    return tasks.some(t => t.prio==='U' && !t.done);
-    if (tab === 'Completed') return tasks.some(t => t.done);
-    return tasks.some(t => t.cat===tab && !t.done);
+  return getOrderedTabs().filter(function(tab) {
+    if (tab === 'All') return true;
+    if (tab === 'Urgent') return tasks.some(function(t){return t.prio==='U'&&!t.done});
+    if (tab === 'Completed') return tasks.some(function(t){return t.done});
+    return tasks.some(function(t){return t.cat===tab&&!t.done});
   });
 }
 
 function tabCount(tab) {
-  if (tab === 'All')       return tasks.filter(t => !t.done).length;
-  if (tab === 'Urgent')    return tasks.filter(t => t.prio==='U' && !t.done).length;
-  if (tab === 'Completed') return tasks.filter(t => t.done).length;
-  return tasks.filter(t => t.cat===tab && !t.done).length;
+  if (tab === 'All') return tasks.filter(function(t){return !t.done}).length;
+  if (tab === 'Urgent') return tasks.filter(function(t){return t.prio==='U'&&!t.done}).length;
+  if (tab === 'Completed') return tasks.filter(function(t){return t.done}).length;
+  return tasks.filter(function(t){return t.cat===tab&&!t.done}).length;
 }
 
-// ── RENDER ────────────────────────────────────────────────
-function render() {
-  renderTabs();
-  renderTasks();
-  renderGauge();
-  renderCatDatalist();
-}
+function render() { renderTabs(); renderTasks(); renderGauge(); renderCatDatalist(); }
 
 function renderTabs() {
-  const tabs = getVisibleTabs();
-  if (!tabs.includes(activeTab)) activeTab = 'All';
-  document.getElementById('tabs').innerHTML = tabs.map(tab =>
-    `<div class="tab ${activeTab===tab?'active':''}" onclick="setTab('${tab}')">
-      ${tab}<span class="tab-badge">${tabCount(tab)}</span>
-    </div>`
-  ).join('');
+  var tabs = getVisibleTabs();
+  if (tabs.indexOf(activeTab) === -1) activeTab = 'All';
+  document.getElementById('tabs').innerHTML = tabs.map(function(tab) {
+    return '<div class="tab ' + (activeTab===tab?'active':'') + '" onclick="setTab(\'' + tab + '\')">' + tab + '<span class="tab-badge">' + tabCount(tab) + '</span></div>';
+  }).join('');
 }
 
 function buildSections(filtered) {
-  const isAll = (activeTab === 'All');
-  let sections = [];
-
+  var isAll = (activeTab === 'All');
+  var sections = [];
   if (isAll) {
-    const cats = [...new Set(filtered.map(t => t.cat))].sort((a,b) => sortByCat({cat:a},{cat:b}));
-    cats.forEach(cat => {
-      const rows = filtered.filter(t => t.cat===cat)
-        .sort((a,b) => PRIO_ORDER[a.prio]-PRIO_ORDER[b.prio]);
-      sections.push({ sepHTML: `<div class="category-sep">${cat}</div>`, rows });
+    var cats = Array.from(new Set(filtered.map(function(t){return t.cat}))).sort(function(a,b){return sortByCat({cat:a},{cat:b})});
+    cats.forEach(function(cat) {
+      var rows = filtered.filter(function(t){return t.cat===cat}).sort(function(a,b){return PRIO_ORDER[a.prio]-PRIO_ORDER[b.prio]});
+      sections.push({sep:'<div class="category-sep">' + cat + '</div>', rows: rows});
     });
   } else if (activeTab === 'Completed') {
-    sections = [{ sepHTML: '', rows: filtered }];
+    sections = [{sep:'', rows: filtered}];
   } else {
-    ['U','M','L'].forEach(p => {
-      const rows = filtered.filter(t => t.prio===p).sort(sortByCat);
-      if (rows.length) sections.push({
-        sepHTML: `<div class="prio-sep sep-${p}"><div class="prio-sep-dot"></div><span class="prio-sep-label">${PRIO_LABEL[p]}</span></div>`,
-        rows
-      });
+    ['U','M','L'].forEach(function(p) {
+      var rows = filtered.filter(function(t){return t.prio===p}).sort(sortByCat);
+      if (rows.length) sections.push({sep:'<div class="prio-sep sep-'+p+'"><div class="prio-sep-dot"></div><span class="prio-sep-label">'+PRIO_LABEL[p]+'</span></div>', rows: rows});
     });
   }
   return sections;
 }
 
 function renderTasks() {
-  const list = document.getElementById('task-list');
-  let filtered;
-  if      (activeTab==='All')       filtered = tasks.filter(t => !t.done);
-  else if (activeTab==='Urgent')    filtered = tasks.filter(t => t.prio==='U' && !t.done);
-  else if (activeTab==='Completed') filtered = tasks.filter(t => t.done);
-  else                              filtered = tasks.filter(t => t.cat===activeTab && !t.done);
+  var list = document.getElementById('task-list');
+  var filtered;
+  if (activeTab==='All') filtered = tasks.filter(function(t){return !t.done});
+  else if (activeTab==='Urgent') filtered = tasks.filter(function(t){return t.prio==='U'&&!t.done});
+  else if (activeTab==='Completed') filtered = tasks.filter(function(t){return t.done});
+  else filtered = tasks.filter(function(t){return t.cat===activeTab&&!t.done});
 
   if (!filtered.length) {
-    list.innerHTML = `<div class="empty-state">
-      <div class="empty-icon">✓</div>
-      <div class="empty-text">Aucune tâche à afficher.</div>
-    </div>`;
+    list.innerHTML = '<div class="empty-state"><div class="empty-icon">&#10003;</div><div class="empty-text">Aucune tache a afficher.</div></div>';
     return;
   }
-
-  const sections = buildSections(filtered);
-  const isAll = (activeTab === 'All');
-  let html = '';
-  let idx  = 0;
-
-  sections.forEach(sec => {
-    html += sec.sepHTML;
-    sec.rows.forEach(t => {
-      html += rowHTML(t, isAll, idx % 2 === 0 ? 'stripe-a' : 'stripe-b');
+  var isAll = (activeTab === 'All');
+  var sections = buildSections(filtered);
+  var html = '', idx = 0;
+  sections.forEach(function(sec) {
+    html += sec.sep;
+    sec.rows.forEach(function(t) {
+      html += rowHTML(t, isAll, idx%2===0 ? 'stripe-a' : 'stripe-b');
       idx++;
     });
   });
-
   list.innerHTML = html;
 }
 
 function rowHTML(t, hideCat, stripe) {
-  const id = t.id; // UUID
-  return `<div class="task-row ${t.done?'done':''} ${stripe}" id="row-${id}">
-    <div class="check-wrap">
-      <input type="checkbox" class="task-check" ${t.done?'checked':''}
-        onchange="toggleDone('${id}',this.checked)">
-    </div>
-    <div class="cat-label">${hideCat ? '' : escHtml(t.cat)}</div>
-    <div class="task-text-wrap">
-      <span class="task-text" id="text-${id}">${escHtml(t.text)}</span>
-      <button class="edit-btn" onclick="startEdit('${id}')" title="Modifier">✏</button>
-    </div>
-    <div class="actions-cell">
-      <button class="prio-btn U ${t.prio==='U'?'active':''}" onclick="setPrio('${id}','U')">U</button>
-      <button class="prio-btn M ${t.prio==='M'?'active':''}" onclick="setPrio('${id}','M')">M</button>
-      <button class="prio-btn L ${t.prio==='L'?'active':''}" onclick="setPrio('${id}','L')">L</button>
-      <button class="del-btn" onclick="deleteTask('${id}')" title="Supprimer">✕</button>
-    </div>
-  </div>`;
+  var id = t.id;
+  return '<div class="task-row ' + (t.done?'done':'') + ' ' + stripe + '" id="row-' + id + '">'
+    + '<div class="check-wrap"><input type="checkbox" class="task-check" ' + (t.done?'checked':'')
+    + ' onchange="toggleDone(\'' + id + '\',this.checked)"></div>'
+    + '<div class="cat-label">' + (hideCat ? '' : esc(t.cat)) + '</div>'
+    + '<div class="task-text-wrap"><span class="task-text" id="text-' + id + '">' + esc(t.text) + '</span>'
+    + '<button class="edit-btn" onclick="startEdit(\'' + id + '\')">&#9999;</button></div>'
+    + '<div class="actions-cell">'
+    + '<button class="prio-btn U ' + (t.prio==='U'?'active':'') + '" onclick="setPrio(\'' + id + '\',\'U\')">U</button>'
+    + '<button class="prio-btn M ' + (t.prio==='M'?'active':'') + '" onclick="setPrio(\'' + id + '\',\'M\')">M</button>'
+    + '<button class="prio-btn L ' + (t.prio==='L'?'active':'') + '" onclick="setPrio(\'' + id + '\',\'L\')">L</button>'
+    + '<button class="del-btn" onclick="deleteTask(\'' + id + '\')" title="Supprimer">&#10005;</button>'
+    + '</div></div>';
 }
 
-function escHtml(s) {
-  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
 function renderGauge() {
-  const total = tasks.length;
-  const done  = tasks.filter(t => t.done).length;
-  document.getElementById('done-count').textContent  = done;
+  var total = tasks.length, done = tasks.filter(function(t){return t.done}).length;
+  document.getElementById('done-count').textContent = done;
   document.getElementById('total-count').textContent = total;
-  const SEGS = 20;
-  const filled = total ? Math.round((done/total)*SEGS) : 0;
-  document.getElementById('gauge').innerHTML = Array.from({length:SEGS},(_,i) =>
-    `<div class="gauge-seg ${i<filled?'on':''}"></div>`
-  ).join('');
+  var filled = total ? Math.round((done/total)*20) : 0;
+  document.getElementById('gauge').innerHTML = Array.from({length:20}, function(_,i) {
+    return '<div class="gauge-seg ' + (i<filled?'on':'') + '"></div>';
+  }).join('');
 }
 
 function renderCatDatalist() {
-  const cats = [...new Set(tasks.map(t => t.cat))];
-  document.getElementById('cat-list').innerHTML = cats.map(c => `<option value="${escHtml(c)}">`).join('');
+  var cats = Array.from(new Set(tasks.map(function(t){return t.cat})));
+  document.getElementById('cat-list').innerHTML = cats.map(function(c){return '<option value="'+esc(c)+'">'}).join('');
 }
 
-// ── ACTIONS (all go to Supabase, realtime triggers re-render) ──
-function setTab(tab) { activeTab=tab; render(); prefillCat(); }
+function setTab(tab) { activeTab = tab; render(); prefillCat(); }
 
-async function toggleDone(id, val) {
-  markSaving(id);
-  await db.from('tasks').update({ done: val }).eq('id', id);
-}
-
-async function setPrio(id, prio) {
-  markSaving(id);
-  await db.from('tasks').update({ prio, done: false }).eq('id', id);
-}
-
-async function deleteTask(id) {
-  markSaving(id);
-  await db.from('tasks').delete().eq('id', id);
-}
-
-function markSaving(id) {
-  const row = document.getElementById('row-' + id);
-  if (row) row.classList.add('saving');
-}
+async function toggleDone(id, val) { markSaving(id); await db.from('tasks').update({done:val}).eq('id',id); }
+async function setPrio(id, prio) { markSaving(id); await db.from('tasks').update({prio:prio,done:false}).eq('id',id); }
+async function deleteTask(id) { markSaving(id); await db.from('tasks').delete().eq('id',id); }
+function markSaving(id) { var r = document.getElementById('row-'+id); if(r) r.classList.add('saving'); }
 
 function startEdit(id) {
-  const t = tasks.find(t => t.id===id); if (!t) return;
-  const wrap = document.getElementById('text-'+id).parentElement;
-  wrap.innerHTML = `
-    <input class="task-text-input" id="edit-${id}"
-      value="${escHtml(t.text)}"
-      onkeydown="if(event.key==='Enter')saveEdit('${id}');if(event.key==='Escape')render();"
-      autofocus>
-    <button class="save-btn" onclick="saveEdit('${id}')">OK</button>`;
+  var t = tasks.find(function(t){return t.id===id}); if(!t) return;
+  var wrap = document.getElementById('text-'+id).parentElement;
+  wrap.innerHTML = '<input class="task-text-input" id="edit-'+id+'" value="'+esc(t.text)+'"'
+    + ' onkeydown="if(event.key===\'Enter\')saveEdit(\''+id+'\');if(event.key===\'Escape\')render();" autofocus>'
+    + '<button class="save-btn" onclick="saveEdit(\''+id+'\')">OK</button>';
   document.getElementById('edit-'+id).focus();
 }
 
 async function saveEdit(id) {
-  const inp = document.getElementById('edit-'+id); if (!inp) return;
-  const text = inp.value.trim(); if (!text) return;
-  const row = document.getElementById('row-'+id);
-  if (row) row.classList.add('saving');
-  await db.from('tasks').update({ text }).eq('id', id);
+  var inp = document.getElementById('edit-'+id); if(!inp) return;
+  var text = inp.value.trim(); if(!text) return;
+  var r = document.getElementById('row-'+id); if(r) r.classList.add('saving');
+  await db.from('tasks').update({text:text}).eq('id',id);
 }
 
 function selectNewPrio(btn) {
-  document.querySelectorAll('.add-prio-btn').forEach(b => b.classList.remove('sel'));
+  document.querySelectorAll('.add-prio-btn').forEach(function(b){b.classList.remove('sel')});
   btn.classList.add('sel');
   newPrio = btn.dataset.p;
 }
 
 async function addTask() {
-  const catEl  = document.getElementById('new-cat');
-  const textEl = document.getElementById('new-task');
-  const cat    = catEl.value.trim();
-  const text   = textEl.value.trim();
-
+  var catEl = document.getElementById('new-cat');
+  var textEl = document.getElementById('new-task');
+  var cat = catEl.value.trim(), text = textEl.value.trim();
   if (!cat || !text) {
-    if (!cat)  { catEl.style.borderColor='#C0392B';  setTimeout(()=>catEl.style.borderColor='',1200); }
-    if (!text) { textEl.style.borderColor='#C0392B'; setTimeout(()=>textEl.style.borderColor='',1200); }
+    if (!cat) { catEl.style.borderColor='#C0392B'; setTimeout(function(){catEl.style.borderColor=''},1200); }
+    if (!text) { textEl.style.borderColor='#C0392B'; setTimeout(function(){textEl.style.borderColor=''},1200); }
     return;
   }
-
-  const btn = document.getElementById('add-btn');
-  btn.disabled = true;
-  setSyncing(true);
-
-  const { error } = await db.from('tasks').insert({ cat, text, prio: newPrio, done: false });
-  btn.disabled = false;
-  setSyncing(false);
-  if (error) { console.error(error); setError(); return; }
-
-  textEl.value = '';
-  prefillCat();
-  textEl.focus();
-  // Realtime will trigger loadTasks → render automatically
+  var btn = document.getElementById('add-btn');
+  btn.disabled = true; setSyncing(true);
+  var result = await db.from('tasks').insert({cat:cat,text:text,prio:newPrio,done:false});
+  btn.disabled = false; setSyncing(false);
+  if (result.error) { console.error(result.error); setError(); return; }
+  textEl.value = ''; prefillCat(); textEl.focus();
 }
-
-const CAT_TABS_SET = new Set(['All','Urgent','Completed']);
 
 function prefillCat() {
-  const el = document.getElementById('new-cat');
-  if (!CAT_TABS_SET.has(activeTab)) {
-    el.value = activeTab;
-  } else {
-    el.value = '';
-  }
+  var el = document.getElementById('new-cat');
+  var specials = ['All','Urgent','Completed'];
+  el.value = specials.indexOf(activeTab) === -1 ? activeTab : '';
 }
 
-document.getElementById('new-task').addEventListener('keydown', e => {
-  if (e.key === 'Enter') addTask();
-});
+document.getElementById('new-task').addEventListener('keydown', function(e) { if(e.key==='Enter') addTask(); });
 
-// ── START ─────────────────────────────────────────────────
 loadTasks();
 </script>
 </body>
