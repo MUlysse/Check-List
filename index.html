@@ -1,312 +1,716 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Ma Checklist</title>
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Check list de Louis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <style>
   :root {
-    --bg: var(--tg-theme-bg-color, #f5f5f0);
-    --bg2: var(--tg-theme-secondary-bg-color, #ebebeb);
-    --text: var(--tg-theme-text-color, #1a1a1a);
-    --hint: var(--tg-theme-hint-color, #888);
-    --accent: #c0392b;
-    --todo-bg: #fef9e7;
-    --todo-color: #b7770d;
-    --done-bg: #eafaf1;
-    --done-color: #1e8449;
-    --header-bg: #1f3a5f;
-    --border: #ddd;
-    --radius: 6px;
+    --bg:           #F0F3F1;
+    --white:        #FFFFFF;
+    --g900:         #0A1F15;
+    --g800:         #0F2D1E;
+    --g700:         #164228;
+    --g600:         #1E5C38;
+    --g500:         #267A49;
+    --g200:         #AECFBC;
+    --g100:         #D4E9DC;
+    --g50:          #EDF5F0;
+    --text:         #0A1F15;
+    --text-mid:     #3A5446;
+    --text-muted:   #7A9E8A;
+    --border:       #C8DDD2;
+    --border-light: #E2EDE8;
+    --stripe-a:     #FFFFFF;
+    --stripe-b:     #F5FAF7;
+    --red:    #C0392B;  --red-bg: #FBEEEC;
+    --grn:    #1A6B3A;  --grn-bg: #E8F5EE;
+    --blu:    #1A4A7A;  --blu-bg: #E8EFF8;
   }
-  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-  body { font-family: 'IBM Plex Sans', sans-serif; background: var(--bg); color: var(--text); font-size: 14px; min-height: 100vh; padding-bottom: 20px; }
 
-  .app-header { background: var(--header-bg); color: white; padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
-  .app-title { font-size: 17px; font-weight: 600; letter-spacing: -0.2px; }
-  .app-counter { font-size: 13px; background: rgba(255,255,255,0.15); padding: 4px 11px; border-radius: 20px; font-weight: 500; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
 
-  .filter-bar { display: flex; gap: 6px; padding: 10px 12px; background: var(--bg2); border-bottom: 1px solid var(--border); overflow-x: auto; scrollbar-width: none; }
-  .filter-bar::-webkit-scrollbar { display: none; }
-  .flt { font-size: 12px; font-weight: 500; padding: 5px 13px; border-radius: 20px; border: 1px solid var(--border); background: white; color: var(--hint); cursor: pointer; white-space: nowrap; transition: all 0.15s; font-family: 'IBM Plex Sans', sans-serif; }
-  .flt.active { background: var(--header-bg); border-color: var(--header-bg); color: white; }
+  body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 28px 16px 60px;
+  }
 
-  .tbl-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-  table { width: 100%; border-collapse: collapse; min-width: 400px; background: white; }
-  thead tr { background: var(--header-bg); color: white; }
-  th { font-size: 11px; font-weight: 600; letter-spacing: 0.8px; text-transform: uppercase; padding: 10px 14px; text-align: left; white-space: nowrap; }
-  th:first-child { width: 36px; padding-left: 12px; }
-  th:nth-child(2) { width: 130px; }
-  th:last-child { width: 90px; text-align: center; }
+  .card {
+    max-width: 940px;
+    margin: 0 auto;
+    background: var(--white);
+    border-radius: 6px;
+    box-shadow: 0 1px 4px rgba(10,31,21,.06), 0 10px 36px rgba(10,31,21,.12);
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
 
-  tbody tr { border-bottom: 1px solid #f0f0f0; transition: background 0.1s; }
-  tbody tr:hover { background: #f9f9f6; }
-  tbody tr.prio { background: #fff8f8; }
-  tbody tr.prio:hover { background: #fff0ef; }
-  tbody tr.done { opacity: 0.5; }
-  tbody tr.done td:nth-child(3) { text-decoration: line-through; }
-  td { padding: 11px 14px; vertical-align: middle; font-size: 13.5px; line-height: 1.35; }
-  td:first-child { padding-left: 12px; width: 36px; }
-  td:last-child { text-align: center; }
+  /* ── HEADER ── */
+  .header {
+    background: var(--g900);
+    padding: 18px 24px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+  }
 
-  .cat-cell { font-weight: 600; font-size: 13px; white-space: nowrap; }
-  tr.prio .cat-cell { color: var(--accent); }
-  tr.prio td:nth-child(3) { color: var(--accent); font-weight: 500; }
+  .header-left { display: flex; align-items: center; gap: 12px; }
 
-  .cb { width: 17px; height: 17px; border-radius: 4px; border: 1.5px solid #ccc; background: white; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.15s; }
-  tr.done .cb { background: var(--done-color); border-color: var(--done-color); }
-  .cb svg { display: none; }
-  tr.done .cb svg { display: block; }
+  .header-title {
+    font-size: 24px;
+    font-weight: 800;
+    color: #FFFFFF;
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
 
-  .badge { display: inline-block; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; white-space: nowrap; }
-  .badge-todo { background: var(--todo-bg); color: var(--todo-color); }
-  .badge-done { background: var(--done-bg); color: var(--done-color); }
+  /* Sync indicator */
+  .sync-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #6EE7A8;
+    flex-shrink: 0;
+    transition: background .3s;
+  }
+  .sync-dot.syncing { background: #F0C040; animation: pulse .8s infinite; }
+  .sync-dot.error   { background: var(--red); }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
 
-  .del-btn { background: none; border: none; color: #ccc; font-size: 16px; cursor: pointer; padding: 0 4px; line-height: 1; transition: color 0.15s; display: none; }
-  tr:hover .del-btn { display: inline; }
-  .del-btn:hover { color: var(--accent); }
+  .header-right {
+    display: flex; flex-direction: column;
+    align-items: flex-end; gap: 7px; flex-shrink: 0;
+  }
 
-  .add-form { padding: 10px 12px; background: white; border-top: 2px solid var(--header-bg); display: flex; gap: 6px; flex-wrap: wrap; position: sticky; bottom: 0; }
-  .add-form input { font-family: 'IBM Plex Sans', sans-serif; font-size: 13px; padding: 9px 12px; border: 1px solid var(--border); border-radius: var(--radius); outline: none; background: #fafafa; color: var(--text); transition: border-color 0.15s; }
-  .add-form input:focus { border-color: var(--header-bg); background: white; }
-  .add-form input::placeholder { color: #bbb; }
-  #inp-cat { width: 120px; }
-  #inp-task { flex: 1; min-width: 140px; }
+  .progress-label {
+    font-size: 14px; font-weight: 600;
+    color: var(--white); letter-spacing: 0.01em;
+  }
+  .progress-label em { font-style: normal; color: #6EE7A8; font-weight: 800; }
 
-  .btn-urgent { font-family: 'IBM Plex Sans', sans-serif; font-size: 12px; font-weight: 600; padding: 9px 12px; border-radius: var(--radius); border: 1.5px solid var(--accent); background: white; color: var(--accent); cursor: pointer; white-space: nowrap; transition: all 0.15s; flex-shrink: 0; }
-  .btn-urgent.on { background: var(--accent); color: white; }
-  .btn-add { font-family: 'IBM Plex Sans', sans-serif; font-size: 13px; font-weight: 600; padding: 9px 16px; border-radius: var(--radius); border: none; background: var(--header-bg); color: white; cursor: pointer; white-space: nowrap; flex-shrink: 0; transition: opacity 0.15s; }
-  .btn-add:active { opacity: 0.8; }
+  .gauge-track { display: flex; gap: 3px; width: 180px; }
+  .gauge-seg {
+    flex: 1; height: 6px; border-radius: 2px;
+    background: rgba(255,255,255,.14);
+    transition: background .25s;
+  }
+  .gauge-seg.on { background: #6EE7A8; }
 
-  .done-section { padding: 10px 14px 4px; font-size: 12px; color: var(--hint); font-style: italic; background: white; border-top: 1px solid #eee; }
+  /* ── TABS ── */
+  .tabs-wrapper {
+    background: var(--g800);
+    border-bottom: 1px solid rgba(255,255,255,.07);
+    overflow-x: auto; scrollbar-width: none;
+  }
+  .tabs-wrapper::-webkit-scrollbar { display: none; }
+  .tabs { display: flex; padding: 0 10px; min-width: max-content; }
 
-  .app-footer { background: var(--header-bg); color: rgba(255,255,255,0.6); font-size: 12px; padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; }
-  .btn-reset { font-family: 'IBM Plex Sans', sans-serif; font-size: 11px; padding: 4px 12px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.3); background: transparent; color: rgba(255,255,255,0.7); cursor: pointer; }
+  .tab {
+    font-size: 12px; font-weight: 700;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: rgba(255,255,255,.4);
+    padding: 10px 14px; cursor: pointer;
+    border-bottom: 2.5px solid transparent;
+    transition: color .15s, border-color .15s;
+    white-space: nowrap; user-select: none;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .tab:hover { color: rgba(255,255,255,.72); }
+  .tab.active { color: #FFFFFF; border-bottom-color: #6EE7A8; }
 
-  #loading { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; color: var(--hint); font-size: 14px; }
-  .spinner { width: 32px; height: 32px; border: 3px solid #ddd; border-top-color: var(--header-bg); border-radius: 50%; animation: spin 0.8s linear infinite; }
-  @keyframes spin { to { transform: rotate(360deg); } }
+  .tab-badge {
+    font-size: 9px; font-weight: 700;
+    background: rgba(255,255,255,.1); color: rgba(255,255,255,.45);
+    border-radius: 9px; padding: 1px 6px; line-height: 1.7;
+  }
+  .tab.active .tab-badge { background: #6EE7A8; color: var(--g900); }
 
-  .empty-row td { text-align: center; padding: 32px; color: var(--hint); font-style: italic; }
+  /* ── TABLE HEAD ── */
+  .table-head {
+    display: grid;
+    grid-template-columns: 38px 140px 1fr 116px;
+    background: var(--g700);
+    padding: 7px 16px; gap: 8px;
+  }
+  .th {
+    font-size: 9px; font-weight: 700;
+    letter-spacing: 0.15em; text-transform: uppercase; color: var(--g200);
+  }
+  .th-uml {
+    display: grid; grid-template-columns: 28px 28px 28px 18px;
+    gap: 3px; align-items: center;
+  }
+  .th-uml span {
+    font-size: 9px; font-weight: 700; letter-spacing: 0.15em;
+    text-transform: uppercase; color: var(--g200); text-align: center;
+  }
 
-  #toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(12px); background: #1f3a5f; color: white; font-size: 13px; padding: 9px 18px; border-radius: 20px; z-index: 999; opacity: 0; transition: all 0.25s; white-space: nowrap; pointer-events: none; }
-  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  /* ── SEPARATORS ── */
+  .prio-sep {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--g50); padding: 3px 16px 3px 54px;
+    border-top: 1.5px solid var(--border);
+    border-bottom: 1px solid var(--border-light);
+  }
+  .prio-sep-dot { width: 7px; height: 7px; border-radius: 2px; flex-shrink: 0; }
+  .prio-sep-label { font-size: 9.5px; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; }
+  .prio-sep.sep-U .prio-sep-dot  { background: var(--red); }
+  .prio-sep.sep-U .prio-sep-label { color: var(--red); }
+  .prio-sep.sep-M .prio-sep-dot  { background: var(--grn); }
+  .prio-sep.sep-M .prio-sep-label { color: var(--grn); }
+  .prio-sep.sep-L .prio-sep-dot  { background: var(--blu); }
+  .prio-sep.sep-L .prio-sep-label { color: var(--blu); }
+
+  .category-sep {
+    background: var(--g50); padding: 4px 16px 4px 54px;
+    border-top: 2px solid var(--g200);
+    border-bottom: 1px solid var(--border-light);
+    font-size: 9.5px; font-weight: 800;
+    letter-spacing: 0.16em; text-transform: uppercase; color: var(--g600);
+  }
+  .category-group:first-child .category-sep { border-top: 1px solid var(--border-light); }
+
+  /* ── TASK ROW ── */
+  .task-row {
+    display: grid;
+    grid-template-columns: 38px 140px 1fr 116px;
+    align-items: center; padding: 0 16px; gap: 8px;
+    min-height: 44px; border-bottom: 1px solid var(--border-light);
+    transition: background .1s, opacity .2s;
+  }
+  .task-row.stripe-a { background: var(--stripe-a); }
+  .task-row.stripe-b { background: var(--stripe-b); }
+  .task-row:hover    { background: #E8F2EC !important; }
+  .task-row.saving   { opacity: .55; pointer-events: none; }
+  .task-row.done .task-text { text-decoration: line-through; color: var(--text-muted); }
+  .task-row.done .cat-label { color: var(--text-muted); }
+
+  .check-wrap { display: flex; align-items: center; justify-content: center; }
+  .task-check {
+    appearance: none; -webkit-appearance: none;
+    width: 15px; height: 15px;
+    border: 1.5px solid var(--border); border-radius: 3px;
+    cursor: pointer; position: relative; transition: all .15s; flex-shrink: 0;
+  }
+  .task-check:hover { border-color: var(--g500); }
+  .task-check:checked { background: var(--g600); border-color: var(--g600); }
+  .task-check:checked::after {
+    content: ''; position: absolute;
+    left: 2px; top: 1px; width: 8px; height: 5px;
+    border-left: 2px solid white; border-bottom: 2px solid white;
+    transform: rotate(-45deg);
+  }
+
+  .cat-label { font-size: 13px; font-weight: 600; color: var(--text-mid); }
+
+  .task-text-wrap { display: flex; align-items: center; gap: 5px; padding: 8px 0; }
+  .task-text { font-size: 15px; font-weight: 400; color: var(--text); line-height: 1.4; flex: 1; }
+  .task-text-input {
+    font-family: 'Plus Jakarta Sans', sans-serif; font-size: 15px; color: var(--text);
+    border: 1.5px solid var(--g500); border-radius: 4px; padding: 4px 8px;
+    flex: 1; outline: none; background: white;
+  }
+  .edit-btn {
+    background: none; border: none; cursor: pointer; font-size: 12px;
+    color: var(--border); padding: 2px 3px; border-radius: 3px;
+    opacity: 0; transition: opacity .12s, color .12s;
+  }
+  .task-row:hover .edit-btn { opacity: 1; }
+  .edit-btn:hover { color: var(--g600); }
+  .save-btn {
+    background: var(--g600); color: white; border: none;
+    cursor: pointer; font-size: 11px; font-weight: 700;
+    padding: 3px 9px; border-radius: 3px;
+  }
+
+  /* ── ACTIONS CELL ── */
+  .actions-cell {
+    display: grid; grid-template-columns: 28px 28px 28px 18px;
+    align-items: center; gap: 3px; justify-items: center;
+  }
+  .prio-btn {
+    font-size: 10.5px; font-weight: 800; letter-spacing: 0.03em;
+    width: 28px; height: 26px; border-radius: 5px; border: 1.5px solid;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: all .12s; background: transparent; flex-shrink: 0;
+  }
+  .prio-btn.U { border-color: #EAB5AF; color: #C0392B; }
+  .prio-btn.U.active { background: var(--red); border-color: var(--red); color: white; }
+  .prio-btn.U:not(.active):hover { background: var(--red-bg); }
+  .prio-btn.M { border-color: #8EC4A4; color: #1A6B3A; }
+  .prio-btn.M.active { background: var(--grn); border-color: var(--grn); color: white; }
+  .prio-btn.M:not(.active):hover { background: var(--grn-bg); }
+  .prio-btn.L { border-color: #9FBAD4; color: #1A4A7A; }
+  .prio-btn.L.active { background: var(--blu); border-color: var(--blu); color: white; }
+  .prio-btn.L:not(.active):hover { background: var(--blu-bg); }
+
+  .del-btn {
+    background: none; border: none; color: var(--border);
+    font-size: 11px; cursor: pointer; padding: 2px; border-radius: 3px;
+    opacity: 0; transition: opacity .12s, color .12s;
+    width: 18px; text-align: center;
+  }
+  .task-row:hover .del-btn { opacity: 1; }
+  .del-btn:hover { color: var(--red); }
+
+  /* ── LOADING / EMPTY ── */
+  .loading-state, .empty-state {
+    padding: 44px 20px; text-align: center;
+  }
+  .loading-icon { font-size: 24px; margin-bottom: 8px; animation: spin 1s linear infinite; display: inline-block; }
+  @keyframes spin { from{transform:rotate(0)} to{transform:rotate(360deg)} }
+  .empty-icon { font-size: 28px; margin-bottom: 8px; opacity: .2; }
+  .empty-text, .loading-text { font-size: 13px; font-weight: 500; color: var(--text-muted); }
+
+  /* ── ADD FORM ── */
+  .add-form {
+    display: flex; gap: 8px;
+    padding: 12px 16px;
+    background: var(--g50);
+    border-top: 2px solid var(--g100);
+    flex-wrap: wrap; align-items: center;
+  }
+  .add-form input[type="text"] {
+    font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px;
+    border: 1.5px solid var(--border); border-radius: 4px;
+    padding: 7px 11px; background: white; outline: none;
+    color: var(--text); transition: border-color .15s; height: 34px;
+  }
+  .add-form input[type="text"]:focus { border-color: var(--g500); }
+  .add-form input[type="text"]::placeholder { color: #AECFBC; }
+  #new-cat  { width: 148px; }
+  #new-task { flex: 1; min-width: 180px; }
+
+  .add-prio-group { display: flex; gap: 4px; }
+  .add-prio-btn {
+    font-size: 10.5px; font-weight: 800; letter-spacing: 0.03em;
+    width: 34px; height: 34px; border-radius: 5px; border: 1.5px solid;
+    cursor: pointer; transition: all .12s; background: transparent;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .add-prio-btn.U { border-color: #EAB5AF; color: #C0392B; }
+  .add-prio-btn.U.sel { background: var(--red); border-color: var(--red); color: white; }
+  .add-prio-btn.M { border-color: #8EC4A4; color: #1A6B3A; }
+  .add-prio-btn.M.sel { background: var(--grn); border-color: var(--grn); color: white; }
+  .add-prio-btn.L { border-color: #9FBAD4; color: #1A4A7A; }
+  .add-prio-btn.L.sel { background: var(--blu); border-color: var(--blu); color: white; }
+
+  .add-btn {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 11px; font-weight: 800;
+    letter-spacing: 0.10em; text-transform: uppercase;
+    background: var(--g900); color: white;
+    border: none; border-radius: 4px;
+    padding: 0 18px; height: 34px;
+    cursor: pointer; transition: background .15s, opacity .15s;
+    white-space: nowrap;
+  }
+  .add-btn:hover { background: var(--g700); }
+  .add-btn:disabled { opacity: .5; cursor: not-allowed; }
+
+  /* ── CONFIG BANNER (shown when keys not set) ── */
+  .config-banner {
+    background: #FEF3C7; border-bottom: 2px solid #F0C040;
+    padding: 12px 20px;
+    font-size: 13px; font-weight: 600; color: #7A4F00;
+    display: none;
+  }
+  .config-banner.visible { display: block; }
+  .config-banner code {
+    background: rgba(0,0,0,.08); padding: 2px 6px;
+    border-radius: 3px; font-size: 12px;
+  }
 </style>
 </head>
 <body>
+<div class="card">
 
-<div id="loading"><div class="spinner"></div><span>Chargement...</span></div>
+  <!-- CONFIG BANNER -->
+  <div class="config-banner" id="config-banner">
+    ⚠️ Remplace <code>https://nevvanntgwuwdhohjymv.supabase.co </code> et <code> eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh2d2Z4bXpkam1ueWV3dW52dHhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5Nzg5MzQsImV4cCI6MjA5MDU1NDkzNH0.3yn_kqynOjAmiX_QFMG12nNDrJ73QQZLPm3ObqqF8d0 </code> dans le fichier pour connecter Supabase.
+  </div>
 
-<div id="app" style="display:none">
-  <div class="app-header">
-    <div class="app-title">Ma checklist</div>
-    <div class="app-counter"><span id="cnt-done">0</span> / <span id="cnt-total">0</span> faites</div>
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-left">
+      <div class="header-title">Check list de Louis</div>
+      <div class="sync-dot" id="sync-dot" title="Synchronisé"></div>
+    </div>
+    <div class="header-right">
+      <div class="progress-label"><em id="done-count">0</em> / <span id="total-count">0</span> faites</div>
+      <div class="gauge-track" id="gauge"></div>
+    </div>
   </div>
-  <div class="filter-bar">
-    <button class="flt active" onclick="setF('all',this)">Tout</button>
-    <button class="flt" onclick="setF('todo',this)">À faire</button>
-    <button class="flt" onclick="setF('urgent',this)">🔴 Urgent</button>
-    <button class="flt" onclick="setF('done',this)">✓ Faites</button>
+
+  <!-- TABS -->
+  <div class="tabs-wrapper">
+    <div class="tabs" id="tabs"></div>
   </div>
-  <div class="tbl-wrap">
-    <table>
-      <thead><tr><th></th><th>Catégorie</th><th>Tâche</th><th>Statut</th></tr></thead>
-      <tbody id="tbody"></tbody>
-    </table>
+
+  <!-- TABLE HEAD -->
+  <div class="table-head">
+    <div class="th"></div>
+    <div class="th">Catégorie</div>
+    <div class="th">Tâche</div>
+    <div class="th-uml"><span>U</span><span>M</span><span>L</span><span></span></div>
   </div>
-  <div class="done-section" id="done-section">Aucune tâche terminée pour l'instant</div>
+
+  <!-- TASKS -->
+  <div id="task-list">
+    <div class="loading-state">
+      <div class="loading-icon">⟳</div>
+      <div class="loading-text">Connexion à Supabase…</div>
+    </div>
+  </div>
+
+  <!-- ADD FORM -->
   <div class="add-form">
-    <input id="inp-cat" type="text" placeholder="Catégorie..." list="cat-dl">
-    <datalist id="cat-dl"></datalist>
-    <input id="inp-task" type="text" placeholder="Nouvelle tâche...">
-    <button class="btn-urgent" id="btn-urg" onclick="toggleUrgent()">Urgent ?</button>
-    <button class="btn-add" onclick="addTask()">+ Ajouter</button>
+    <input type="text" id="new-cat" list="cat-list" placeholder="Catégorie..." autocomplete="off">
+    <datalist id="cat-list"></datalist>
+    <input type="text" id="new-task" placeholder="Nouvelle tâche..." autocomplete="off">
+    <div class="add-prio-group">
+      <button class="add-prio-btn U" data-p="U" onclick="selectNewPrio(this)">U</button>
+      <button class="add-prio-btn M sel" data-p="M" onclick="selectNewPrio(this)">M</button>
+      <button class="add-prio-btn L" data-p="L" onclick="selectNewPrio(this)">L</button>
+    </div>
+    <button class="add-btn" id="add-btn" onclick="addTask()">+ Ajouter</button>
   </div>
-  <div class="app-footer">
-    <span>Cochez pour terminer · 🗑 pour supprimer</span>
-    <button class="btn-reset" onclick="resetDone()">Réinitialiser</button>
-  </div>
+
 </div>
 
-<div id="toast"></div>
-
 <script>
-const TG = window.Telegram?.WebApp;
+// ════════════════════════════════════════════════════════════
+//  ① COLLE ICI TES DEUX VALEURS SUPABASE
+// ════════════════════════════════════════════════════════════
+const SUPABASE_URL = 'https://nevvanntgwuwdhohjymv.supabase.co';       // ex: https://xxxx.supabase.co
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh2d2Z4bXpkam1ueWV3dW52dHhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5Nzg5MzQsImV4cCI6MjA5MDU1NDkzNH0.3yn_kqynOjAmiX_QFMG12nNDrJ73QQZLPm3ObqqF8d0';   // clé anon publique
+// ════════════════════════════════════════════════════════════
 
-// ── TÂCHES PAR DÉFAUT (chargées une seule fois au 1er lancement) ──
-const DEFAULT_TASKS = [
-  { id:1,  category:'Colis',            task:'Chercher mon colis Fabron',                                                     priority:true,  done:false },
-  { id:2,  category:'EDHEC',            task:'Checker toutes les futures échéances, travail à faire, exams, etc.',            priority:true,  done:false },
-  { id:3,  category:'EDHEC',            task:'Mettre à jour mon Excel des notes',                                             priority:true,  done:false },
-  { id:4,  category:'Finance perso',    task:'Faire mes comptes (Alix me devant)',                                            priority:true,  done:false },
-  { id:5,  category:'IHEDN',            task:'Article IHEDN',                                                                 priority:false, done:false },
-  { id:6,  category:'Junior Entreprise',task:'Relancer la prospection pour la JE',                                            priority:false, done:false },
-  { id:7,  category:'Logistique',       task:'Vérifier mon EDT ICS',                                                          priority:true,  done:false },
-  { id:8,  category:'Logistique',       task:'Voir avec Maman pour le déménagement',                                          priority:true,  done:false },
-  { id:9,  category:'Logistique',       task:'Créer une appli check list disponible en ligne gratuitement',                   priority:true,  done:false },
-  { id:10, category:'Manhattan',        task:'Chercher des profils "target to follow" (Chertok, Pigasse, etc.)',               priority:false, done:false },
-  { id:11, category:'Manhattan',        task:'Inclure projets secondaires : livre, PhD, MSc, média, parti politique, etc.',   priority:false, done:false },
-  { id:12, category:'Networking',       task:'Répondre à Louis-Marie',                                                        priority:true,  done:false },
-  { id:13, category:'Onoris',           task:'Attendre le nouveau site pour démarcher Clémence Duclos',                       priority:false, done:false },
-  { id:14, category:'Onoris',           task:'Brainstorming chaînes YouTube : devenir les Echos ou créer la galaxie Onoris',  priority:false, done:false },
-  { id:15, category:'Onoris',           task:'Changer la bannière LinkedIn',                                                  priority:false, done:false },
-  { id:16, category:'Onoris',           task:'Corriger template Podcast',                                                     priority:false, done:false },
-  { id:17, category:'Onoris',           task:'Demander à Paul de changer les logos sur Insta',                                priority:false, done:false },
-  { id:18, category:'Onoris',           task:'Envoyer messages aux Avocats pour la SCI',                                      priority:false, done:false },
-  { id:19, category:'Onoris',           task:'Organiser les templates Canva + consignes',                                     priority:false, done:false },
-  { id:20, category:'Onoris',           task:'Programmer un call avec Breaking into Sovereign',                               priority:false, done:false },
-  { id:21, category:'Onoris',           task:'Réflexion rubrique Finance',                                                    priority:false, done:false },
-  { id:22, category:'Santé',            task:'Rendez-vous dentiste',                                                          priority:true,  done:false },
-  { id:23, category:'Santé',            task:'Rendez-vous dermatologue',                                                      priority:true,  done:false },
-  { id:24, category:'Santé',            task:'Rendez-vous médecin',                                                           priority:true,  done:false },
-  { id:25, category:'Santé',            task:'Rendez-vous opticien',                                                          priority:true,  done:false },
-  { id:26, category:'Sovereign',        task:'Ajouter toutes les personnes de mon réseau LinkedIn dans mon bloc notes',       priority:false, done:false },
-  { id:27, category:'Wish List',        task:'Faire des recherches sur le parfum Zara',                                       priority:false, done:false },
-  { id:28, category:'Wish List',        task:'Faire des recherches sur un bon défroisseur',                                   priority:false, done:false },
+// ── INIT ──────────────────────────────────────────────────
+const CONFIGURED = !SUPABASE_URL.includes('COLLE') && !SUPABASE_KEY.includes('COLLE');
+if (!CONFIGURED) document.getElementById('config-banner').classList.add('visible');
+
+const db = CONFIGURED
+  ? supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+  : null;
+
+// ── STATE ─────────────────────────────────────────────────
+let tasks      = [];
+let activeTab  = 'All';
+let newPrio    = 'M';
+
+const TAB_ORDER        = ['All','Urgent','Onoris','Sovereign','Logistique'];
+const PRIO_ORDER       = { U:0, M:1, L:2 };
+const PRIO_LABEL       = { U:'Urgent', M:'Mid-term', L:'Long term' };
+const CAT_PRIORITY_ORDER = ['Onoris','Sovereign','Logistique','EDHEC'];
+const SPECIAL_TABS     = new Set(['All','Urgent','Completed']);
+
+// Seed tasks (inserted once if the table is empty on first use)
+const SEED_TASKS = [
+  { cat:'IHEDN',      text:'Article IHEDN',                                                          prio:'M', done:false },
+  { cat:'Logistique', text:'Créer une appli check list disponible en ligne gratuitement',             prio:'U', done:false },
+  { cat:'Logistique', text:'Faire la MAJ WebCatalog',                                                 prio:'U', done:false },
+  { cat:'Logistique', text:'Trouver un moyen de réparer le clavier de mon ordinateur',                prio:'U', done:false },
+  { cat:'Manhattan',  text:'Chercher des profils "target to follow" (Chertok, Pigasse, etc.)',        prio:'M', done:false },
+  { cat:'Manhattan',  text:'Inclure projets secondaires : livre, PhD, MSc, média, parti politique…', prio:'L', done:false },
+  { cat:'Sovereign',  text:'Ajouter toutes les personnes de mon réseau LinkedIn dans mon bloc notes', prio:'M', done:false },
+  { cat:'Sovereign',  text:'Contacter Rodolphe !',                                                    prio:'U', done:false },
+  { cat:'Wish List',  text:'Faire des recherches sur un bon défroisseur',                             prio:'L', done:false },
+  { cat:'Coiffeur',   text:"Prendre RDV aujourd'hui",                                                 prio:'U', done:true  },
+  { cat:'Onoris',     text:"Finaliser l'article Dubai Resilience",                                    prio:'U', done:false },
+  { cat:'Onoris',     text:'Publier la rubrique Sovereign Advisory',                                  prio:'M', done:false },
 ];
 
-let tasks = [], filter = 'all', isUrgent = false, nextId = 29;
-
-// ── INIT ──
-window.addEventListener('DOMContentLoaded', () => {
-  if (!TG || !TG.CloudStorage) {
-    // Hors Telegram : affiche quand même l'app avec les tâches par défaut
-    document.getElementById('loading').style.display = 'none';
-    document.getElementById('app').style.display = 'block';
-    tasks = JSON.parse(JSON.stringify(DEFAULT_TASKS));
-    render();
-    return;
-  }
-  TG.ready();
-  TG.expand();
-  loadFromCloud();
-});
-
-// ── CLOUD STORAGE ──
-function saveToCloud() {
-  if (!TG?.CloudStorage) return;
-  TG.CloudStorage.setItem('checklist_v2', JSON.stringify({ tasks, nextId }));
+// ── SUPABASE HELPERS ──────────────────────────────────────
+function setSyncing(on) {
+  const dot = document.getElementById('sync-dot');
+  dot.className = 'sync-dot' + (on ? ' syncing' : '');
 }
 
-function loadFromCloud() {
-  TG.CloudStorage.getItem('checklist_v2', (err, value) => {
-    document.getElementById('loading').style.display = 'none';
-    document.getElementById('app').style.display = 'block';
+function setError() {
+  document.getElementById('sync-dot').className = 'sync-dot error';
+}
 
-    if (!err && value) {
-      try {
-        const p = JSON.parse(value);
-        tasks = p.tasks || [];
-        nextId = p.nextId || tasks.length + 1;
-      } catch(e) {
-        // 1er lancement : charge les tâches par défaut
-        tasks = JSON.parse(JSON.stringify(DEFAULT_TASKS));
-        nextId = 29;
-        saveToCloud();
-      }
-    } else {
-      // 1er lancement
-      tasks = JSON.parse(JSON.stringify(DEFAULT_TASKS));
-      nextId = 29;
-      saveToCloud();
-    }
-    render();
+async function loadTasks() {
+  if (!CONFIGURED) { tasks = []; render(); prefillCat(); return; }
+  setSyncing(true);
+  const { data, error } = await db.from('tasks').select('*').order('created_at', { ascending: true });
+  setSyncing(false);
+  if (error) { console.error(error); setError(); return; }
+  tasks = data || [];
+  if (tasks.length === 0) await seedTasks();
+  render();
+  prefillCat();
+}
+
+async function seedTasks() {
+  const { error } = await db.from('tasks').insert(SEED_TASKS);
+  if (error) { console.error('Seed error:', error); return; }
+  const { data } = await db.from('tasks').select('*').order('created_at', { ascending: true });
+  tasks = data || [];
+}
+
+// ── REALTIME — any change on any device → reload ──────────
+if (CONFIGURED) {
+  db.channel('tasks-live')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'tasks' }, () => {
+      loadTasks();
+    })
+    .subscribe();
+}
+
+// ── SORT HELPER ───────────────────────────────────────────
+function sortByCat(a, b) {
+  const ai = CAT_PRIORITY_ORDER.indexOf(a.cat);
+  const bi = CAT_PRIORITY_ORDER.indexOf(b.cat);
+  if (ai === -1 && bi === -1) return a.cat.localeCompare(b.cat);
+  if (ai === -1) return 1; if (bi === -1) return -1;
+  return ai - bi;
+}
+
+// ── TABS ──────────────────────────────────────────────────
+function getOrderedTabs() {
+  const cats = [...new Set(tasks.map(t => t.cat))];
+  const ordered = [...TAB_ORDER];
+  cats.forEach(c => { if (!ordered.includes(c) && c !== 'Completed') ordered.push(c); });
+  ordered.push('Completed');
+  return ordered;
+}
+
+function getVisibleTabs() {
+  return getOrderedTabs().filter(tab => {
+    if (tab === 'All')       return true;
+    if (tab === 'Urgent')    return tasks.some(t => t.prio==='U' && !t.done);
+    if (tab === 'Completed') return tasks.some(t => t.done);
+    return tasks.some(t => t.cat===tab && !t.done);
   });
 }
 
-// ── ACTIONS ──
-function addTask() {
-  const cat = document.getElementById('inp-cat').value.trim();
-  const txt = document.getElementById('inp-task').value.trim();
-  if (!cat || !txt) return toast('Remplis catégorie et tâche');
-  tasks.push({ id: nextId++, category: cat, task: txt, priority: isUrgent, done: false });
-  document.getElementById('inp-cat').value = '';
-  document.getElementById('inp-task').value = '';
-  isUrgent = false;
-  document.getElementById('btn-urg').classList.remove('on');
-  saveToCloud(); render(); toast('Tâche ajoutée ✓');
+function tabCount(tab) {
+  if (tab === 'All')       return tasks.filter(t => !t.done).length;
+  if (tab === 'Urgent')    return tasks.filter(t => t.prio==='U' && !t.done).length;
+  if (tab === 'Completed') return tasks.filter(t => t.done).length;
+  return tasks.filter(t => t.cat===tab && !t.done).length;
 }
 
-function toggleTask(id) {
-  const t = tasks.find(x => x.id === id);
-  if (t) { t.done = !t.done; saveToCloud(); render(); }
-}
-
-function deleteTask(id) {
-  tasks = tasks.filter(x => x.id !== id);
-  saveToCloud(); render(); toast('Supprimée');
-}
-
-function resetDone() {
-  if (!confirm('Supprimer toutes les tâches terminées ?')) return;
-  tasks = tasks.filter(t => !t.done);
-  saveToCloud(); render(); toast('Réinitialisé');
-}
-
-function toggleUrgent() {
-  isUrgent = !isUrgent;
-  document.getElementById('btn-urg').classList.toggle('on', isUrgent);
-}
-
-// ── RENDER ──
-function setF(f, btn) {
-  filter = f;
-  document.querySelectorAll('.flt').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  render();
-}
-
+// ── RENDER ────────────────────────────────────────────────
 function render() {
-  let list = tasks;
-  if (filter === 'todo') list = tasks.filter(t => !t.done);
-  else if (filter === 'urgent') list = tasks.filter(t => t.priority && !t.done);
-  else if (filter === 'done') list = tasks.filter(t => t.done);
+  renderTabs();
+  renderTasks();
+  renderGauge();
+  renderCatDatalist();
+}
 
-  const done = tasks.filter(t => t.done).length;
-  document.getElementById('cnt-done').textContent = done;
-  document.getElementById('cnt-total').textContent = tasks.length;
+function renderTabs() {
+  const tabs = getVisibleTabs();
+  if (!tabs.includes(activeTab)) activeTab = 'All';
+  document.getElementById('tabs').innerHTML = tabs.map(tab =>
+    `<div class="tab ${activeTab===tab?'active':''}" onclick="setTab('${tab}')">
+      ${tab}<span class="tab-badge">${tabCount(tab)}</span>
+    </div>`
+  ).join('');
+}
 
-  const cats = [...new Set(tasks.map(t => t.category))];
-  document.getElementById('cat-dl').innerHTML = cats.map(c => `<option value="${esc(c)}">`).join('');
+function buildSections(filtered) {
+  const isAll = (activeTab === 'All');
+  let sections = [];
 
-  document.getElementById('done-section').textContent = done > 0
-    ? `${done} tâche${done > 1 ? 's' : ''} terminée${done > 1 ? 's' : ''}`
-    : "Aucune tâche terminée pour l'instant";
+  if (isAll) {
+    const cats = [...new Set(filtered.map(t => t.cat))].sort((a,b) => sortByCat({cat:a},{cat:b}));
+    cats.forEach(cat => {
+      const rows = filtered.filter(t => t.cat===cat)
+        .sort((a,b) => PRIO_ORDER[a.prio]-PRIO_ORDER[b.prio]);
+      sections.push({ sepHTML: `<div class="category-sep">${cat}</div>`, rows });
+    });
+  } else if (activeTab === 'Completed') {
+    sections = [{ sepHTML: '', rows: filtered }];
+  } else {
+    ['U','M','L'].forEach(p => {
+      const rows = filtered.filter(t => t.prio===p).sort(sortByCat);
+      if (rows.length) sections.push({
+        sepHTML: `<div class="prio-sep sep-${p}"><div class="prio-sep-dot"></div><span class="prio-sep-label">${PRIO_LABEL[p]}</span></div>`,
+        rows
+      });
+    });
+  }
+  return sections;
+}
 
-  const tbody = document.getElementById('tbody');
-  if (list.length === 0) {
-    tbody.innerHTML = `<tr class="empty-row"><td colspan="4">Aucune tâche dans cette vue</td></tr>`;
+function renderTasks() {
+  const list = document.getElementById('task-list');
+  let filtered;
+  if      (activeTab==='All')       filtered = tasks.filter(t => !t.done);
+  else if (activeTab==='Urgent')    filtered = tasks.filter(t => t.prio==='U' && !t.done);
+  else if (activeTab==='Completed') filtered = tasks.filter(t => t.done);
+  else                              filtered = tasks.filter(t => t.cat===activeTab && !t.done);
+
+  if (!filtered.length) {
+    list.innerHTML = `<div class="empty-state">
+      <div class="empty-icon">✓</div>
+      <div class="empty-text">Aucune tâche à afficher.</div>
+    </div>`;
     return;
   }
-  tbody.innerHTML = list.map(t => `
-    <tr class="${t.priority ? 'prio' : ''} ${t.done ? 'done' : ''}">
-      <td><div class="cb" onclick="toggleTask(${t.id})">
-        <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
-          <path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </div></td>
-      <td class="cat-cell">${esc(t.category)}</td>
-      <td>${esc(t.task)}</td>
-      <td>
-        <span class="badge ${t.done ? 'badge-done' : 'badge-todo'}">${t.done ? 'Fait ✓' : 'À faire'}</span>
-        <button class="del-btn" onclick="deleteTask(${t.id})">🗑</button>
-      </td>
-    </tr>`).join('');
+
+  const sections = buildSections(filtered);
+  const isAll = (activeTab === 'All');
+  let html = '';
+  let idx  = 0;
+
+  sections.forEach(sec => {
+    html += sec.sepHTML;
+    sec.rows.forEach(t => {
+      html += rowHTML(t, isAll, idx % 2 === 0 ? 'stripe-a' : 'stripe-b');
+      idx++;
+    });
+  });
+
+  list.innerHTML = html;
 }
 
-function esc(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+function rowHTML(t, hideCat, stripe) {
+  const id = t.id; // UUID
+  return `<div class="task-row ${t.done?'done':''} ${stripe}" id="row-${id}">
+    <div class="check-wrap">
+      <input type="checkbox" class="task-check" ${t.done?'checked':''}
+        onchange="toggleDone('${id}',this.checked)">
+    </div>
+    <div class="cat-label">${hideCat ? '' : escHtml(t.cat)}</div>
+    <div class="task-text-wrap">
+      <span class="task-text" id="text-${id}">${escHtml(t.text)}</span>
+      <button class="edit-btn" onclick="startEdit('${id}')" title="Modifier">✏</button>
+    </div>
+    <div class="actions-cell">
+      <button class="prio-btn U ${t.prio==='U'?'active':''}" onclick="setPrio('${id}','U')">U</button>
+      <button class="prio-btn M ${t.prio==='M'?'active':''}" onclick="setPrio('${id}','M')">M</button>
+      <button class="prio-btn L ${t.prio==='L'?'active':''}" onclick="setPrio('${id}','L')">L</button>
+      <button class="del-btn" onclick="deleteTask('${id}')" title="Supprimer">✕</button>
+    </div>
+  </div>`;
 }
-function toast(msg) {
-  const el = document.getElementById('toast');
-  el.textContent = msg; el.classList.add('show');
-  setTimeout(() => el.classList.remove('show'), 2200);
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
-document.getElementById('inp-task').addEventListener('keydown', e => {
+
+function renderGauge() {
+  const total = tasks.length;
+  const done  = tasks.filter(t => t.done).length;
+  document.getElementById('done-count').textContent  = done;
+  document.getElementById('total-count').textContent = total;
+  const SEGS = 20;
+  const filled = total ? Math.round((done/total)*SEGS) : 0;
+  document.getElementById('gauge').innerHTML = Array.from({length:SEGS},(_,i) =>
+    `<div class="gauge-seg ${i<filled?'on':''}"></div>`
+  ).join('');
+}
+
+function renderCatDatalist() {
+  const cats = [...new Set(tasks.map(t => t.cat))];
+  document.getElementById('cat-list').innerHTML = cats.map(c => `<option value="${escHtml(c)}">`).join('');
+}
+
+// ── ACTIONS (all go to Supabase, realtime triggers re-render) ──
+function setTab(tab) { activeTab=tab; render(); prefillCat(); }
+
+async function toggleDone(id, val) {
+  markSaving(id);
+  await db.from('tasks').update({ done: val }).eq('id', id);
+}
+
+async function setPrio(id, prio) {
+  markSaving(id);
+  await db.from('tasks').update({ prio, done: false }).eq('id', id);
+}
+
+async function deleteTask(id) {
+  markSaving(id);
+  await db.from('tasks').delete().eq('id', id);
+}
+
+function markSaving(id) {
+  const row = document.getElementById('row-' + id);
+  if (row) row.classList.add('saving');
+}
+
+function startEdit(id) {
+  const t = tasks.find(t => t.id===id); if (!t) return;
+  const wrap = document.getElementById('text-'+id).parentElement;
+  wrap.innerHTML = `
+    <input class="task-text-input" id="edit-${id}"
+      value="${escHtml(t.text)}"
+      onkeydown="if(event.key==='Enter')saveEdit('${id}');if(event.key==='Escape')render();"
+      autofocus>
+    <button class="save-btn" onclick="saveEdit('${id}')">OK</button>`;
+  document.getElementById('edit-'+id).focus();
+}
+
+async function saveEdit(id) {
+  const inp = document.getElementById('edit-'+id); if (!inp) return;
+  const text = inp.value.trim(); if (!text) return;
+  const row = document.getElementById('row-'+id);
+  if (row) row.classList.add('saving');
+  await db.from('tasks').update({ text }).eq('id', id);
+}
+
+function selectNewPrio(btn) {
+  document.querySelectorAll('.add-prio-btn').forEach(b => b.classList.remove('sel'));
+  btn.classList.add('sel');
+  newPrio = btn.dataset.p;
+}
+
+async function addTask() {
+  const catEl  = document.getElementById('new-cat');
+  const textEl = document.getElementById('new-task');
+  const cat    = catEl.value.trim();
+  const text   = textEl.value.trim();
+
+  if (!cat || !text) {
+    if (!cat)  { catEl.style.borderColor='#C0392B';  setTimeout(()=>catEl.style.borderColor='',1200); }
+    if (!text) { textEl.style.borderColor='#C0392B'; setTimeout(()=>textEl.style.borderColor='',1200); }
+    return;
+  }
+
+  const btn = document.getElementById('add-btn');
+  btn.disabled = true;
+  setSyncing(true);
+
+  const { error } = await db.from('tasks').insert({ cat, text, prio: newPrio, done: false });
+  btn.disabled = false;
+  setSyncing(false);
+  if (error) { console.error(error); setError(); return; }
+
+  textEl.value = '';
+  prefillCat();
+  textEl.focus();
+  // Realtime will trigger loadTasks → render automatically
+}
+
+const CAT_TABS_SET = new Set(['All','Urgent','Completed']);
+
+function prefillCat() {
+  const el = document.getElementById('new-cat');
+  if (!CAT_TABS_SET.has(activeTab)) {
+    el.value = activeTab;
+  } else {
+    el.value = '';
+  }
+}
+
+document.getElementById('new-task').addEventListener('keydown', e => {
   if (e.key === 'Enter') addTask();
 });
+
+// ── START ─────────────────────────────────────────────────
+loadTasks();
 </script>
 </body>
 </html>
