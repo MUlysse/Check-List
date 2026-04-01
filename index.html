@@ -11,6 +11,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAxMjAgMTIwJz48cmVjdCB4PSc2JyB5PSc2JyB3aWR0aD0nMTA4JyBoZWlnaHQ9JzEwOCcgcng9JzI0JyBmaWxsPScjZmZmZmZmJyBzdHJva2U9JyMwMDAwMDAnIHN0cm9rZS13aWR0aD0nMTInLz48Y2lyY2xlIGN4PSc2MCcgY3k9JzYwJyByPScyNCcgZmlsbD0nI0E1MUMzMCcvPjwvc3ZnPg==">
 <link rel="shortcut icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAxMjAgMTIwJz48cmVjdCB4PSc2JyB5PSc2JyB3aWR0aD0nMTA4JyBoZWlnaHQ9JzEwOCcgcng9JzI0JyBmaWxsPScjZmZmZmZmJyBzdHJva2U9JyMwMDAwMDAnIHN0cm9rZS13aWR0aD0nMTInLz48Y2lyY2xlIGN4PSc2MCcgY3k9JzYwJyByPScyNCcgZmlsbD0nI0E1MUMzMCcvPjwvc3ZnPg==">
 <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <style>
 :root {
   --crimson:      #A51C30;
@@ -280,6 +281,10 @@ var TABS=['All','Urgent','Onoris','Sovereign','EDHEC','Logistique'];
 var PO={U:0,M:1,L:2}, PL={U:'Urgent',M:'Mid-term',L:'Long term'};
 var CO=['Onoris','Sovereign','EDHEC','Logistique'];
 var STORAGE_KEY='checklistTasksV1';
+var SUPABASE_URL='https://xvwfxmzdjmnyewunvtxk.supabase.co';
+var SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh2d2Z4bXpkam1ueWV3dW52dHhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5Nzg5MzQsImV4cCI6MjA5MDU1NDkzNH0.3yn_kqynOjAmiX_QFMG12nNDrJ73QQZLPm3ObqqF8d0';
+var SUPABASE_TABLE='tasks';
+var supabaseClient=null;
 
 function loadTasks(){
   var stored=localStorage.getItem(STORAGE_KEY);
@@ -288,15 +293,68 @@ function loadTasks(){
       var data=JSON.parse(stored);
       if(Array.isArray(data.tasks)){
         tasks=data.tasks;
-        nid=typeof data.nid==='number'&&data.nid>0?data.nid:tasks.reduce(function(m,t){return Math.max(m,t.id||0);},0)+1;
+        nid=typeof data.nid==='number'&&data.nid>0?data.nid:1;
         if(typeof data.tab==='string')tab=data.tab;
       }
     }catch(e){}
   }
-  if(!localStorage.getItem(STORAGE_KEY)) saveTasks();
 }
 function saveTasks(){
   try{localStorage.setItem(STORAGE_KEY, JSON.stringify({tasks:tasks,nid:nid,tab:tab}));}catch(e){}
+}
+function newId(){
+  if(window.crypto&&crypto.randomUUID) return crypto.randomUUID();
+  return 't'+Math.random().toString(36).slice(2)+Date.now().toString(36);
+}
+function setSyncState(state){
+  var d=document.getElementById('sync-dot');
+  if(!d)return;
+  d.classList.remove('syncing','error');
+  if(state) d.classList.add(state);
+}
+function initSupabase(){
+  if(!window.supabase) return;
+  supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+  setSyncState('syncing');
+  loadTasksRemote().then(function(){ setSyncState(); }).catch(function(e){ console.warn('Supabase load failed',e); setSyncState('error'); }).finally(function(){ subscribeToRemoteChanges(); });
+}
+async function loadTasksRemote(){
+  if(!supabaseClient) return;
+  setSyncState('syncing');
+  var res=await supabaseClient.from(SUPABASE_TABLE).select('id,cat,text,prio,done').order('created_at',{ascending:true});
+  if(res.error) throw res.error;
+  if(Array.isArray(res.data)){
+    tasks=res.data.map(function(t){return {id:t.id,cat:t.cat,text:t.text,prio:t.prio,done:t.done};});
+    saveTasks();
+    render();
+  }
+  setSyncState();
+}
+async function insertRemoteTask(task){
+  if(!supabaseClient) return;
+  setSyncState('syncing');
+  var res=await supabaseClient.from(SUPABASE_TABLE).insert([task]);
+  if(res.error){ console.warn('Supabase insert failed',res.error); setSyncState('error'); } else { setSyncState(); }
+}
+async function updateRemoteTask(id,changes){
+  if(!supabaseClient) return;
+  setSyncState('syncing');
+  var res=await supabaseClient.from(SUPABASE_TABLE).update(changes).eq('id',id);
+  if(res.error){ console.warn('Supabase update failed',res.error); setSyncState('error'); } else { setSyncState(); }
+}
+async function deleteRemoteTask(id){
+  if(!supabaseClient) return;
+  setSyncState('syncing');
+  var res=await supabaseClient.from(SUPABASE_TABLE).delete().eq('id',id);
+  if(res.error){ console.warn('Supabase delete failed',res.error); setSyncState('error'); } else { setSyncState(); }
+}
+function subscribeToRemoteChanges(){
+  if(!supabaseClient) return;
+  var channel=supabaseClient.channel('realtime-tasks');
+  channel.on('postgres_changes',{event:'INSERT',schema:'public',table:SUPABASE_TABLE},function(){ loadTasksRemote(); });
+  channel.on('postgres_changes',{event:'UPDATE',schema:'public',table:SUPABASE_TABLE},function(){ loadTasksRemote(); });
+  channel.on('postgres_changes',{event:'DELETE',schema:'public',table:SUPABASE_TABLE},function(){ loadTasksRemote(); });
+  channel.subscribe();
 }
 window.addEventListener('storage', function(ev){
   if(ev.key!==STORAGE_KEY||!ev.newValue)return;
@@ -304,7 +362,7 @@ window.addEventListener('storage', function(ev){
     var data=JSON.parse(ev.newValue);
     if(Array.isArray(data.tasks)){
       tasks=data.tasks;
-      nid=typeof data.nid==='number'&&data.nid>0?data.nid:tasks.reduce(function(m,t){return Math.max(m,t.id||0);},0)+1;
+      nid=typeof data.nid==='number'&&data.nid>0?data.nid:1;
       if(typeof data.tab==='string')tab=data.tab;
       render();
     }
@@ -338,14 +396,14 @@ function rTasks(){
 
 function rh(t,hc,s){
   return '<div class="row '+(t.done?'done':'')+' '+s+'" id="r'+t.id+'">'
-    +'<div class="chk-wrap"><input type="checkbox" class="chk"'+(t.done?' checked':'')+' onchange="tgl('+t.id+',this.checked)"></div>'
+    +'<div class="chk-wrap"><input type="checkbox" class="chk"'+(t.done?' checked':'')+' onchange="tgl(\''+t.id+'\',this.checked)"></div>'
     +'<div class="rc">'+(hc?'':e(t.cat))+'</div>'
-    +'<div class="rt-wrap"><span class="rt" id="s'+t.id+'">'+e(t.text)+'</span><button class="edit-btn" onclick="ed('+t.id+')">&#9999;</button></div>'
+    +'<div class="rt-wrap"><span class="rt" id="s'+t.id+'">'+e(t.text)+'</span><button class="edit-btn" onclick="ed(\''+t.id+'\')">&#9999;</button></div>'
     +'<div class="act">'
-    +'<button class="pb U'+(t.prio==='U'?' on':'')+'" onclick="sp('+t.id+',\'U\')">U</button>'
-    +'<button class="pb M'+(t.prio==='M'?' on':'')+'" onclick="sp('+t.id+',\'M\')">M</button>'
-    +'<button class="pb L'+(t.prio==='L'?' on':'')+'" onclick="sp('+t.id+',\'L\')">L</button>'
-    +'<button class="del" onclick="dt('+t.id+')">&#10005;</button>'
+    +'<button class="pb U'+(t.prio==='U'?' on':'')+'" onclick="sp(\''+t.id+'\',\'U\')">U</button>'
+    +'<button class="pb M'+(t.prio==='M'?' on':'')+'" onclick="sp(\''+t.id+'\',\'M\')">M</button>'
+    +'<button class="pb L'+(t.prio==='L'?' on':'')+'" onclick="sp(\''+t.id+'\',\'L\')">L</button>'
+    +'<button class="del" onclick="dt(\''+t.id+'\')">&#10005;</button>'
     +'</div></div>';
 }
 
@@ -356,18 +414,18 @@ function rGauge(){var tot=tasks.length,dn=tasks.filter(function(t){return t.done
 function rDl(){var c=[];tasks.forEach(function(t){if(c.indexOf(t.cat)<0)c.push(t.cat);});document.getElementById('cl').innerHTML=c.map(function(x){return'<option value="'+e(x)+'">';}).join('');}
 
 function setTab(x){tab=x;render();pfc();saveTasks();}
-function tgl(id,v){var t=tasks.find(function(t){return t.id===id;});if(t)t.done=v;render();saveTasks();}
-function sp(id,p){var t=tasks.find(function(t){return t.id===id;});if(t){t.prio=p;t.done=false;}render();saveTasks();}
-function dt(id){tasks=tasks.filter(function(t){return t.id!==id;});render();saveTasks();}
+async function tgl(id,v){var t=tasks.find(function(t){return t.id===id;});if(t){t.done=v;}render();saveTasks(); if(supabaseClient) await updateRemoteTask(id,{done:v});}
+async function sp(id,p){var t=tasks.find(function(t){return t.id===id;});if(t){t.prio=p;t.done=false;}render();saveTasks(); if(supabaseClient) await updateRemoteTask(id,{prio:p,done:false});}
+async function dt(id){tasks=tasks.filter(function(t){return t.id!==id;});render();saveTasks(); if(supabaseClient) await deleteRemoteTask(id);}
 
 function ed(id){
   var t=tasks.find(function(t){return t.id===id;});if(!t)return;
   var sp=document.getElementById('s'+id);if(!sp)return;
   var w=sp.parentElement;
-  w.innerHTML='<input class="rt-input" id="ei'+id+'" value="'+e(t.text)+'" onkeydown="if(event.key===\'Enter\')sv('+id+');if(event.key===\'Escape\')render();" autofocus><button class="save-btn" onclick="sv('+id+')">OK</button>';
+  w.innerHTML='<input class="rt-input" id="ei'+id+'" value="'+e(t.text)+'" onkeydown="if(event.key===\'Enter\')sv(\''+id+'\');if(event.key===\'Escape\')render();" autofocus><button class="save-btn" onclick="sv(\''+id+'\')">OK</button>';
   document.getElementById('ei'+id).focus();
 }
-function sv(id){var i=document.getElementById('ei'+id);if(!i)return;var v=i.value.trim();if(!v)return;var t=tasks.find(function(t){return t.id===id;});if(t)t.text=v;render();saveTasks();}
+async function sv(id){var i=document.getElementById('ei'+id);if(!i)return;var v=i.value.trim();if(!v)return;var t=tasks.find(function(t){return t.id===id;});if(t)t.text=v;render();saveTasks(); if(supabaseClient) await updateRemoteTask(id,{text:v});}
 
 function openModal(){document.getElementById('bd').classList.add('open');setTimeout(function(){document.getElementById('new-task').focus();},80);}
 function closeModal(){document.getElementById('bd').classList.remove('open');}
@@ -375,14 +433,15 @@ function bdClick(ev){if(ev.target===document.getElementById('bd'))closeModal();}
 
 function selP(btn){document.querySelectorAll('.apb').forEach(function(b){b.classList.remove('sel');});btn.classList.add('sel');np=btn.getAttribute('data-p');}
 
-function addTask(){
+async function addTask(){
   var ce=document.getElementById('new-cat'),te=document.getElementById('new-task');
   var cat=ce.value.trim(),txt=te.value.trim();
   if(!cat){ce.style.borderColor='#C0392B';setTimeout(function(){ce.style.borderColor='';},1200);}
   if(!txt){te.style.borderColor='#C0392B';setTimeout(function(){te.style.borderColor='';},1200);}
   if(!cat||!txt)return;
-  tasks.push({id:nid++,cat:cat,text:txt,prio:np,done:false});
-  te.value='';pfc();closeModal();render();saveTasks();
+  var task={id:newId(),cat:cat,text:txt,prio:np,done:false};
+  tasks.push(task);
+  te.value='';pfc();closeModal();render();saveTasks(); if(supabaseClient) await insertRemoteTask(task);
 }
 
 function pfc(){var sp=['All','Urgent','Completed'];document.getElementById('new-cat').value=sp.indexOf(tab)<0?tab:'';}
@@ -392,6 +451,7 @@ document.getElementById('new-task').addEventListener('keydown',function(e){if(e.
 
 loadTasks();
 render();
+initSupabase();
 </script>
 
 <!-- BOTTOM BAR -->
