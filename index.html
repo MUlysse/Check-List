@@ -222,12 +222,6 @@ body{font-family:'Inter',sans-serif;background:var(--gray-bg);color:var(--black)
 <div class="tabs-wrap"><div class="tabs" id="tabs"></div></div>
 
 <div class="body-card">
-  <div class="thead">
-    <div class="th"></div>
-    <div class="th">Categorie</div>
-    <div class="th">Tache</div>
-    <div class="th-uml"><span>U</span><span>M</span><span>L</span><span></span></div>
-  </div>
   <div id="list"></div>
 </div>
 
@@ -321,10 +315,10 @@ function initSupabase(){
 async function loadTasksRemote(){
   if(!supabaseClient) return;
   setSyncState('syncing');
-  var res=await supabaseClient.from(SUPABASE_TABLE).select('id,cat,text,prio,done,today').order('created_at',{ascending:true});
+  var res=await supabaseClient.from(SUPABASE_TABLE).select('id,cat,text,prio,done').order('created_at',{ascending:true});
   if(res.error) throw res.error;
   if(Array.isArray(res.data)){
-    tasks=res.data.map(function(t){return {id:t.id,cat:t.cat,text:t.text,prio:t.prio,done:t.done,today:t.today||false};});
+    tasks=res.data.map(function(t){return {id:t.id,cat:t.cat,text:t.text,prio:t.prio,done:t.done,today:false};});
     var settingsTask = tasks.find(function(t){return t.id === 'settings';});
     if(settingsTask){
       try{
@@ -383,7 +377,7 @@ window.addEventListener('storage', function(ev){
 function sc(a,b){var ai=CO.indexOf(a.cat),bi=CO.indexOf(b.cat);if(ai<0&&bi<0)return a.cat.localeCompare(b.cat);if(ai<0)return 1;if(bi<0)return-1;return ai-bi;}
 
 function otabs(){var c=[],r=TABS.slice();tasks.forEach(function(t){if(c.indexOf(t.cat)<0)c.push(t.cat);});c.forEach(function(x){if(r.indexOf(x)<0&&x!=='Completed')r.push(x);});r.push('Completed');return r;}
-function vtabs(){return otabs().filter(function(x){if(x==='All')return true;if(x==='Aujourd\'hui')return tasks.some(function(t){return t.today&&!t.done;});if(x==='Urgent')return tasks.some(function(t){return t.prio==='U'&&!t.done;});if(x==='Completed')return tasks.some(function(t){return t.done;});return tasks.some(function(t){return t.cat===x&&!t.done;});});}
+function vtabs(){return otabs().filter(function(x){if(x==='All')return true;if(x==='Aujourd\'hui')return true;if(x==='Urgent')return tasks.some(function(t){return t.prio==='U'&&!t.done;});if(x==='Completed')return tasks.some(function(t){return t.done;});return tasks.some(function(t){return t.cat===x&&!t.done;});});}
 function tc(x){if(x==='All')return tasks.filter(function(t){return!t.done;}).length;if(x==='Aujourd\'hui')return tasks.filter(function(t){return t.today&&!t.done;}).length;if(x==='Urgent')return tasks.filter(function(t){return t.prio==='U'&&!t.done;}).length;if(x==='Completed')return tasks.filter(function(t){return t.done;}).length;return tasks.filter(function(t){return t.cat===x&&!t.done;}).length;}
 
 function render(){rTabs();rTasks();rGauge();rDl();}
