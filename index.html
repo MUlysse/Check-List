@@ -408,9 +408,23 @@ async function insertRemoteTask(task){
   if(res.error){ console.warn('Supabase insert failed',res.error); setSyncState('error'); }
   else {
     if(Array.isArray(res.data)&&res.data[0]&&res.data[0].id!==undefined&&res.data[0].id!==task.id){
-      var t=tasks.find(function(x){return x.id===task.id;});
-      if(t) t.id=res.data[0].id;
+      var oldId=task.id;
+      var newId=res.data[0].id;
+      var t=tasks.find(function(x){return x.id===oldId;});
+      if(t){ t.id=newId; saveTasks(); }
     }
+    // if the task changed while the insert was pending, reapply latest state and force a remote refresh
+    var current = tasks.find(function(x){return x.id===task.id;});
+    if(current){
+      var updatePayload={};
+      if(current.today!==payload.today) updatePayload.today=current.today;
+      if(current.doneAt!==payload.doneAt) updatePayload.doneAt=current.doneAt;
+      if(current.done!==payload.done) updatePayload.done=current.done;
+      if(current.prio!==payload.prio) updatePayload.prio=current.prio;
+      if(current.text!==payload.text) updatePayload.text=current.text;
+      if(Object.keys(updatePayload).length){ await updateRemoteTask(current.id, updatePayload); }
+    }
+    if(!res.error){ await loadTasksRemote(); }
     setSyncState();
   }
 }
@@ -425,7 +439,7 @@ async function updateRemoteTask(id,changes){
     if(/doneAt/.test(msg)) delete next.doneAt;
     if(JSON.stringify(next)!==JSON.stringify(changes)) res=await supabaseClient.from(SUPABASE_TABLE).update(next).eq('id',id);
   }
-  if(res.error){ console.warn('Supabase update failed',res.error); setSyncState('error'); } else { setSyncState(); }
+  if(res.error){ console.warn('Supabase update failed',res.error); setSyncState('error'); } else { await loadTasksRemote(); setSyncState(); }
 }
 async function deleteRemoteTask(id){
   if(!supabaseClient) return;
