@@ -439,7 +439,7 @@ async function updateRemoteTask(id,changes){
     if(/doneAt/.test(msg)) delete next.doneAt;
     if(JSON.stringify(next)!==JSON.stringify(changes)) res=await supabaseClient.from(SUPABASE_TABLE).update(next).eq('id',id);
   }
-  if(res.error){ console.warn('Supabase update failed',res.error); setSyncState('error'); } else { await loadTasksRemote(); setSyncState(); }
+  if(res.error){ console.warn('Supabase update failed',res.error); await loadTasksRemote(); setSyncState('error'); } else { await loadTasksRemote(); setSyncState(); }
 }
 async function deleteRemoteTask(id){
   if(!supabaseClient) return;
