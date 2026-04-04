@@ -272,6 +272,8 @@ var tasks=[
 ];
 var nid=19,tab='All',np='M',na=false;
 var TABS=['All','Aujourd\'hui','Urgent','Onoris','Sovereign','EDHEC','Logistique'];
+var TODAY_TAB='Aujourd\'hui';
+var SETTINGS_CAT='__settings__';
 var PO={U:0,M:1,L:2}, PL={U:'Urgent',M:'Mid-term',L:'Long term'};
 var CO=['Onoris','Sovereign','EDHEC','Logistique'];
 var STORAGE_KEY='checklistTasksV1';
@@ -315,19 +317,22 @@ function initSupabase(){
 async function loadTasksRemote(){
   if(!supabaseClient) return;
   setSyncState('syncing');
-  var res=await supabaseClient.from(SUPABASE_TABLE).select('id,cat,text,prio,done').order('created_at',{ascending:true});
+  var res=await supabaseClient.from(SUPABASE_TABLE).select('id,cat,text,prio,done,today').order('id',{ascending:true});
+  if(res.error && /today/.test(String(res.error.message||res.error))) {
+    res=await supabaseClient.from(SUPABASE_TABLE).select('id,cat,text,prio,done').order('id',{ascending:true});
+  }
   if(res.error) throw res.error;
   if(Array.isArray(res.data)){
-    tasks=res.data.map(function(t){return {id:t.id,cat:t.cat,text:t.text,prio:t.prio,done:t.done,today:false};});
-    var settingsTask = tasks.find(function(t){return t.id === 'settings';});
+    tasks=res.data.map(function(t){return {id:t.id,cat:t.cat,text:t.text,prio:t.prio,done:t.done,today:t.today||false};});
+    var settingsTask = tasks.find(function(t){return t.cat === SETTINGS_CAT;});
     if(settingsTask){
       try{
         var s = JSON.parse(settingsTask.text);
         if(Array.isArray(s.tabs)) TABS = s.tabs;
-        CO = TABS.filter(function(x){return !['All','Urgent','Completed','Aujourd\'hui'].includes(x);});
+        CO = TABS.filter(function(x){return !['All','Urgent','Completed',TODAY_TAB].includes(x);});
       }catch(e){}
     }
-    tasks = tasks.filter(function(t){return t.id !== 'settings';});
+    tasks = tasks.filter(function(t){return t.cat !== SETTINGS_CAT;});
     saveTasks();
     render();
   }
@@ -336,13 +341,30 @@ async function loadTasksRemote(){
 async function insertRemoteTask(task){
   if(!supabaseClient) return;
   setSyncState('syncing');
-  var res=await supabaseClient.from(SUPABASE_TABLE).insert([task]);
-  if(res.error){ console.warn('Supabase insert failed',res.error); setSyncState('error'); } else { setSyncState(); }
+  var payload={cat:task.cat,text:task.text,prio:task.prio,done:task.done,today:task.today};
+  var res=await supabaseClient.from(SUPABASE_TABLE).insert([payload]).select();
+  if(res.error && /today/.test(String(res.error.message||res.error))){
+    delete payload.today;
+    res=await supabaseClient.from(SUPABASE_TABLE).insert([payload]).select();
+  }
+  if(res.error){ console.warn('Supabase insert failed',res.error); setSyncState('error'); }
+  else {
+    if(Array.isArray(res.data)&&res.data[0]&&res.data[0].id!==undefined&&res.data[0].id!==task.id){
+      var t=tasks.find(function(x){return x.id===task.id;});
+      if(t) t.id=res.data[0].id;
+    }
+    setSyncState();
+  }
 }
 async function updateRemoteTask(id,changes){
   if(!supabaseClient) return;
   setSyncState('syncing');
   var res=await supabaseClient.from(SUPABASE_TABLE).update(changes).eq('id',id);
+  if(res.error && changes.today!==undefined && /today/.test(String(res.error.message||res.error))){
+    var next = Object.assign({},changes);
+    delete next.today;
+    res=await supabaseClient.from(SUPABASE_TABLE).update(next).eq('id',id);
+  }
   if(res.error){ console.warn('Supabase update failed',res.error); setSyncState('error'); } else { setSyncState(); }
 }
 async function deleteRemoteTask(id){
@@ -368,41 +390,43 @@ window.addEventListener('storage', function(ev){
       nid=typeof data.nid==='number'&&data.nid>0?data.nid:1;
       if(typeof data.tab==='string')tab=data.tab;
       if(Array.isArray(data.tabs))TABS=data.tabs;
-      CO = TABS.filter(x => !['All','Urgent','Completed','Aujourd\'hui'].includes(x));
+      CO = TABS.filter(x => !['All','Urgent','Completed',TODAY_TAB].includes(x));
       render();
     }
   }catch(e){}
 });
 
 function sc(a,b){var ai=CO.indexOf(a.cat),bi=CO.indexOf(b.cat);if(ai<0&&bi<0)return a.cat.localeCompare(b.cat);if(ai<0)return 1;if(bi<0)return-1;return ai-bi;}
+function normalizeTab(x){return String(x||'').replace(/[\u2018\u2019\u201B\u2032]/g, "'");}
+function isTodayTab(x){return normalizeTab(x)===TODAY_TAB;}
 
 function otabs(){var c=[],r=TABS.slice();tasks.forEach(function(t){if(c.indexOf(t.cat)<0)c.push(t.cat);});c.forEach(function(x){if(r.indexOf(x)<0&&x!=='Completed')r.push(x);});r.push('Completed');return r;}
-function vtabs(){return otabs().filter(function(x){if(x==='All')return true;if(x==='Aujourd\'hui')return true;if(x==='Urgent')return tasks.some(function(t){return t.prio==='U'&&!t.done;});if(x==='Completed')return tasks.some(function(t){return t.done;});return tasks.some(function(t){return t.cat===x&&!t.done;});});}
-function tc(x){if(x==='All')return tasks.filter(function(t){return!t.done;}).length;if(x==='Aujourd\'hui')return tasks.filter(function(t){return t.today&&!t.done;}).length;if(x==='Urgent')return tasks.filter(function(t){return t.prio==='U'&&!t.done;}).length;if(x==='Completed')return tasks.filter(function(t){return t.done;}).length;return tasks.filter(function(t){return t.cat===x&&!t.done;}).length;}
+function vtabs(){return otabs().filter(function(x){if(x==='All')return true;if(isTodayTab(x))return true;if(x==='Urgent')return tasks.some(function(t){return t.prio==='U'&&!t.done;});if(x==='Completed')return tasks.some(function(t){return t.done;});return tasks.some(function(t){return t.cat===x&&!t.done;});});}
+function tc(x){if(x==='All')return tasks.filter(function(t){return!t.done;}).length;if(isTodayTab(x))return tasks.filter(function(t){return t.today&&!t.done;}).length;if(x==='Urgent')return tasks.filter(function(t){return t.prio==='U'&&!t.done;}).length;if(x==='Completed')return tasks.filter(function(t){return t.done;}).length;return tasks.filter(function(t){return t.cat===x&&!t.done;}).length;}
 
 function render(){rTabs();rTasks();rGauge();rDl();}
 
 function rTabs(){var ts=vtabs();if(ts.indexOf(tab)<0)tab='All';var h='';ts.forEach(function(x){h+='<div class="tab'+(tab===x?' active':'')+'" data-tab="'+x+'" onclick="setTab(\''+x+'\')" draggable="true" ondragstart="dragStart(event)" ondragover="dragOver(event)" ondrop="drop(event)">'+x+'<span class="tab-badge">'+tc(x)+'</span></div>';});document.getElementById('tabs').innerHTML=h;}
 
 var draggedTab = null;
-function dragStart(e) { draggedTab = e.target; e.dataTransfer.effectAllowed = 'move'; }
+function dragStart(e) { draggedTab = e.target.closest('.tab'); if(draggedTab){ e.dataTransfer.effectAllowed = 'move'; }}
 function dragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; }
 async function saveSettingsRemote(){
   if(!supabaseClient) return;
-  var settingsTask = tasks.find(function(t){return t.id === 'settings';});
   var settingsData = JSON.stringify({tabs: TABS});
+  var settingsTask = tasks.find(function(t){return t.cat === SETTINGS_CAT;});
   if(!settingsTask){
-    settingsTask = {id: 'settings', cat: '', text: settingsData, prio: 'L', done: false, today: false};
+    settingsTask = {id:newId(), cat:SETTINGS_CAT, text:settingsData, prio:'L', done:true, today:false};
     tasks.push(settingsTask);
     await insertRemoteTask(settingsTask);
   } else {
     settingsTask.text = settingsData;
-    await updateRemoteTask('settings', {text: settingsData});
+    await updateRemoteTask(settingsTask.id,{text:settingsData});
   }
 }
-function drop(e) { e.preventDefault(); var target = e.target.closest('.tab'); if(target && target !== draggedTab) { var fromTab = draggedTab.getAttribute('data-tab'); var toTab = target.getAttribute('data-tab'); var fromIndex = TABS.indexOf(fromTab); var toIndex = TABS.indexOf(toTab); if(fromIndex !== -1 && toIndex !== -1) { var item = TABS.splice(fromIndex, 1)[0]; TABS.splice(toIndex, 0, item); CO = TABS.filter(x => !['All','Urgent','Completed','Aujourd\'hui'].includes(x)); render(); saveTasks(); saveSettingsRemote(); } } }
+function drop(e) { e.preventDefault(); var target = e.target.closest('.tab'); if(target && draggedTab && target !== draggedTab) { var fromTab = draggedTab.getAttribute('data-tab'); var toTab = target.getAttribute('data-tab'); var fromIndex = TABS.indexOf(fromTab); var toIndex = TABS.indexOf(toTab); if(fromIndex !== -1 && toIndex !== -1) { var item = TABS.splice(fromIndex, 1)[0]; TABS.splice(toIndex, 0, item); CO = TABS.filter(x => !['All','Urgent','Completed',TODAY_TAB].includes(x)); render(); saveTasks(); saveSettingsRemote(); } } }
 
-function gf(){if(tab==='All')return tasks.filter(function(t){return!t.done;});if(tab==='Aujourd\'hui')return tasks.filter(function(t){return t.today&&!t.done;});if(tab==='Urgent')return tasks.filter(function(t){return t.prio==='U'&&!t.done;});if(tab==='Completed')return tasks.filter(function(t){return t.done;});return tasks.filter(function(t){return t.cat===tab&&!t.done;});}
+function gf(){if(tab==='All')return tasks.filter(function(t){return!t.done;});if(isTodayTab(tab))return tasks.filter(function(t){return t.today&&!t.done;});if(tab==='Urgent')return tasks.filter(function(t){return t.prio==='U'&&!t.done;});if(tab==='Completed')return tasks.filter(function(t){return t.done;});return tasks.filter(function(t){return t.cat===tab&&!t.done;});}
 
 function rTasks(){
   var el=document.getElementById('list'),rows=gf();
