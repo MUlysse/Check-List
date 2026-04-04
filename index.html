@@ -96,7 +96,7 @@ body{font-family:'Inter',sans-serif;background:var(--gray-bg);color:var(--black)
 .cat-grp:first-child .cat-sep{border-top:1px solid var(--border-lt);}
 
 /* ROWS */
-.row{display:grid;grid-template-columns:40px 140px 1fr 116px;align-items:center;padding:0 16px;gap:8px;min-height:52px;border-bottom:1px solid var(--border-lt);transition:background .1s;}
+.row{display:grid;grid-template-columns:34px 120px 1fr 116px;align-items:center;padding:0 16px;gap:6px;min-height:52px;border-bottom:1px solid var(--border-lt);transition:background .1s;}
 .row.sa{background:var(--stripe-a);} .row.sb{background:var(--stripe-b);}
 .row:hover{background:var(--crimson-lt)!important;}
 .row.done .rt{text-decoration:line-through;color:var(--gray-md);}
@@ -115,8 +115,6 @@ body{font-family:'Inter',sans-serif;background:var(--gray-bg);color:var(--black)
 .save-btn{background:var(--crimson);color:white;border:none;cursor:pointer;font-size:11px;font-weight:700;padding:3px 9px;border-radius:3px;}
 .act{display:grid;grid-template-columns:28px 28px 28px 28px 28px;align-items:center;gap:3px;justify-items:center;}
 .pb{font-size:10.5px;font-weight:800;width:28px;height:26px;border-radius:5px;border:1.5px solid;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .12s;background:transparent;flex-shrink:0;}
-.del{width:28px;height:28px;border:none;background:transparent;color:var(--gray-md);font-size:16px;line-height:1;cursor:pointer;border-radius:5px;display:flex;align-items:center;justify-content:center;transition:color .15s;}
-.del:hover{color:var(--crimson);}
 .pb.U{border-color:#EAB5AF;color:#C0392B;} .pb.U.on{background:var(--red);border-color:var(--red);color:white;} .pb.U:not(.on):hover{background:var(--red-bg);}
 .pb.M{border-color:#8EC4A4;color:#1A6B3A;} .pb.M.on{background:var(--grn);border-color:var(--grn);color:white;} .pb.M:not(.on):hover{background:var(--grn-bg);}
 .pb.A{border-color:#000;color:#000;} .pb.A.on{background:#000;border-color:#000;color:white;} .pb.A:not(.on):hover{background:var(--gray-bg);}
@@ -285,6 +283,7 @@ var SUPABASE_URL='https://xvwfxmzdjmnyewunvtxk.supabase.co';
 var SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh2d2Z4bXpkam1ueWV3dW52dHhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5Nzg5MzQsImV4cCI6MjA5MDU1NDkzNH0.3yn_kqynOjAmiX_QFMG12nNDrJ73QQZLPm3ObqqF8d0';
 var SUPABASE_TABLE='tasks';
 var supabaseClient=null;
+var deleteTimers={};
 
 function loadTasks(){
   var stored=localStorage.getItem(STORAGE_KEY);
@@ -299,9 +298,39 @@ function loadTasks(){
       }
     }catch(e){}
   }
+  // Ensure all task categories are in TABS
+  var cats = [];
+  tasks.forEach(function(t){ if(cats.indexOf(t.cat)<0) cats.push(t.cat); });
+  cats.forEach(function(c){ if(TABS.indexOf(c)<0 && c !== 'Completed') TABS.push(c); });
+  CO = TABS.filter(x => !['All','Urgent','Completed',TODAY_TAB].includes(x));
 }
 function saveTasks(){
   try{localStorage.setItem(STORAGE_KEY, JSON.stringify({tasks:tasks.filter(function(t){return t.cat!==SETTINGS_CAT;}),nid:nid,tab:tab,tabs:TABS}));}catch(e){}
+}
+function clearAutoDelete(id){
+  if(deleteTimers[id]){ clearTimeout(deleteTimers[id]); delete deleteTimers[id]; }
+}
+function scheduleAutoDelete(task){
+  clearAutoDelete(task.id);
+  if(!task.done) return;
+  if(!task.doneAt) task.doneAt = Date.now();
+  var delay = 24*60*60*1000 - (Date.now() - Number(task.doneAt || 0));
+  if(delay <= 0){ autoDeleteTask(task.id); return; }
+  deleteTimers[task.id] = setTimeout(function(){ autoDeleteTask(task.id); }, delay);
+}
+function autoDeleteTask(id){
+  var t = tasks.find(function(t){return t.id===id;});
+  if(!t||!t.done) return;
+  var elapsed = Date.now() - Number(t.doneAt || 0);
+  if(elapsed < 24*60*60*1000){ scheduleAutoDelete(t); return; }
+  tasks = tasks.filter(function(t){return t.id!==id;});
+  clearAutoDelete(id);
+  render();
+  saveTasks();
+  if(supabaseClient) deleteRemoteTask(id);
+}
+function scheduleAllAutoDelete(){
+  tasks.forEach(function(t){ if(t.done) scheduleAutoDelete(t); });
 }
 function newId(){
   if(window.crypto&&crypto.randomUUID) return crypto.randomUUID();
@@ -322,36 +351,59 @@ function initSupabase(){
 async function loadTasksRemote(){
   if(!supabaseClient) return;
   setSyncState('syncing');
-  var res=await supabaseClient.from(SUPABASE_TABLE).select('id,cat,text,prio,done,today').order('id',{ascending:true});
-  if(res.error && /today/.test(String(res.error.message||res.error))) {
-    res=await supabaseClient.from(SUPABASE_TABLE).select('id,cat,text,prio,done').order('id',{ascending:true});
-  }
+  var localById = {};
+  tasks.forEach(function(t){ localById[t.id] = t; });
+  var res=await supabaseClient.from(SUPABASE_TABLE).select().order('id',{ascending:true});
   if(res.error) throw res.error;
   if(Array.isArray(res.data)){
-    var rows = res.data.map(function(t){return {id:t.id,cat:t.cat,text:t.text,prio:t.prio,done:t.done,today:t.today||false};});
+    var rows = res.data.map(function(t){
+      var doneAt = typeof t.doneAt==='number'?t.doneAt:(typeof t.doneAt==='string'?parseInt(t.doneAt,10):undefined);
+      return {id:t.id,cat:t.cat,text:t.text,prio:t.prio,done:t.done,today:t.today||false,doneAt:doneAt};
+    });
     var settingsTask = rows.find(function(t){return t.cat === SETTINGS_CAT;});
     if(settingsTask){
       settingsId = settingsTask.id;
       try{
         var s = JSON.parse(settingsTask.text);
         if(Array.isArray(s.tabs)) TABS = s.tabs;
+        if(typeof s.tab === 'string') tab = s.tab;
         CO = TABS.filter(function(x){return !['All','Urgent','Completed',TODAY_TAB].includes(x);});
       }catch(e){}
     }
-    tasks = rows.filter(function(t){return t.cat !== SETTINGS_CAT;});
+    var merged = rows.map(function(rt){
+      var local = localById[rt.id];
+      if(local){
+        if(local.today && !rt.today) rt.today = local.today;
+        if(local.doneAt && !rt.doneAt) rt.doneAt = local.doneAt;
+        delete localById[rt.id];
+      }
+      return rt;
+    });
+    Object.keys(localById).forEach(function(id){ merged.push(localById[id]); });
+    tasks = merged.filter(function(t){return t.cat !== SETTINGS_CAT;});
+    // Ensure all task categories are in TABS
+    var cats = [];
+    tasks.forEach(function(t){ if(cats.indexOf(t.cat)<0) cats.push(t.cat); });
+    cats.forEach(function(c){ if(TABS.indexOf(c)<0 && c !== 'Completed') TABS.push(c); });
+    CO = TABS.filter(function(x){return !['All','Urgent','Completed',TODAY_TAB].includes(x);});
     saveTasks();
     render();
+    scheduleAllAutoDelete();
   }
   setSyncState();
 }
 async function insertRemoteTask(task){
   if(!supabaseClient) return;
   setSyncState('syncing');
-  var payload={cat:task.cat,text:task.text,prio:task.prio,done:task.done,today:task.today};
+  var payload={cat:task.cat,text:task.text,prio:task.prio,done:task.done};
+  if(task.today!==undefined) payload.today=task.today;
+  if(task.doneAt!==undefined) payload.doneAt=task.doneAt;
   var res=await supabaseClient.from(SUPABASE_TABLE).insert([payload]).select();
-  if(res.error && /today/.test(String(res.error.message||res.error))){
-    delete payload.today;
-    res=await supabaseClient.from(SUPABASE_TABLE).insert([payload]).select();
+  if(res.error){
+    var msg=String(res.error.message||res.error);
+    if(/today/.test(msg)) delete payload.today;
+    if(/doneAt/.test(msg)) delete payload.doneAt;
+    if(/today/.test(msg)||/doneAt/.test(msg)) res=await supabaseClient.from(SUPABASE_TABLE).insert([payload]).select();
   }
   if(res.error){ console.warn('Supabase insert failed',res.error); setSyncState('error'); }
   else {
@@ -366,10 +418,12 @@ async function updateRemoteTask(id,changes){
   if(!supabaseClient) return;
   setSyncState('syncing');
   var res=await supabaseClient.from(SUPABASE_TABLE).update(changes).eq('id',id);
-  if(res.error && changes.today!==undefined && /today/.test(String(res.error.message||res.error))){
+  if(res.error){
+    var msg=String(res.error.message||res.error);
     var next = Object.assign({},changes);
-    delete next.today;
-    res=await supabaseClient.from(SUPABASE_TABLE).update(next).eq('id',id);
+    if(/today/.test(msg)) delete next.today;
+    if(/doneAt/.test(msg)) delete next.doneAt;
+    if(JSON.stringify(next)!==JSON.stringify(changes)) res=await supabaseClient.from(SUPABASE_TABLE).update(next).eq('id',id);
   }
   if(res.error){ console.warn('Supabase update failed',res.error); setSyncState('error'); } else { setSyncState(); }
 }
@@ -398,6 +452,7 @@ window.addEventListener('storage', function(ev){
       if(Array.isArray(data.tabs))TABS=data.tabs;
       CO = TABS.filter(x => !['All','Urgent','Completed',TODAY_TAB].includes(x));
       render();
+      scheduleAllAutoDelete();
     }
   }catch(e){}
 });
@@ -429,7 +484,7 @@ function dragEnter(e){ var t = e.target.closest('.tab'); if(t && t !== draggedTa
 function dragLeave(e){ var t = e.target.closest('.tab'); if(t && t !== draggedTab){ t.classList.remove('drag-over'); if(dropTarget===t) dropTarget=null; }}
 async function saveSettingsRemote(){
   if(!supabaseClient) return;
-  var settingsData = JSON.stringify({tabs: TABS});
+  var settingsData = JSON.stringify({tabs: TABS, tab: tab});
   var payload={cat:SETTINGS_CAT,text:settingsData,prio:'L',done:true};
   if(settingsId){
     await updateRemoteTask(settingsId,{text:settingsData});
@@ -465,7 +520,6 @@ function rh(t,hc,s){
     +'<button class="pb U'+(t.prio==='U'?' on':'')+'" onclick="sp(\''+t.id+'\',\'U\')">U</button>'
     +'<button class="pb M'+(t.prio==='M'?' on':'')+'" onclick="sp(\''+t.id+'\',\'M\')">M</button>'
     +'<button class="pb L'+(t.prio==='L'?' on':'')+'" onclick="sp(\''+t.id+'\',\'L\')">L</button>'
-    +'<button class="del" onclick="dt(\''+t.id+'\')">&#10005;</button>'
     +'</div></div>';
 }
 
@@ -475,9 +529,9 @@ function rGauge(){var tot=tasks.length,dn=tasks.filter(function(t){return t.done
 
 function rDl(){var c=[];tasks.forEach(function(t){if(c.indexOf(t.cat)<0)c.push(t.cat);});document.getElementById('cl').innerHTML=c.map(function(x){return'<option value="'+e(x)+'">';}).join('');}
 
-function setTab(x){if(ignoreClick){ignoreClick=false;return;}tab=x;render();pfc();saveTasks();}
-async function tgl(id,v){var t=tasks.find(function(t){return t.id===id;});if(t){t.done=v;}render();saveTasks(); if(supabaseClient) await updateRemoteTask(id,{done:v});}
-async function sp(id,p){var t=tasks.find(function(t){return t.id===id;});if(t){t.prio=p;t.done=false;}render();saveTasks(); if(supabaseClient) await updateRemoteTask(id,{prio:p,done:false});}
+function setTab(x){if(ignoreClick){ignoreClick=false;return;}tab=x;render();pfc();saveTasks();saveSettingsRemote();}
+async function tgl(id,v){var t=tasks.find(function(t){return t.id===id;});if(t){t.done=v;if(v){t.doneAt=Date.now();scheduleAutoDelete(t);}else{delete t.doneAt;clearAutoDelete(id);}}render();saveTasks(); if(supabaseClient) await updateRemoteTask(id,{done:v,doneAt:v?t.doneAt:null});}
+async function sp(id,p){var t=tasks.find(function(t){return t.id===id;});if(t){t.prio=p;t.done=false;delete t.doneAt;clearAutoDelete(id);}render();saveTasks(); if(supabaseClient) await updateRemoteTask(id,{prio:p,done:false,doneAt:null});}
 async function st(id){var t=tasks.find(function(t){return t.id===id;});if(t){t.today=!t.today;}render();saveTasks(); if(supabaseClient) await updateRemoteTask(id,{today:t.today});}
 async function dt(id){tasks=tasks.filter(function(t){return t.id!==id;});render();saveTasks(); if(supabaseClient) await deleteRemoteTask(id);}
 
@@ -503,7 +557,7 @@ async function addTask(){
   if(!cat){ce.style.borderColor='#C0392B';setTimeout(function(){ce.style.borderColor='';},1200);}
   if(!txt){te.style.borderColor='#C0392B';setTimeout(function(){te.style.borderColor='';},1200);}
   if(!cat||!txt)return;
-  var task={id:newId(),cat:cat,text:txt,prio:np,done:false,today:na};
+  var task={id:newId(),cat:cat,text:txt,prio:np,done:false,today:na,doneAt:undefined};
   tasks.push(task);
   te.value='';na=false;pfc();closeModal();render();saveTasks(); if(supabaseClient) await insertRemoteTask(task);
 }
@@ -514,6 +568,7 @@ document.addEventListener('keydown',function(e){if(e.ctrlKey&&e.key==='r'){e.pre
 document.getElementById('new-task').addEventListener('keydown',function(e){if(e.key==='Enter')addTask();});
 
 loadTasks();
+scheduleAllAutoDelete();
 render();
 initSupabase();
 </script>
