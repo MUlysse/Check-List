@@ -143,6 +143,13 @@ body{font-family:'Inter',sans-serif;background:var(--gray-bg);color:var(--black)
 .add-btn{font-family:'Inter',sans-serif;font-size:11.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;background:var(--crimson);color:white;border:none;border-radius:4px;padding:0 22px;height:42px;cursor:pointer;transition:background .15s;white-space:nowrap;flex-shrink:0;}
 .add-btn:hover{background:var(--crimson-dk);}
 
+/* LOGIN MODAL */
+.login-modal .modal-row { display: flex; flex-direction: column; gap: 12px; }
+.modal-input { font-family:'Inter',sans-serif; font-size:16px; border:1.5px solid var(--border); border-radius:4px; padding:9px 12px; background:white; outline:none; color:var(--black); transition:border-color .15s; height:42px; width:100%; box-sizing:border-box; }
+.modal-input:focus { border-color:var(--crimson); }
+.modal-input::placeholder { color:var(--gray-lt); }
+.login-error { color: var(--red); font-size: 14px; text-align: center; }
+
 /* FAB */
 .fab{position:fixed;bottom:28px;right:22px;width:54px;height:54px;border-radius:50%;background:var(--crimson);color:white;border:none;font-size:28px;font-weight:300;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:90;line-height:1;transition:background .15s;}
 .fab:hover{background:var(--crimson);transform:none;}
@@ -251,6 +258,21 @@ body{font-family:'Inter',sans-serif;background:var(--gray-bg);color:var(--black)
   </div>
 </div>
 
+<!-- LOGIN OVERLAY -->
+<div id="login-backdrop" class="backdrop">
+  <div class="modal login-modal">
+    <div class="modal-title">Connexion <button class="modal-close" onclick="closeLogin()">&times;</button></div>
+    <div class="modal-row">
+      <input type="email" id="login-email" placeholder="Email" class="modal-input">
+      <input type="password" id="login-password" placeholder="Mot de passe" class="modal-input">
+    </div>
+    <div class="modal-row">
+      <button class="add-btn" onclick="login()">Se connecter</button>
+    </div>
+    <div id="login-error" class="login-error"></div>
+  </div>
+</div>
+
 <script>
 var tasks=[
   {id:1, cat:'Onoris',    text:"Finaliser l'article Dubai Resilience",              prio:'U',done:false},
@@ -283,8 +305,46 @@ var STORAGE_KEY='checklistTasksV1';
 var SUPABASE_URL='https://xvwfxmzdjmnyewunvtxk.supabase.co';
 var SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh2d2Z4bXpkam1ueWV3dW52dHhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5Nzg5MzQsImV4cCI6MjA5MDU1NDkzNH0.3yn_kqynOjAmiX_QFMG12nNDrJ73QQZLPm3ObqqF8d0';
 var SUPABASE_TABLE='tasks';
-var supabaseClient=null;
+var supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 var deleteTimers={};
+
+async function checkSession() {
+  if (!supabaseClient) return false;
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  return !!session;
+}
+
+function showLogin() {
+  document.getElementById('login-backdrop').classList.add('open');
+  document.getElementById('login-email').focus();
+}
+
+function closeLogin() {
+  document.getElementById('login-backdrop').classList.remove('open');
+  document.getElementById('login-error').textContent = '';
+}
+
+async function login() {
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value.trim();
+  if (!email || !password) return;
+
+  document.getElementById('login-error').textContent = 'Connexion en cours...';
+  const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+  if (error) {
+    document.getElementById('login-error').textContent = error.message;
+  } else {
+    closeLogin();
+    initApp();
+  }
+}
+
+async function initApp() {
+  loadTasks();
+  scheduleAllAutoDelete();
+  render();
+  initSupabase();
+}
 
 function loadTasks(){
   var stored=localStorage.getItem(STORAGE_KEY);
@@ -344,17 +404,18 @@ function setSyncState(state){
   if(state) d.classList.add(state);
 }
 function initSupabase(){
-  if(!window.supabase) return;
-  supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+  if(!supabaseClient) return;
   setSyncState('syncing');
   loadTasksRemote().then(function(){ setSyncState(); }).catch(function(e){ console.warn('Supabase load failed',e); setSyncState('error'); }).finally(function(){ subscribeToRemoteChanges(); });
 }
 async function loadTasksRemote(){
   if(!supabaseClient) return;
   setSyncState('syncing');
+  const { data: { user } } = await supabaseClient.auth.getUser();
+  if (!user) return;
   var localById = {};
   tasks.forEach(function(t){ localById[t.id] = t; });
-  var res=await supabaseClient.from(SUPABASE_TABLE).select().order('id',{ascending:true});
+  var res=await supabaseClient.from(SUPABASE_TABLE).select().eq('user_id', user.id).order('id',{ascending:true});
   if(res.error) throw res.error;
   if(Array.isArray(res.data)){
     var rows = res.data.map(function(t){
@@ -396,7 +457,9 @@ async function loadTasksRemote(){
 async function insertRemoteTask(task){
   if(!supabaseClient) return;
   setSyncState('syncing');
-  var payload={cat:task.cat,text:task.text,prio:task.prio,done:task.done};
+  const { data: { user } } = await supabaseClient.auth.getUser();
+  if (!user) return;
+  var payload={cat:task.cat,text:task.text,prio:task.prio,done:task.done,user_id:user.id};
   if(task.today!==undefined) payload.today=task.today;
   if(task.doneAt!==undefined) payload.doneAt=task.doneAt;
   var res=await supabaseClient.from(SUPABASE_TABLE).insert([payload]).select();
@@ -499,8 +562,10 @@ function dragEnter(e){ var t = e.target.closest('.tab'); if(t && t !== draggedTa
 function dragLeave(e){ var t = e.target.closest('.tab'); if(t && t !== draggedTab){ t.classList.remove('drag-over'); if(dropTarget===t) dropTarget=null; }}
 async function saveSettingsRemote(){
   if(!supabaseClient) return;
+  const { data: { user } } = await supabaseClient.auth.getUser();
+  if (!user) return;
   var settingsData = JSON.stringify({tabs: TABS, tab: tab});
-  var payload={cat:SETTINGS_CAT,text:settingsData,prio:'L',done:true};
+  var payload={cat:SETTINGS_CAT,text:settingsData,prio:'L',done:true,user_id:user.id};
   if(settingsId){
     await updateRemoteTask(settingsId,{text:settingsData});
   } else {
@@ -581,11 +646,18 @@ function pfc(){var sp=['All','Urgent','Completed'];document.getElementById('new-
 
 document.addEventListener('keydown',function(e){if(e.ctrlKey&&e.key==='r'){e.preventDefault();location.reload();}if(e.key==='Escape')closeModal();});
 document.getElementById('new-task').addEventListener('keydown',function(e){if(e.key==='Enter')addTask();});
+document.getElementById('login-email').addEventListener('keydown',function(e){if(e.key==='Enter')document.getElementById('login-password').focus();});
+document.getElementById('login-password').addEventListener('keydown',function(e){if(e.key==='Enter')login();});
 
-loadTasks();
-scheduleAllAutoDelete();
-render();
-initSupabase();
+// Check session on load
+(async function() {
+  const hasSession = await checkSession();
+  if (hasSession) {
+    initApp();
+  } else {
+    showLogin();
+  }
+})();
 </script>
 
 <!-- BOTTOM BAR -->
