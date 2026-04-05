@@ -31,6 +31,7 @@
   --red:#C0392B; --red-bg:#FBEEEC;
   --grn:#1A6B3A; --grn-bg:#E8F5EE;
   --blu:#1A4A7A; --blu-bg:#E8EFF8;
+  --purple:#7D5BFF;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 html,body{overflow-x:hidden;}
@@ -42,6 +43,7 @@ body{font-family:'Inter',sans-serif;background:var(--gray-bg);color:var(--black)
 .tb-left{display:flex;align-items:center;gap:10px;}
 .tb-logo{width:22px;height:22px;border-radius:4px;object-fit:cover;flex-shrink:0;}
 .tb-title{font-size:12px;font-weight:600;color:rgba(255,255,255,.7);letter-spacing:.12em;text-transform:uppercase;}
+.tb-left{display:flex;align-items:center;gap:10px;}
 .tb-right{display:flex;align-items:center;gap:6px;}
 .sync-dot{width:6px;height:6px;border-radius:50%;background:#6EE7A8;flex-shrink:0;}
 .sync-dot.syncing{background:#F0C040;animation:blink .8s infinite;}
@@ -75,10 +77,10 @@ body{font-family:'Inter',sans-serif;background:var(--gray-bg);color:var(--black)
 .tab.active{color:var(--crimson);border-bottom-color:var(--crimson);}
 .tab-badge{font-size:10px;font-weight:700;background:var(--gray-lt);color:var(--gray-md);border-radius:9px;padding:1px 6px;line-height:1.7;}
 .tab.active .tab-badge{background:var(--crimson);color:white;}
-.view-bar{display:flex;gap:10px;padding:14px 16px 12px;background:var(--white);border-bottom:1px solid var(--border);}
-.view-btn{flex:1;border:1px solid var(--border);border-radius:999px;background:transparent;color:var(--black);padding:.8rem 1rem;font-weight:600;cursor:pointer;transition:all .2s ease;}
-.view-btn.active{background:var(--purple);color:#fff;border-color:transparent;box-shadow:0 8px 20px rgba(100,48,255,.12);}
-.view-btn:hover{background:rgba(142,92,255,.08);}
+.view-bar{display:flex;gap:10px;padding:0;align-items:center;}
+.view-btn{flex:1;display:inline-flex;align-items:center;justify-content:center;min-height:28px;border:1px solid rgba(255,255,255,.7);border-radius:999px;background:rgba(255,255,255,.08);color:#fff;padding:0 .95rem;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s ease;text-transform:uppercase;letter-spacing:.08em;}
+.view-btn.active{background:rgba(255,255,255,.18);color:#fff;border-color:#fff;}
+.view-btn:hover{background:rgba(255,255,255,.22);}
 .book-card{display:flex;gap:12px;align-items:flex-start;padding:14px 12px;border:1px solid var(--border);border-radius:16px;margin-bottom:14px;box-shadow:0 1px 1px rgba(0,0,0,.02);background:#fff;}
 .book-cover{width:80px;height:110px;border-radius:14px;background:var(--white);box-shadow:0 2px 10px rgba(0,0,0,.04);object-fit:cover;flex-shrink:0;}
 .book-info{flex:1;min-width:0;display:grid;row-gap:8px;}
@@ -226,6 +228,12 @@ body{font-family:'Inter',sans-serif;background:var(--gray-bg);color:var(--black)
 <div class="wrap">
 
 <div class="top-bar">
+  <div class="tb-left">
+    <div class="view-bar">
+      <button class="view-btn active" data-view="Checklist" onclick="setView('Checklist')">Checklist</button>
+      <button class="view-btn" data-view="Books" onclick="setView('Books')">Books</button>
+    </div>
+  </div>
   <div class="tb-right">
     <div class="sync-dot" id="sync-dot"></div>
     <button class="tb-btn" onclick="location.reload()" title="Ctrl+R">&#8635;</button>
@@ -241,14 +249,9 @@ body{font-family:'Inter',sans-serif;background:var(--gray-bg);color:var(--black)
     </div>
   </div>
   <div class="h-right">
-    <div class="prog-label"><em id="dn">0</em> / <span id="tot">0</span> faites</div>
+    <div class="prog-label"><em id="dn">0</em> / <span id="tot">0</span> <span id="gauge-label">faites</span></div>
     <div class="gauge" id="gauge"></div>
   </div>
-</div>
-
-<div class="view-bar">
-  <button class="view-btn active" data-view="Checklist" onclick="setView('Checklist')">Checklist</button>
-  <button class="view-btn" data-view="Books" onclick="setView('Books')">Books</button>
 </div>
 
 <div class="tabs-wrap"><div class="tabs" id="tabs"></div></div>
@@ -411,6 +414,8 @@ function loadTasks(){
         if(typeof data.tab==='string')tab=data.tab;
         if(Array.isArray(data.tabs))TABS=data.tabs;
       }
+      if(Array.isArray(data.books)) books=data.books;
+      if(typeof data.view==='string') currentView=data.view;
     }catch(e){}
   }
   // Ensure all task categories are in TABS
@@ -420,7 +425,7 @@ function loadTasks(){
   CO = TABS.filter(x => !['All','Urgent','Completed',TODAY_TAB].includes(x));
 }
 function saveTasks(){
-  try{localStorage.setItem(STORAGE_KEY, JSON.stringify({tasks:tasks.filter(function(t){return t.cat!==SETTINGS_CAT;}),nid:nid,tab:tab,tabs:TABS}));}catch(e){}
+  try{localStorage.setItem(STORAGE_KEY, JSON.stringify({tasks:tasks.filter(function(t){return t.cat!==SETTINGS_CAT;}),nid:nid,tab:tab,tabs:TABS,books:books,view:currentView}));}catch(e){}
 }
 function clearAutoDelete(id){
   if(deleteTimers[id]){ clearTimeout(deleteTimers[id]); delete deleteTimers[id]; }
@@ -582,7 +587,7 @@ async function deleteRemoteTask(id){
   if(!supabaseClient) return;
   setSyncState('syncing');
   var res=await supabaseClient.from(SUPABASE_TABLE).delete().eq('id',id);
-  if(res.error){ console.warn('Supabase delete failed',res.error); setSyncState('error'); } else { setSyncState(); }
+  if(res.error){ console.warn('Supabase delete failed',res.error); setSyncState('error'); } else { await loadTasksRemote(); setSyncState(); }
 }
 function subscribeToRemoteChanges(){
   if(!supabaseClient) return;
@@ -704,12 +709,28 @@ function rh(t,hc,s){
 
 function e(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
-function rGauge(){var tot=tasks.length,dn=tasks.filter(function(t){return t.done;}).length;document.getElementById('dn').textContent=dn;document.getElementById('tot').textContent=tot;var f=tot?Math.round(dn/tot*20):0,h='';for(var i=0;i<20;i++)h+='<div class="gauge-seg'+(i<f?' on':'')+'"></div>';document.getElementById('gauge').innerHTML=h;}
+function rGauge(){
+  var tot, dn;
+  if(currentView==='Books'){
+    tot = books.length;
+    dn = books.filter(function(b){return b.status==='read';}).length;
+    document.getElementById('gauge-label').textContent = 'lus';
+  } else {
+    tot = tasks.length;
+    dn = tasks.filter(function(t){return t.done;}).length;
+    document.getElementById('gauge-label').textContent = 'faites';
+  }
+  document.getElementById('dn').textContent=dn;
+  document.getElementById('tot').textContent=tot;
+  var f=tot?Math.round(dn/tot*20):0,h='';
+  for(var i=0;i<20;i++)h+='<div class="gauge-seg'+(i<f?' on':'')+'"></div>';
+  document.getElementById('gauge').innerHTML=h;
+}
 
 function rDl(){var c=[];tasks.forEach(function(t){if(c.indexOf(t.cat)<0)c.push(t.cat);});document.getElementById('cl').innerHTML=c.map(function(x){return'<option value="'+e(x)+'">';}).join('');}
 
 function setTab(x){if(ignoreClick){ignoreClick=false;return;}tab=x;render();pfc();saveTasks();saveSettingsRemote();}
-function setView(v){currentView=v;render();}
+function setView(v){currentView=v;render();saveTasks();}
 async function tgl(id,v){var t=tasks.find(function(t){return t.id===id;});if(t){t.done=v;if(v){t.doneAt=Date.now();scheduleAutoDelete(t);}else{delete t.doneAt;clearAutoDelete(id);}}render();saveTasks(); if(supabaseClient) await updateRemoteTask(id,{done:v,doneAt:v?t.doneAt:null});}
 async function sp(id,p){var t=tasks.find(function(t){return t.id===id;});if(t){t.prio=p;t.done=false;delete t.doneAt;clearAutoDelete(id);}render();saveTasks(); if(supabaseClient) await updateRemoteTask(id,{prio:p,done:false,doneAt:null});}
 async function st(id){var t=tasks.find(function(t){return t.id===id;});if(t){t.today=!t.today;}render();saveTasks(); if(supabaseClient) await updateRemoteTask(id,{today:t.today});}
@@ -767,7 +788,7 @@ async function addBook(){
       if(coverUrl) book.coverUrl = coverUrl;
     }
     document.getElementById('book-bd').removeAttribute('data-editing');
-    closeBookModal();render();
+    closeBookModal();saveTasks();render();
     if(supabaseClient) await updateRemoteBook(book.id,{title:book.title,author:book.author,status:book.status,cover_url:book.coverUrl});
     return;
   }
@@ -778,6 +799,7 @@ async function addBook(){
     if(coverUrl) newBook.coverUrl = coverUrl;
   }
   books.push(newBook);
+  saveTasks();
   titleEl.value='';authorEl.value='';coverEl.value='';statusEl.value='to_read';
   closeBookModal();render();
   if(supabaseClient) await insertRemoteBook(newBook);
@@ -790,8 +812,11 @@ async function uploadBookCover(bookId,file){
   var path = 'covers/'+user.id+'/'+bookId+'-'+file.name.replace(/[^a-zA-Z0-9_.-]/g,'_');
   var res = await supabaseClient.storage.from(SUPABASE_BUCKET).upload(path, file, {upsert:true});
   if(res.error){ console.warn('Supabase cover upload failed',res.error); return ''; }
-  var pub = supabaseClient.storage.from(SUPABASE_BUCKET).getPublicUrl(path);
-  return pub.data ? pub.data.publicUrl : '';
+  var pub = await supabaseClient.storage.from(SUPABASE_BUCKET).getPublicUrl(path);
+  if(!pub.error && pub.data && pub.data.publicUrl) return pub.data.publicUrl;
+  var signed = await supabaseClient.storage.from(SUPABASE_BUCKET).createSignedUrl(path, 3600);
+  if(!signed.error && signed.data && signed.data.signedUrl) return signed.data.signedUrl;
+  return SUPABASE_URL + '/storage/v1/object/public/' + SUPABASE_BUCKET + '/' + path.split('/').map(encodeURIComponent).join('/');
 }
 
 async function insertRemoteBook(book){
@@ -825,6 +850,7 @@ function setBookStatus(id,status){
   var book = books.find(function(b){return b.id===id;});
   if(!book) return;
   book.status=status;
+  saveTasks();
   render();
   if(supabaseClient) updateRemoteBook(id,{status:status});
 }
