@@ -91,7 +91,7 @@ body{font-family:'Inter',sans-serif;background:var(--gray-bg);color:var(--black)
 .book-action{border:1px solid var(--border);border-radius:999px;padding:.45rem .8rem;background:transparent;color:var(--black);cursor:pointer;transition:all .2s ease;}
 .book-action.on{background:var(--crimson);color:#fff;border-color:transparent;}
 .book-row{margin-bottom:16px;}
-.book-status-group{margin-bottom:24px;}
+.book-status-group{margin-bottom:24px;padding:16px 16px 0;}
 .book-status-heading{display:flex;align-items:center;gap:10px;font-weight:700;color:var(--black);margin-bottom:12px;}
 .book-status-heading .ps-dot{width:10px;height:10px;border-radius:50%;background:var(--crimson);}
 .book-cover-placeholder{width:80px;height:110px;border-radius:14px;background:var(--border);display:flex;align-items:center;justify-content:center;color:var(--gray-md);font-size:.75rem;text-align:center;padding:10px;}
@@ -474,15 +474,19 @@ async function loadBooksRemote(){
   var res = await supabaseClient.from(SUPABASE_TABLE_BOOKS).select().eq('user_id', user.id).order('id',{ascending:true});
   if(res.error) throw res.error;
   if(Array.isArray(res.data)){
+    // Preserve local data-URL covers (they are never sent to Supabase)
+    var localCovers = {};
+    books.forEach(function(b){ if(b.coverUrl && b.coverUrl.startsWith('data:')) localCovers[b.id] = b.coverUrl; });
     books = res.data.map(function(b){
       return {
         id: b.id,
         title: b.title || '',
         author: b.author || '',
         status: b.status || 'to_read',
-        coverUrl: b.cover_url || ''
+        coverUrl: b.cover_url || localCovers[b.id] || ''
       };
     });
+    saveTasks();
     render();
   }
 }
@@ -691,7 +695,7 @@ function rhBook(b){
   var cover=b.coverUrl?'<img class="book-cover" src="'+e(b.coverUrl)+'" alt="Couverture">':'<div class="book-cover-placeholder">Pas de couverture</div>';
   var actions='';
   BOOK_STATUS_ORDER.forEach(function(status){actions+='<button class="book-action'+(b.status===status?' on':'')+'" onclick="setBookStatus(\''+b.id+'\',\''+status+'\')">'+BOOK_STATUS_LABELS[status]+'</button>';});
-  return '<div class="book-card">'+cover+'<div class="book-info"><div class="book-title">'+e(b.title)+'</div><div class="book-author">'+e(b.author)+'</div><div class="book-status">Statut: '+BOOK_STATUS_LABELS[b.status]+'</div><div class="book-actions">'+actions+'<button class="book-action" onclick="editBook(\''+b.id+'\')">Modifier</button></div></div></div>';
+  return '<div class="book-card">'+cover+'<div class="book-info"><div class="book-title">'+e(b.title)+'</div><div class="book-author">'+e(b.author)+'</div><div class="book-status">Statut: '+BOOK_STATUS_LABELS[b.status]+'</div><div class="book-actions">'+actions+'<button class="book-action" onclick="editBook(\''+b.id+'\')">Modifier</button><button class="book-action" onclick="deleteBook(\''+b.id+'\')">Supprimer</button></div></div></div>';
 }
 
 function rh(t,hc,s){
@@ -827,10 +831,15 @@ async function uploadBookCover(bookId,file){
   const { data: { user } } = await supabaseClient.auth.getUser();
   if (!user) return '';
   var path = 'covers/'+user.id+'/'+bookId+'-'+file.name.replace(/[^a-zA-Z0-9_.-]/g,'_');
+  console.log('[BookCover] Uploading to bucket:', SUPABASE_BUCKET, 'path:', path);
   var res = await supabaseClient.storage.from(SUPABASE_BUCKET).upload(path, file, {upsert:true});
-  if(res.error){ console.warn('Supabase cover upload failed',res.error); return ''; }
+  if(res.error){
+    console.error('[BookCover] Upload failed:', res.error.message, res.error);
+    return '';
+  }
+  console.log('[BookCover] Upload success');
   var pub = await supabaseClient.storage.from(SUPABASE_BUCKET).getPublicUrl(path);
-  if(!pub.error && pub.data && pub.data.publicUrl) return pub.data.publicUrl;
+  if(pub.data && pub.data.publicUrl){ console.log('[BookCover] Public URL:', pub.data.publicUrl); return pub.data.publicUrl; }
   var signed = await supabaseClient.storage.from(SUPABASE_BUCKET).createSignedUrl(path, 3600);
   if(!signed.error && signed.data && signed.data.signedUrl) return signed.data.signedUrl;
   return SUPABASE_URL + '/storage/v1/object/public/' + SUPABASE_BUCKET + '/' + path.split('/').map(encodeURIComponent).join('/');
@@ -841,10 +850,11 @@ async function insertRemoteBook(book){
   setSyncState('syncing');
   const { data: { user } } = await supabaseClient.auth.getUser();
   if (!user) return;
-  var payload={title:book.title,author:book.author,status:book.status,cover_url:book.coverUrl,user_id:user.id};
+  // Never send base64 data URLs to Supabase — they exceed API limits
+  var remoteUrl = book.coverUrl && !book.coverUrl.startsWith('data:') ? book.coverUrl : '';
+  var payload={title:book.title,author:book.author,status:book.status,cover_url:remoteUrl,user_id:user.id};
   var res = await supabaseClient.from(SUPABASE_TABLE_BOOKS).insert([payload]).select();
   if(res.error){
-    // Retry without cover_url in case the column is missing or value is too large
     var payload2={title:book.title,author:book.author,status:book.status,user_id:user.id};
     res = await supabaseClient.from(SUPABASE_TABLE_BOOKS).insert([payload2]).select();
   }
@@ -855,11 +865,21 @@ async function insertRemoteBook(book){
 async function updateRemoteBook(id,changes){
   if(!supabaseClient) return;
   setSyncState('syncing');
-  var res = await supabaseClient.from(SUPABASE_TABLE_BOOKS).update(changes).eq('id',id);
+  // Never send base64 data URLs to Supabase — they exceed API limits
+  var remoteChanges = Object.assign({},changes);
+  if(remoteChanges.cover_url && remoteChanges.cover_url.startsWith('data:')) remoteChanges.cover_url = '';
+  var res = await supabaseClient.from(SUPABASE_TABLE_BOOKS).update(remoteChanges).eq('id',id);
   if(res.error){ console.warn('Supabase book update failed',res.error); setSyncState('error'); }
   else { setSyncState(); await loadBooksRemote(); }
 }
 
+async function deleteBook(id){
+  if(!confirm('Supprimer ce livre ?')) return;
+  books = books.filter(function(b){return b.id!==id;});
+  saveTasks();
+  render();
+  await deleteRemoteBook(id);
+}
 async function deleteRemoteBook(id){
   if(!supabaseClient) return;
   setSyncState('syncing');
