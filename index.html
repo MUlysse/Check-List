@@ -539,6 +539,9 @@ async function loadTasksRemote(){
 async function insertRemoteTask(task){
   if(!supabaseClient) return;
   setSyncState('syncing');
+  // Save today intent before any async op — realtime can overwrite it via loadTasksRemote()
+  var intendedToday = !!task.today;
+  var taskCat = task.cat, taskText = task.text;
   const { data: { user } } = await supabaseClient.auth.getUser();
   if (!user) return;
   var payload={cat:task.cat,text:task.text,prio:task.prio,done:task.done,user_id:user.id};
@@ -571,6 +574,12 @@ async function insertRemoteTask(task){
       if(Object.keys(updatePayload).length){ await updateRemoteTask(current.id, updatePayload); }
     }
     if(!res.error){ await loadTasksRemote(); }
+    // Restore today if lost during the async sync cycle (race with realtime subscription)
+    if(intendedToday){
+      var restored = tasks.find(function(x){return x.id===task.id;})
+                  || tasks.find(function(x){return x.cat===taskCat&&x.text===taskText&&!x.done;});
+      if(restored && !restored.today){ restored.today=true; saveTasks(); render(); }
+    }
     setSyncState();
   }
 }
@@ -783,7 +792,7 @@ async function addBook(){
   if(!author){authorEl.style.borderColor='#C0392B';setTimeout(function(){authorEl.style.borderColor='';},1200);}
   if(!title||!author)return;
   var editing = document.getElementById('book-bd').getAttribute('data-editing');
-  var book = editing ? books.find(function(b){return b.id===editing;}) : null;
+  var book = editing ? books.find(function(b){return String(b.id)===String(editing);}) : null;
   if(book){
     book.title=title; book.author=author; book.status=status;
     var file = coverEl.files && coverEl.files[0];
@@ -875,7 +884,7 @@ async function updateRemoteBook(id,changes){
 
 async function deleteBook(id){
   if(!confirm('Supprimer ce livre ?')) return;
-  books = books.filter(function(b){return b.id!==id;});
+  books = books.filter(function(b){return String(b.id)!==String(id);});
   saveTasks();
   render();
   await deleteRemoteBook(id);
@@ -889,7 +898,7 @@ async function deleteRemoteBook(id){
 }
 
 function setBookStatus(id,status){
-  var book = books.find(function(b){return b.id===id;});
+  var book = books.find(function(b){return String(b.id)===String(id);});
   if(!book) return;
   book.status=status;
   saveTasks();
@@ -898,7 +907,7 @@ function setBookStatus(id,status){
 }
 
 function editBook(id){
-  var book = books.find(function(b){return b.id===id;});
+  var book = books.find(function(b){return String(b.id)===String(id);});
   if(!book) return;
   openBookModal();
   document.getElementById('new-title').value = book.title;
