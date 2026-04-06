@@ -89,11 +89,11 @@ body{font-family:'Inter',sans-serif;background:var(--gray-bg);color:var(--black)
 .book-status{display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:.85rem;color:var(--gray-dk);}
 .book-actions{display:flex;gap:6px;flex-wrap:wrap;}
 .book-action{border:1px solid var(--border);border-radius:999px;padding:.45rem .8rem;background:transparent;color:var(--black);cursor:pointer;transition:all .2s ease;}
-.book-action.on{background:var(--purple);color:#fff;border-color:transparent;}
+.book-action.on{background:var(--crimson);color:#fff;border-color:transparent;}
 .book-row{margin-bottom:16px;}
 .book-status-group{margin-bottom:24px;}
 .book-status-heading{display:flex;align-items:center;gap:10px;font-weight:700;color:var(--black);margin-bottom:12px;}
-.book-status-heading .ps-dot{width:10px;height:10px;border-radius:50%;background:var(--purple);}
+.book-status-heading .ps-dot{width:10px;height:10px;border-radius:50%;background:var(--crimson);}
 .book-cover-placeholder{width:80px;height:110px;border-radius:14px;background:var(--border);display:flex;align-items:center;justify-content:center;color:var(--gray-md);font-size:.75rem;text-align:center;padding:10px;}
 
 /* BODY */
@@ -783,9 +783,13 @@ async function addBook(){
   if(book){
     book.title=title; book.author=author; book.status=status;
     var file = coverEl.files && coverEl.files[0];
-    if(file && supabaseClient){
-      var coverUrl = await uploadBookCover(book.id, file);
-      if(coverUrl) book.coverUrl = coverUrl;
+    if(file){
+      var dataUrl = await fileToDataUrl(file);
+      if(dataUrl) book.coverUrl = dataUrl;
+      if(supabaseClient){
+        var uploadedUrl = await uploadBookCover(book.id, file);
+        if(uploadedUrl) book.coverUrl = uploadedUrl;
+      }
     }
     document.getElementById('book-bd').removeAttribute('data-editing');
     closeBookModal();saveTasks();render();
@@ -794,15 +798,28 @@ async function addBook(){
   }
   var newBook={id:newId(),title:title,author:author,status:status,coverUrl:''};
   var file = coverEl.files && coverEl.files[0];
-  if(file && supabaseClient){
-    var coverUrl = await uploadBookCover(newBook.id, file);
-    if(coverUrl) newBook.coverUrl = coverUrl;
+  if(file){
+    var dataUrl = await fileToDataUrl(file);
+    if(dataUrl) newBook.coverUrl = dataUrl;
+    if(supabaseClient){
+      var uploadedUrl = await uploadBookCover(newBook.id, file);
+      if(uploadedUrl) newBook.coverUrl = uploadedUrl;
+    }
   }
   books.push(newBook);
   saveTasks();
   titleEl.value='';authorEl.value='';coverEl.value='';statusEl.value='to_read';
   closeBookModal();render();
   if(supabaseClient) await insertRemoteBook(newBook);
+}
+
+function fileToDataUrl(file){
+  return new Promise(function(resolve){
+    var reader = new FileReader();
+    reader.onload = function(ev){ resolve(ev.target.result); };
+    reader.onerror = function(){ resolve(''); };
+    reader.readAsDataURL(file);
+  });
 }
 
 async function uploadBookCover(bookId,file){
@@ -826,6 +843,11 @@ async function insertRemoteBook(book){
   if (!user) return;
   var payload={title:book.title,author:book.author,status:book.status,cover_url:book.coverUrl,user_id:user.id};
   var res = await supabaseClient.from(SUPABASE_TABLE_BOOKS).insert([payload]).select();
+  if(res.error){
+    // Retry without cover_url in case the column is missing or value is too large
+    var payload2={title:book.title,author:book.author,status:book.status,user_id:user.id};
+    res = await supabaseClient.from(SUPABASE_TABLE_BOOKS).insert([payload2]).select();
+  }
   if(res.error){ console.warn('Supabase book insert failed',res.error); setSyncState('error'); }
   else { setSyncState(); await loadBooksRemote(); }
 }
