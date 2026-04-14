@@ -247,9 +247,9 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
 .proj-grid-cell.year-sep{border-left:2px solid rgba(0,0,0,0.10);}
 .proj-grid-cell.sem-sep{border-left:2px solid rgba(0,0,0,0.12);}
 .proj-grid-cell.month-sep{border-left:1px solid rgba(0,0,0,0.04);}
-.proj-period{position:absolute;border-radius:5px;cursor:pointer;display:flex;align-items:center;padding:0 22px 0 8px;font-size:11px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#fff;box-shadow:0 1px 4px rgba(0,0,0,0.18);transition:filter .15s,opacity .15s;}
-.proj-period.is-past{opacity:0.33;filter:grayscale(0.25);}
-.proj-period:hover{filter:brightness(1.08);}
+.proj-period{position:absolute;border-radius:5px;cursor:pointer;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.18);transition:filter .15s;}
+.proj-period:hover{filter:brightness(1.06);}
+.proj-period-half{position:absolute;top:0;bottom:0;display:flex;align-items:center;padding:0 22px 0 8px;white-space:nowrap;overflow:hidden;color:#fff;font-weight:500;}
 .proj-period-del{position:absolute;right:3px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.28);border:none;color:#fff;border-radius:3px;cursor:pointer;font-size:11px;line-height:1;padding:1px 4px;opacity:0;transition:opacity .12s;flex-shrink:0;}
 .proj-period:hover .proj-period-del{opacity:1;}
 .proj-period-del:hover{background:rgba(200,0,0,0.6);}
@@ -881,6 +881,9 @@ function rh(t,hc,s){
 function e(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
 function rGauge(){
+  var footer=document.querySelector('.sidebar-footer');
+  if(currentView==='Projection'){if(footer)footer.style.display='none';return;}
+  if(footer)footer.style.display='';
   var dnEl=document.getElementById('dn'),totEl=document.getElementById('tot');
   var fill=document.getElementById('gauge-fill');
   var label=document.getElementById('gauge-label');
@@ -892,18 +895,6 @@ function rGauge(){
     if(totEl)totEl.textContent=total;
     if(fill)fill.style.width=pct+'%';
     if(label)label.textContent='lus';
-  } else if(currentView==='Projection'){
-    var now=new Date();
-    var pastCount=projPeriods.filter(function(p){
-      var ec=monthToCol(p.endDate);
-      return ec<monthToCol(now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0'));
-    }).length;
-    var tot2=projPeriods.length;
-    var pct2=tot2>0?Math.round(pastCount/tot2*100):0;
-    if(dnEl)dnEl.textContent=pastCount;
-    if(totEl)totEl.textContent=tot2;
-    if(fill)fill.style.width=pct2+'%';
-    if(label)label.textContent='passées';
   } else {
     var all=tasks.filter(function(t){return!t.archived;});
     var done=all.filter(function(t){return t.done;});
@@ -1352,7 +1343,8 @@ function rProjection(){
         +'</div>';
     }
 
-    // Helper: render one set of periods at a given vertical position
+    // Helper: render one set of periods — splits each at today's pixel position
+    var todaySplitLocalPx=(nowAbsCol-rowAbsStart+todayFrac)*MW; // px of today within this row
     function renderPeriods(list,top,height,fontSize){
       list.slice().sort(function(a,b){
         return (monthToCol(b.endDate)-monthToCol(b.startDate))-(monthToCol(a.endDate)-monthToCol(a.startDate));
@@ -1364,14 +1356,20 @@ function rProjection(){
         var localE=Math.min(pAbsE,rowAbsEnd)-rowAbsStart;
         var leftPx=localS*MW;
         var widthPx=(localE-localS+1)*MW-2;
-        var isPast=pAbsE<nowAbsCol;
         var cat=PROJ_CATS[p.cat]||PROJ_CATS.education;
-        h+='<div class="proj-period'+(isPast?' is-past':'')+'" '
-          +'style="left:'+leftPx+'px;width:'+widthPx+'px;top:'+top+'px;height:'+height+'px;'
-          +'background:'+cat.color+';font-size:'+fontSize+'px;" '
+        // How many px of this period are in the past
+        var pastPx=Math.min(Math.max(Math.round(todaySplitLocalPx-leftPx),0),widthPx);
+        var futurePx=widthPx-pastPx;
+        var del='<button class="proj-period-del" onclick="event.stopPropagation();deletePeriodDirect(\''+p.id+'\')" title="Supprimer">&#10005;</button>';
+        h+='<div class="proj-period" '
+          +'style="left:'+leftPx+'px;width:'+widthPx+'px;top:'+top+'px;height:'+height+'px;" '
           +'onclick="openProjPeriodModal(\''+p.id+'\',null)" '
-          +'title="'+e(p.name+(p.desc?' — '+p.desc:''))+'">'+e(p.name)
-          +'<button class="proj-period-del" onclick="event.stopPropagation();deletePeriodDirect(\''+p.id+'\')" title="Supprimer">&#10005;</button>'
+          +'title="'+e(p.name+(p.desc?' — '+p.desc:''))+'">'
+          // Grey past half
+          +(pastPx>0?'<div class="proj-period-half" style="left:0;width:'+pastPx+'px;background:#B0ADA8;'+(futurePx<=0?'padding-right:22px;':'')+'font-size:'+fontSize+'px;">'+(futurePx<=0?e(p.name):'')+'</div>':'')
+          // Coloured future half
+          +(futurePx>0?'<div class="proj-period-half" style="left:'+pastPx+'px;width:'+futurePx+'px;background:'+cat.color+';font-size:'+fontSize+'px;">'+e(p.name)+'</div>':'')
+          +del
           +'</div>';
       });
     }
