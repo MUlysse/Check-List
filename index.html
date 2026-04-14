@@ -221,6 +221,45 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
 /* ── Pull-to-refresh indicator ── */
 #ptr-indicator{position:fixed;top:0;left:50%;transform:translateX(-50%) translateY(-48px);width:36px;height:36px;border-radius:50%;background:#4A90D9;color:#fff;font-size:18px;display:flex;align-items:center;justify-content:center;z-index:9999;transition:transform .2s,opacity .2s;opacity:0;pointer-events:none;}
 #ptr-indicator.visible{opacity:1;}
+
+/* ── Projection View ── */
+.body-card.proj-mode{padding:0;overflow:hidden;}
+.proj-wrap{display:flex;flex-direction:column;height:100%;overflow:hidden;}
+.proj-toolbar{padding:8px 16px;border-bottom:1px solid rgba(0,0,0,0.05);display:flex;align-items:center;gap:8px;flex-shrink:0;flex-wrap:wrap;}
+.proj-scroll{flex:1;overflow:auto;-webkit-overflow-scrolling:touch;}
+.proj-inner{display:inline-flex;flex-direction:column;min-width:100%;padding-bottom:40px;}
+.proj-head-sticky{position:sticky;top:0;z-index:10;background:#FAFAF8;}
+.proj-year-row,.proj-month-row-hdr{display:flex;}
+.proj-corner{flex-shrink:0;border-bottom:1px solid rgba(0,0,0,0.07);}
+.proj-year-cell{font-size:10px;font-weight:700;color:#1C1C1E;text-align:center;padding:5px 0 4px;border-left:2px solid rgba(0,0,0,0.12);border-bottom:1px solid rgba(0,0,0,0.07);letter-spacing:0.04em;flex-shrink:0;}
+.proj-month-cell-hdr{font-size:9px;font-weight:500;color:#B0ADA8;text-align:center;padding:3px 0 4px;border-left:1px solid rgba(0,0,0,0.05);border-bottom:2px solid rgba(0,0,0,0.09);flex-shrink:0;letter-spacing:0.02em;}
+.proj-month-cell-hdr.is-today-month{color:#FF3B30;font-weight:700;}
+.proj-data-row{display:flex;border-bottom:1px solid rgba(0,0,0,0.05);min-height:42px;}
+.proj-data-row:hover .proj-row-body{background:rgba(0,0,0,0.01);}
+.proj-row-label-cell{flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 6px 0 12px;background:#F5F3EF;border-right:1px solid rgba(0,0,0,0.07);}
+.proj-row-name{font-size:12px;font-weight:500;color:#3D3B38;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.proj-row-dots{background:none;border:none;cursor:pointer;color:#C8C5BF;font-size:15px;padding:2px 3px;border-radius:3px;line-height:1;flex-shrink:0;}
+.proj-row-dots:hover{color:#8A8680;background:rgba(0,0,0,0.05);}
+.proj-row-body{position:relative;flex-shrink:0;}
+.proj-grid-cell{position:absolute;top:0;bottom:0;pointer-events:none;}
+.proj-grid-cell.year-sep{border-left:2px solid rgba(0,0,0,0.10);}
+.proj-grid-cell.month-sep{border-left:1px solid rgba(0,0,0,0.04);}
+.proj-period{position:absolute;border-radius:5px;cursor:pointer;display:flex;align-items:center;padding:0 8px;font-size:11px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#fff;box-shadow:0 1px 4px rgba(0,0,0,0.18);transition:filter .15s,opacity .15s;}
+.proj-period.is-past{opacity:0.33;filter:grayscale(0.25);}
+.proj-period:hover{filter:brightness(1.08);}
+.proj-today-marker{position:absolute;top:0;bottom:0;width:2px;background:#FF3B30;z-index:6;pointer-events:none;}
+.proj-today-tick{position:absolute;top:0;left:-4px;width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:6px solid #FF3B30;}
+.proj-add-row-footer{display:flex;padding:6px 0 6px 12px;}
+.proj-btn{padding:7px 14px;border-radius:7px;border:none;background:#4A90D9;color:#fff;font-size:12px;font-weight:600;cursor:pointer;transition:background .15s;white-space:nowrap;}
+.proj-btn:hover{background:#3A7DC7;}
+.proj-btn-outline{padding:6px 12px;border-radius:7px;border:1.5px dashed #C8C5BF;background:transparent;color:#8A8680;font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;white-space:nowrap;}
+.proj-btn-outline:hover{border-color:#8A8680;color:#3D3B38;}
+.proj-btn-del{padding:9px 14px;border-radius:8px;border:none;background:#FF3B30;color:#fff;font-size:13px;font-weight:600;cursor:pointer;}
+.proj-legend{display:flex;gap:10px;align-items:center;margin-left:4px;}
+.proj-legend-dot{width:9px;height:9px;border-radius:3px;flex-shrink:0;}
+.proj-legend-lbl{font-size:11px;color:#8A8680;display:flex;align-items:center;gap:4px;}
+.proj-extend-btn{padding:4px 10px;border-radius:6px;border:1px solid #E0DDD8;background:transparent;color:#8A8680;font-size:11px;cursor:pointer;margin-left:auto;}
+.proj-extend-btn:hover{background:#F5F3EF;color:#3D3B38;}
 </style>
 </head>
 <body>
@@ -239,6 +278,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
     <div class="view-bar" id="view-bar">
       <button class="view-btn active" data-view="Checklist" onclick="setView('Checklist')">Checklist</button>
       <button class="view-btn" data-view="Books" onclick="setView('Books')">Books</button>
+      <button class="view-btn" data-view="Projection" onclick="setView('Projection')">Projection</button>
     </div>
     <div class="tabs-wrap" id="tabs-wrap">
       <div class="tabs" id="tabs"></div>
@@ -362,6 +402,25 @@ var BOOK_STATUS_ORDER=['reading','to_read','read'];
 var supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 var deleteTimers={};
 
+// ── Projection data ──
+var PROJ_START_YEAR=2023;
+var PROJ_NUM_YEARS=4;
+var PROJ_COL_W=44;
+var PROJ_LABEL_W=92;
+var PROJ_ROW_H=42;
+var PROJ_MONTHS=['Sep','Oct','Nov','Déc','Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû'];
+var PROJ_CATS={education:{label:'Éducation',color:'#4A90D9'},professional:{label:'Professionnel',color:'#34C759'},projects:{label:'Projets',color:'#FF9500'}};
+var projRows=[
+  {id:'pr1',label:'PM',order:0},
+  {id:'pr2',label:'M1',order:1},
+  {id:'pr3',label:'P1 / P2',order:2},
+  {id:'pr4',label:'M2',order:3},
+  {id:'pr5',label:"Fin d'études",order:4},
+];
+var projPeriods=[];
+var _pPeriodId=null;
+var _pRowId=null;
+
 async function checkSession() {
   if (!supabaseClient) return false;
   const { data: { session } } = await supabaseClient.auth.getSession();
@@ -413,6 +472,10 @@ function loadTasks(){
       }
       if(Array.isArray(data.books)) books=data.books;
       if(typeof data.view==='string') currentView=data.view;
+      if(Array.isArray(data.projRows)&&data.projRows.length) projRows=data.projRows;
+      if(Array.isArray(data.projPeriods)) projPeriods=data.projPeriods;
+      if(typeof data.projStartYear==='number') PROJ_START_YEAR=data.projStartYear;
+      if(typeof data.projNumYears==='number') PROJ_NUM_YEARS=data.projNumYears;
     }catch(e){}
   }
   // Ensure all task categories are in TABS
@@ -422,7 +485,7 @@ function loadTasks(){
   CO = TABS.filter(x => !['All','Urgent','Completed',TODAY_TAB].includes(x));
 }
 function saveTasks(){
-  try{localStorage.setItem(STORAGE_KEY, JSON.stringify({tasks:tasks.filter(function(t){return t.cat!==SETTINGS_CAT;}),nid:nid,tab:tab,tabs:TABS,books:books,view:currentView}));}catch(e){}
+  try{localStorage.setItem(STORAGE_KEY, JSON.stringify({tasks:tasks.filter(function(t){return t.cat!==SETTINGS_CAT;}),nid:nid,tab:tab,tabs:TABS,books:books,view:currentView,projRows:projRows,projPeriods:projPeriods,projStartYear:PROJ_START_YEAR,projNumYears:PROJ_NUM_YEARS}));}catch(e){}
 }
 function clearAutoDelete(id){
   if(deleteTimers[id]){ clearTimeout(deleteTimers[id]); delete deleteTimers[id]; }
@@ -641,15 +704,26 @@ function tc(x){if(x==='All')return tasks.filter(function(t){return!t.done;}).len
 
 function render(){
   rViewBar();
+  var bc=document.querySelector('.body-card');
   if(currentView==='Books'){
     document.getElementById('tabs-wrap').style.display='none';
+    if(bc){bc.classList.remove('proj-mode');}
     var mti=document.getElementById('main-title-icon');
     var mtt=document.getElementById('main-title-text');
     if(mti){var bi=getTabIcon('Books');mti.textContent=bi.icon;mti.style.background=bi.bg;mti.style.color='#fff';}
     if(mtt)mtt.textContent='Books';
     rBooks();
+  } else if(currentView==='Projection'){
+    document.getElementById('tabs-wrap').style.display='none';
+    if(bc){bc.classList.add('proj-mode');}
+    var mti=document.getElementById('main-title-icon');
+    var mtt=document.getElementById('main-title-text');
+    if(mti){mti.textContent='◫';mti.style.background='#8A8680';mti.style.color='#fff';}
+    if(mtt)mtt.textContent='Projection';
+    rProjection();
   } else {
     document.getElementById('tabs-wrap').style.display='block';
+    if(bc){bc.classList.remove('proj-mode');}
     rTabs();
     rTasks();
     var _ico=getTabIcon(tab);var _mti=document.getElementById('main-title-icon');var _mtt=document.getElementById('main-title-text');if(_mti){_mti.textContent=_ico.icon;_mti.style.background=_ico.bg;_mti.style.color='#fff';}if(_mtt)_mtt.textContent=tab;
@@ -788,6 +862,18 @@ function rGauge(){
     if(totEl)totEl.textContent=total;
     if(fill)fill.style.width=pct+'%';
     if(label)label.textContent='lus';
+  } else if(currentView==='Projection'){
+    var now=new Date();
+    var pastCount=projPeriods.filter(function(p){
+      var ec=monthToCol(p.endDate);
+      return ec<monthToCol(now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0'));
+    }).length;
+    var tot2=projPeriods.length;
+    var pct2=tot2>0?Math.round(pastCount/tot2*100):0;
+    if(dnEl)dnEl.textContent=pastCount;
+    if(totEl)totEl.textContent=tot2;
+    if(fill)fill.style.width=pct2+'%';
+    if(label)label.textContent='passées';
   } else {
     var all=tasks.filter(function(t){return!t.archived;});
     var done=all.filter(function(t){return t.done;});
@@ -1044,7 +1130,7 @@ function editBook(id){
 
 function pfc(){var sp=['All','Urgent','Completed'];document.getElementById('new-cat').value=sp.indexOf(tab)<0?tab:'';}
 
-document.addEventListener('keydown',function(e){if(e.ctrlKey&&e.key==='r'){e.preventDefault();location.reload();}if(e.key==='Escape'){closeModal();closeBookModal();}});
+document.addEventListener('keydown',function(e){if(e.ctrlKey&&e.key==='r'){e.preventDefault();location.reload();}if(e.key==='Escape'){closeModal();closeBookModal();closeProjPeriodModal();closeProjRowModal();}});
 
 // ── Pull-to-refresh (iPhone) — déclenché uniquement depuis le header sidebar ──
 (function(){
@@ -1084,6 +1170,261 @@ document.getElementById('login-password').addEventListener('keydown',function(e)
     showLogin();
   }
 })();
+</script>
+
+<!-- PROJECTION: modal période -->
+<div class="backdrop" id="proj-p-bd" onclick="if(event.target===this)closeProjPeriodModal()">
+  <div class="modal">
+    <div class="modal-title" id="proj-p-title">Nouvelle période <button class="modal-close" onclick="closeProjPeriodModal()">&#10005;</button></div>
+    <div class="modal-row">
+      <input type="text" id="pp-name" placeholder="Nom de la période" autocomplete="off">
+    </div>
+    <div class="modal-row">
+      <select id="pp-row"></select>
+      <select id="pp-cat">
+        <option value="education">Éducation</option>
+        <option value="professional">Professionnel</option>
+        <option value="projects">Projets</option>
+      </select>
+    </div>
+    <div class="modal-row">
+      <input type="month" id="pp-start" style="flex:1">
+      <input type="month" id="pp-end" style="flex:1">
+    </div>
+    <div class="modal-row">
+      <input type="text" id="pp-desc" placeholder="Description (optionnel)" autocomplete="off">
+    </div>
+    <div class="modal-row" id="pp-row-edit" style="display:none;gap:8px">
+      <button class="add-btn" onclick="saveProjPeriod()" style="flex:1">Enregistrer</button>
+      <button class="proj-btn-del" onclick="deleteProjPeriod()">Supprimer</button>
+    </div>
+    <div class="modal-row" id="pp-row-new">
+      <button class="add-btn" onclick="saveProjPeriod()" style="flex:1">+ Ajouter</button>
+    </div>
+  </div>
+</div>
+
+<!-- PROJECTION: modal ligne -->
+<div class="backdrop" id="proj-r-bd" onclick="if(event.target===this)closeProjRowModal()">
+  <div class="modal">
+    <div class="modal-title" id="proj-r-title">Nouvelle ligne <button class="modal-close" onclick="closeProjRowModal()">&#10005;</button></div>
+    <div class="modal-row">
+      <input type="text" id="pr-label" placeholder="Nom de la ligne" autocomplete="off">
+    </div>
+    <div class="modal-row" id="pr-row-edit" style="display:none;gap:8px">
+      <button class="add-btn" onclick="saveProjRow()" style="flex:1">Enregistrer</button>
+      <button class="proj-btn-del" onclick="deleteProjRow()">Supprimer</button>
+    </div>
+    <div class="modal-row" id="pr-row-new">
+      <button class="add-btn" onclick="saveProjRow()" style="flex:1">+ Ajouter</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Projection helpers ──
+function monthToCol(yyyymm){
+  if(!yyyymm)return -1;
+  var p=yyyymm.split('-'),y=parseInt(p[0]),m=parseInt(p[1]);
+  var ay,mi;
+  if(m>=9){ay=y-PROJ_START_YEAR;mi=m-9;}
+  else{ay=y-1-PROJ_START_YEAR;mi=m+3;}
+  return ay*12+mi;
+}
+function colToDate(col){
+  var ay=Math.floor(col/12),mi=col%12;
+  var y=PROJ_START_YEAR+ay+(mi<4?1:0);
+  var m=mi<4?mi+9:mi-3;
+  return y+'-'+String(m).padStart(2,'0');
+}
+
+// ── Projection render ──
+function rProjection(){
+  var el=document.getElementById('list');
+  var total=PROJ_NUM_YEARS*12;
+  var bodyW=total*PROJ_COL_W;
+
+  // Today
+  var now=new Date();
+  var nowYM=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+  var tCol=monthToCol(nowYM);
+  var tFrac=(now.getDate()-1)/new Date(now.getFullYear(),now.getMonth()+1,0).getDate();
+  var tPx=(tCol+tFrac)*PROJ_COL_W;
+  var tVisible=tCol>=0&&tCol<total;
+
+  var h='<div class="proj-wrap">';
+
+  // Toolbar
+  h+='<div class="proj-toolbar">'
+    +'<button class="proj-btn" onclick="openProjPeriodModal(null,null)">+ Période</button>'
+    +'<button class="proj-btn-outline" onclick="openProjRowModal(null)">+ Ligne</button>'
+    +'<div class="proj-legend">';
+  Object.keys(PROJ_CATS).forEach(function(k){
+    h+='<span class="proj-legend-lbl"><span class="proj-legend-dot" style="background:'+PROJ_CATS[k].color+'"></span>'+PROJ_CATS[k].label+'</span>';
+  });
+  h+='</div>'
+    +'<button class="proj-extend-btn" onclick="PROJ_NUM_YEARS++;saveTasks();rProjection();" title="Étendre d\'un an">+1 an</button>'
+    +'</div>';
+
+  // Scroll wrapper
+  h+='<div class="proj-scroll"><div class="proj-inner">';
+
+  // Sticky header
+  h+='<div class="proj-head-sticky">';
+
+  // Year row
+  h+='<div class="proj-year-row">';
+  h+='<div class="proj-corner" style="width:'+PROJ_LABEL_W+'px;flex-shrink:0;"></div>';
+  for(var y=0;y<PROJ_NUM_YEARS;y++){
+    var yr=PROJ_START_YEAR+y;
+    h+='<div class="proj-year-cell" style="width:'+(12*PROJ_COL_W)+'px;">'+yr+' – '+(yr+1)+'</div>';
+  }
+  h+='</div>';
+
+  // Month row
+  h+='<div class="proj-month-row-hdr">';
+  h+='<div class="proj-corner" style="width:'+PROJ_LABEL_W+'px;flex-shrink:0;"></div>';
+  for(var c=0;c<total;c++){
+    var isToday=(c===tCol);
+    h+='<div class="proj-month-cell-hdr'+(isToday?' is-today-month':'')+'" style="width:'+PROJ_COL_W+'px;">'+PROJ_MONTHS[c%12]+'</div>';
+  }
+  h+='</div></div>';
+
+  // Data rows
+  var rows=projRows.slice().sort(function(a,b){return a.order-b.order;});
+  rows.forEach(function(row){
+    var periods=projPeriods.filter(function(p){return p.rowId===row.id;});
+
+    h+='<div class="proj-data-row">';
+    h+='<div class="proj-row-label-cell" style="width:'+PROJ_LABEL_W+'px;height:'+PROJ_ROW_H+'px;">'
+      +'<span class="proj-row-name">'+e(row.label)+'</span>'
+      +'<button class="proj-row-dots" onclick="openProjRowModal(\''+row.id+'\')">⋯</button>'
+      +'</div>';
+
+    h+='<div class="proj-row-body" style="width:'+bodyW+'px;height:'+PROJ_ROW_H+'px;">';
+
+    // Grid lines
+    for(var c2=0;c2<total;c2++){
+      var cls=(c2>0&&c2%12===0)?'year-sep':'month-sep';
+      h+='<div class="proj-grid-cell '+cls+'" style="left:'+(c2*PROJ_COL_W)+'px;width:'+PROJ_COL_W+'px;"></div>';
+    }
+
+    // Today marker
+    if(tVisible){
+      h+='<div class="proj-today-marker" style="left:'+tPx+'px;">'
+        +'<div class="proj-today-tick"></div>'
+        +'</div>';
+    }
+
+    // Period blocks — sort wider first so narrower ones render on top
+    periods.slice().sort(function(a,b){
+      return (monthToCol(b.endDate)-monthToCol(b.startDate))-(monthToCol(a.endDate)-monthToCol(a.startDate));
+    }).forEach(function(p){
+      var sc=monthToCol(p.startDate);
+      var ec=monthToCol(p.endDate);
+      if(ec<0||sc>=total)return;
+      var sc2=Math.max(0,sc),ec2=Math.min(total-1,ec);
+      var leftPx=sc2*PROJ_COL_W;
+      var widthPx=(ec2-sc2+1)*PROJ_COL_W-2;
+      var isPast=ec<tCol||(ec===tCol&&tFrac>0.9);
+      var cat=PROJ_CATS[p.cat]||PROJ_CATS.education;
+      h+='<div class="proj-period'+(isPast?' is-past':'')+'" '
+        +'style="left:'+leftPx+'px;width:'+widthPx+'px;top:5px;height:'+(PROJ_ROW_H-10)+'px;background:'+cat.color+'" '
+        +'onclick="openProjPeriodModal(\''+p.id+'\',null)" '
+        +'title="'+e(p.name+(p.desc?' — '+p.desc:''))+'">'+e(p.name)+'</div>';
+    });
+
+    h+='</div></div>';
+  });
+
+  // Add-row footer
+  h+='<div class="proj-add-row-footer">'
+    +'<button class="proj-btn-outline" onclick="openProjRowModal(null)" style="font-size:11px;padding:4px 10px;">+ Ligne</button>'
+    +'</div>';
+
+  h+='</div></div></div>';
+  el.innerHTML=h;
+}
+
+// ── Période modal ──
+function openProjPeriodModal(periodId,forRowId){
+  _pPeriodId=periodId||null;
+  var p=periodId?projPeriods.find(function(x){return x.id===periodId;}):null;
+  // Fill row select
+  var sel=document.getElementById('pp-row');
+  sel.innerHTML=projRows.slice().sort(function(a,b){return a.order-b.order;}).map(function(r){
+    return '<option value="'+r.id+'"'+(p&&p.rowId===r.id?' selected':'')+'>'+e(r.label)+'</option>';
+  }).join('');
+  if(forRowId&&!p) sel.value=forRowId;
+  document.getElementById('pp-name').value=p?p.name:'';
+  document.getElementById('pp-start').value=p?p.startDate:'';
+  document.getElementById('pp-end').value=p?p.endDate:'';
+  document.getElementById('pp-cat').value=p?(p.cat||'education'):'education';
+  document.getElementById('pp-desc').value=p?(p.desc||''):'';
+  document.getElementById('proj-p-title').firstChild.textContent=p?'Modifier la période ':'Nouvelle période ';
+  document.getElementById('pp-row-edit').style.display=p?'flex':'none';
+  document.getElementById('pp-row-new').style.display=p?'none':'flex';
+  document.getElementById('proj-p-bd').classList.add('open');
+  setTimeout(function(){document.getElementById('pp-name').focus();},80);
+}
+function closeProjPeriodModal(){document.getElementById('proj-p-bd').classList.remove('open');}
+function saveProjPeriod(){
+  var name=document.getElementById('pp-name').value.trim();
+  var start=document.getElementById('pp-start').value;
+  var end=document.getElementById('pp-end').value;
+  var rowId=document.getElementById('pp-row').value;
+  var cat=document.getElementById('pp-cat').value;
+  var desc=document.getElementById('pp-desc').value.trim();
+  if(!name){var el=document.getElementById('pp-name');el.style.borderColor='#C0392B';setTimeout(function(){el.style.borderColor='';},1200);return;}
+  if(!start||!end||monthToCol(end)<monthToCol(start)){
+    var s=document.getElementById('pp-start'),en=document.getElementById('pp-end');
+    s.style.borderColor='#C0392B';en.style.borderColor='#C0392B';
+    setTimeout(function(){s.style.borderColor='';en.style.borderColor='';},1200);return;
+  }
+  if(_pPeriodId){
+    var p=projPeriods.find(function(x){return x.id===_pPeriodId;});
+    if(p){p.name=name;p.startDate=start;p.endDate=end;p.rowId=rowId;p.cat=cat;p.desc=desc;}
+  } else {
+    projPeriods.push({id:newId(),rowId:rowId,name:name,startDate:start,endDate:end,cat:cat,desc:desc});
+  }
+  closeProjPeriodModal();saveTasks();rProjection();
+}
+function deleteProjPeriod(){
+  if(!_pPeriodId)return;
+  projPeriods=projPeriods.filter(function(p){return p.id!==_pPeriodId;});
+  closeProjPeriodModal();saveTasks();rProjection();
+}
+
+// ── Ligne modal ──
+function openProjRowModal(rowId){
+  _pRowId=rowId||null;
+  var row=rowId?projRows.find(function(r){return r.id===rowId;}):null;
+  document.getElementById('pr-label').value=row?row.label:'';
+  document.getElementById('proj-r-title').firstChild.textContent=row?'Modifier la ligne ':'Nouvelle ligne ';
+  document.getElementById('pr-row-edit').style.display=row?'flex':'none';
+  document.getElementById('pr-row-new').style.display=row?'none':'flex';
+  document.getElementById('proj-r-bd').classList.add('open');
+  setTimeout(function(){document.getElementById('pr-label').focus();},80);
+}
+function closeProjRowModal(){document.getElementById('proj-r-bd').classList.remove('open');}
+function saveProjRow(){
+  var label=document.getElementById('pr-label').value.trim();
+  if(!label){var el=document.getElementById('pr-label');el.style.borderColor='#C0392B';setTimeout(function(){el.style.borderColor='';},1200);return;}
+  if(_pRowId){
+    var row=projRows.find(function(r){return r.id===_pRowId;});
+    if(row)row.label=label;
+  } else {
+    var maxO=projRows.length>0?Math.max.apply(null,projRows.map(function(r){return r.order;})):0;
+    projRows.push({id:newId(),label:label,order:maxO+1});
+  }
+  closeProjRowModal();saveTasks();rProjection();
+}
+function deleteProjRow(){
+  if(!_pRowId||!confirm('Supprimer cette ligne et toutes ses périodes ?'))return;
+  projRows=projRows.filter(function(r){return r.id!==_pRowId;});
+  projPeriods=projPeriods.filter(function(p){return p.rowId!==_pRowId;});
+  closeProjRowModal();saveTasks();rProjection();
+}
 </script>
 
 <!-- BOTTOM BAR -->
