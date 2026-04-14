@@ -183,6 +183,11 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
   .main-title{font-size:22px;}
   .body-card{padding:4px 12px 80px;}
   .fab{bottom:16px;right:16px;width:42px;height:42px;}
+  .modal{padding:18px 16px;}
+  .modal-row{flex-wrap:wrap;}
+  .modal-row input[type=text],.modal-row input[type=email],.modal-row input[type=password],.modal-row select{min-width:0;width:100%;flex:1 1 100%;}
+  .prio-grp{flex-shrink:0;}
+  .add-btn{flex:1;}
 }
 </style>
 </head>
@@ -629,9 +634,7 @@ function rViewBar(){
 function getTabIcon(name){
   var icons={'All':{bg:'#4A90D9',icon:'☰'},'Completed':{bg:'#34C759',icon:'✓'},'Aujourd\'hui':{bg:'#34C759',icon:'★'},'Urgent':{bg:'#FF9500',icon:'!'}};
   if(icons[name]) return icons[name];
-  var colors=['#AF52DE','#5856D6','#007AFF','#32ADE6','#FF2D55','#FF6B35','#30B0C7'];
-  var idx=0;for(var i=0;i<name.length;i++)idx=(idx+name.charCodeAt(i))%colors.length;
-  return {bg:colors[idx],icon:name.charAt(0).toUpperCase()};
+  return {bg:'#8A8680',icon:name.charAt(0).toUpperCase()};
 }
 function rTabs(){
   var ts=vtabs();
