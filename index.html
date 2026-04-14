@@ -371,7 +371,7 @@ function loadTasks(){
         tasks=data.tasks.filter(function(t){return t.cat!==SETTINGS_CAT;});
         nid=typeof data.nid==='number'&&data.nid>0?data.nid:1;
         if(typeof data.tab==='string')tab=data.tab;
-        if(Array.isArray(data.tabs))TABS=data.tabs;
+        if(Array.isArray(data.tabs)){TABS=data.tabs;if(TABS.indexOf('All')<0)TABS.unshift('All');if(TABS.indexOf(TODAY_TAB)<0)TABS.splice(1,0,TODAY_TAB);if(TABS.indexOf('Urgent')<0)TABS.splice(2,0,'Urgent');}
       }
       if(Array.isArray(data.books)) books=data.books;
       if(typeof data.view==='string') currentView=data.view;
@@ -471,6 +471,9 @@ async function loadTasksRemote(){
       try{
         var s = JSON.parse(settingsTask.text);
         if(Array.isArray(s.tabs)) TABS = s.tabs;
+        if(TABS.indexOf('All')<0) TABS.unshift('All');
+        if(TABS.indexOf(TODAY_TAB)<0) TABS.splice(1,0,TODAY_TAB);
+        if(TABS.indexOf('Urgent')<0) TABS.splice(2,0,'Urgent');
         if(typeof s.tab === 'string') tab = s.tab;
         CO = TABS.filter(function(x){return !['All','Urgent','Completed',TODAY_TAB].includes(x);});
       }catch(e){}
@@ -582,7 +585,7 @@ window.addEventListener('storage', function(ev){
       tasks=data.tasks.filter(function(t){return t.cat!==SETTINGS_CAT;});
       nid=typeof data.nid==='number'&&data.nid>0?data.nid:1;
       if(typeof data.tab==='string')tab=data.tab;
-      if(Array.isArray(data.tabs))TABS=data.tabs;
+      if(Array.isArray(data.tabs)){TABS=data.tabs;if(TABS.indexOf('All')<0)TABS.unshift('All');if(TABS.indexOf(TODAY_TAB)<0)TABS.splice(1,0,TODAY_TAB);if(TABS.indexOf('Urgent')<0)TABS.splice(2,0,'Urgent');}
       CO = TABS.filter(x => !['All','Urgent','Completed',TODAY_TAB].includes(x));
       render();
       scheduleAllAutoDelete();
@@ -707,10 +710,10 @@ function rhBook(b){
   var cover=b.coverUrl?'<img class="book-cover" src="'+e(b.coverUrl)+'" alt="">':'<div class="book-cover-placeholder">&#128218;</div>';
   var actions='';
   BOOK_STATUS_ORDER.forEach(function(s){
-    if(s!==b.status) actions+='<button class="book-action" onclick="setBookStatus(''+b.id+'',''+s+'')">'+BOOK_STATUS_LABELS[s]+'</button>';
+    if(s!==b.status) actions+='<button class="book-action" data-bid="'+b.id+'" data-bst="'+s+'" onclick="setBookStatus(+this.dataset.bid,this.dataset.bst)">'+BOOK_STATUS_LABELS[s]+'</button>';
   });
-  actions+='<button class="book-action book-action-edit" onclick="editBook(''+b.id+'')">Modifier</button>';
-  actions+='<button class="book-action book-action-del" title="Supprimer" onclick="deleteBook(''+b.id+'')">&#10005;</button>';
+  actions+='<button class="book-action book-action-edit" data-bid="'+b.id+'" onclick="editBook(+this.dataset.bid)">Modifier</button>';
+  actions+='<button class="book-action book-action-del" title="Supprimer" data-bid="'+b.id+'" onclick="deleteBook(+this.dataset.bid)">&#10005;</button>';
   return '<div class="book-drag-handle">&#8942;</div>'+cover
     +'<div class="book-card"><div class="book-info">'
     +'<div class="book-title">'+e(b.title)+'</div>'
