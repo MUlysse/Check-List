@@ -1211,7 +1211,6 @@ document.getElementById('login-password').addEventListener('keydown',function(e)
       <input type="text" id="pp-name" placeholder="Nom de la période" autocomplete="off">
     </div>
     <div class="modal-row">
-      <select id="pp-row"></select>
       <select id="pp-cat">
         <option value="education">Éducation</option>
         <option value="professional">Professionnel</option>
@@ -1398,15 +1397,16 @@ function deletePeriodDirect(id){
 }
 
 // ── Période modal ──
+function rowIdFromDate(yyyymm){
+  if(!yyyymm)return projRows.length?projRows[0].id:null;
+  var p=yyyymm.split('-'),y=parseInt(p[0]),m=parseInt(p[1]);
+  var idx=m>=9?y-PROJ_START_YEAR:y-1-PROJ_START_YEAR;
+  var row=projRows.find(function(r){return r.order===idx;});
+  return row?row.id:(projRows.length?projRows[0].id:null);
+}
 function openProjPeriodModal(periodId,forRowId){
   _pPeriodId=periodId||null;
   var p=periodId?projPeriods.find(function(x){return x.id===periodId;}):null;
-  // Fill row select
-  var sel=document.getElementById('pp-row');
-  sel.innerHTML=projRows.slice().sort(function(a,b){return a.order-b.order;}).map(function(r){
-    return '<option value="'+r.id+'"'+(p&&p.rowId===r.id?' selected':'')+'>'+e(r.label)+'</option>';
-  }).join('');
-  if(forRowId&&!p) sel.value=forRowId;
   document.getElementById('pp-name').value=p?p.name:'';
   document.getElementById('pp-start').value=p?p.startDate:'';
   document.getElementById('pp-end').value=p?p.endDate:'';
@@ -1423,7 +1423,6 @@ function saveProjPeriod(){
   var name=document.getElementById('pp-name').value.trim();
   var start=document.getElementById('pp-start').value;
   var end=document.getElementById('pp-end').value;
-  var rowId=document.getElementById('pp-row').value;
   var cat=document.getElementById('pp-cat').value;
   var desc=document.getElementById('pp-desc').value.trim();
   if(!name){var el=document.getElementById('pp-name');el.style.borderColor='#C0392B';setTimeout(function(){el.style.borderColor='';},1200);return;}
@@ -1432,6 +1431,7 @@ function saveProjPeriod(){
     s.style.borderColor='#C0392B';en.style.borderColor='#C0392B';
     setTimeout(function(){s.style.borderColor='';en.style.borderColor='';},1200);return;
   }
+  var rowId=rowIdFromDate(start);
   if(_pPeriodId){
     var p=projPeriods.find(function(x){return x.id===_pPeriodId;});
     if(p){p.name=name;p.startDate=start;p.endDate=end;p.rowId=rowId;p.cat=cat;p.desc=desc;}
