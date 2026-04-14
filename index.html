@@ -249,7 +249,9 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
 .proj-grid-cell.month-sep{border-left:1px solid rgba(0,0,0,0.04);}
 .proj-period{position:absolute;border-radius:5px;cursor:pointer;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.18);transition:filter .15s;}
 .proj-period:hover{filter:brightness(1.06);}
-.proj-period-half{position:absolute;top:0;bottom:0;display:flex;align-items:center;padding:0 22px 0 8px;white-space:nowrap;overflow:hidden;color:#fff;font-weight:500;}
+.proj-period-half{position:absolute;top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;padding:3px 22px 3px 8px;overflow:hidden;color:#fff;font-weight:500;}
+.proj-period-half .pn{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.25;font-weight:500;}
+.proj-period-half .pd{font-size:9px;opacity:0.82;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:400;line-height:1.2;}
 .proj-period-del{position:absolute;right:3px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.28);border:none;color:#fff;border-radius:3px;cursor:pointer;font-size:11px;line-height:1;padding:1px 4px;opacity:0;transition:opacity .12s;flex-shrink:0;}
 .proj-period:hover .proj-period-del{opacity:1;}
 .proj-period-del:hover{background:rgba(200,0,0,0.6);}
@@ -413,7 +415,7 @@ var PROJ_START_YEAR=2024;
 var PROJ_NUM_YEARS=5;
 var PROJ_COL_W=65;
 var PROJ_LABEL_W=160;
-var PROJ_ROW_H=62;
+var PROJ_ROW_H=76;
 var PROJ_DATA_VERSION=4;
 var PROJ_MONTHS=['Septembre','Octobre','Novembre','Décembre','Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août'];
 var PROJ_CATS={education:{label:'Éducation',color:'#4A90D9'},professional:{label:'Professionnel',color:'#34C759'},projects:{label:'Projets',color:'#FF9500'}};
@@ -925,7 +927,7 @@ function ed(id){
 }
 async function sv(id){var i=document.getElementById('ei'+id);if(!i)return;var v=i.value.trim();if(!v)return;var t=tasks.find(function(t){return t.id===id;});if(t)t.text=v;render();saveTasks(); if(supabaseClient) await updateRemoteTask(id,{text:v});}
 
-function openModal(){if(currentView==='Books'){openBookModal();return;}document.getElementById('bd').classList.add('open');document.querySelectorAll('.apb').forEach(function(b){b.classList.remove('sel');});np='M';na=false;setTimeout(function(){document.getElementById('new-task').focus();},80);}
+function openModal(){if(currentView==='Projection'){openProjPeriodModal(null,null);return;}if(currentView==='Books'){openBookModal();return;}document.getElementById('bd').classList.add('open');document.querySelectorAll('.apb').forEach(function(b){b.classList.remove('sel');});np='M';na=false;setTimeout(function(){document.getElementById('new-task').focus();},80);}
 function closeModal(){document.getElementById('bd').classList.remove('open');}
 function bdClick(ev){if(ev.target===document.getElementById('bd'))closeModal();}
 
@@ -1264,9 +1266,7 @@ function rProjection(){
   var el=document.getElementById('list');
   var LW=PROJ_LABEL_W;
   var RH=PROJ_ROW_H;
-  var mainEl=document.querySelector('.main');
-  var availW=mainEl?mainEl.clientWidth:(window.innerWidth-240);
-  var MW=Math.max(44,Math.floor((availW-LW)/12));
+  var MW=LW; // même largeur que la colonne label
   var bodyW=12*MW;
 
   // Layer geometry (two visual rows inside each phase row)
@@ -1360,15 +1360,21 @@ function rProjection(){
         // How many px of this period are in the past
         var pastPx=Math.min(Math.max(Math.round(todaySplitLocalPx-leftPx),0),widthPx);
         var futurePx=widthPx-pastPx;
+        // Show label in the future (coloured) half only if it is wide enough; otherwise fall back to grey half
+        var LABEL_MIN=52;
+        var labelInFuture=futurePx>=LABEL_MIN;
+        // Build name+desc HTML (desc only in taller main band)
+        var showDesc=height>=34&&p.desc;
+        function mkLabel(nm){return '<span class="pn" style="font-size:'+fontSize+'px;">'+nm+'</span>'+(showDesc?'<span class="pd">'+e(p.desc)+'</span>':'');}
         var del='<button class="proj-period-del" onclick="event.stopPropagation();deletePeriodDirect(\''+p.id+'\')" title="Supprimer">&#10005;</button>';
         h+='<div class="proj-period" '
           +'style="left:'+leftPx+'px;width:'+widthPx+'px;top:'+top+'px;height:'+height+'px;" '
           +'onclick="openProjPeriodModal(\''+p.id+'\',null)" '
           +'title="'+e(p.name+(p.desc?' — '+p.desc:''))+'">'
-          // Grey past half
-          +(pastPx>0?'<div class="proj-period-half" style="left:0;width:'+pastPx+'px;background:#B0ADA8;'+(futurePx<=0?'padding-right:22px;':'')+'font-size:'+fontSize+'px;">'+(futurePx<=0?e(p.name):'')+'</div>':'')
-          // Coloured future half
-          +(futurePx>0?'<div class="proj-period-half" style="left:'+pastPx+'px;width:'+futurePx+'px;background:'+cat.color+';font-size:'+fontSize+'px;">'+e(p.name)+'</div>':'')
+          // Grey past half — carries the label when the future sliver is too narrow
+          +(pastPx>0?'<div class="proj-period-half" style="left:0;width:'+pastPx+'px;background:#B0ADA8;padding-right:'+(futurePx<=0?'22':'4')+'px;">'+(!labelInFuture?mkLabel(e(p.name)):'')+'</div>':'')
+          // Coloured future half — carries the label when wide enough
+          +(futurePx>0?'<div class="proj-period-half" style="left:'+pastPx+'px;width:'+futurePx+'px;background:'+cat.color+';">'+(labelInFuture?mkLabel(e(p.name)):'')+'</div>':'')
           +del
           +'</div>';
       });
