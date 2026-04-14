@@ -232,7 +232,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
 .proj-year-row,.proj-month-row-hdr{display:flex;}
 .proj-corner{flex-shrink:0;border-bottom:1px solid rgba(0,0,0,0.07);}
 .proj-year-cell{font-size:10px;font-weight:700;color:#1C1C1E;text-align:center;padding:5px 0 4px;border-left:2px solid rgba(0,0,0,0.12);border-bottom:1px solid rgba(0,0,0,0.07);letter-spacing:0.04em;flex-shrink:0;}
-.proj-month-cell-hdr{font-size:7.5px;font-weight:500;color:#B0ADA8;text-align:center;padding:3px 1px 4px;border-left:1px solid rgba(0,0,0,0.05);border-bottom:2px solid rgba(0,0,0,0.09);flex-shrink:0;letter-spacing:-0.02em;overflow:hidden;white-space:nowrap;text-overflow:clip;}
+.proj-month-cell-hdr{font-size:10px;font-weight:500;color:#B0ADA8;text-align:center;padding:4px 2px 5px;border-left:1px solid rgba(0,0,0,0.05);border-bottom:2px solid rgba(0,0,0,0.09);flex-shrink:0;letter-spacing:-0.01em;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
 .proj-month-cell-hdr.is-today-month{color:#FF3B30;font-weight:700;}
 .proj-data-row{display:flex;border-bottom:1px solid rgba(0,0,0,0.07);}
 .proj-data-row:hover .proj-row-body{background:rgba(0,0,0,0.01);}
@@ -1266,7 +1266,10 @@ function rProjection(){
   var el=document.getElementById('list');
   var LW=PROJ_LABEL_W;
   var RH=PROJ_ROW_H;
-  var MW=LW; // même largeur que la colonne label
+  var mainEl=document.querySelector('.main');
+  var availW=mainEl?mainEl.clientWidth:(window.innerWidth-240);
+  var MW=Math.max(44,Math.floor(availW/13)); // 13 colonnes égales : 1 label + 12 mois
+  var LW=MW;
   var bodyW=12*MW;
 
   // Layer geometry (two visual rows inside each phase row)
