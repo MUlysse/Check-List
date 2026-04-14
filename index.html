@@ -223,11 +223,13 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
 #ptr-indicator.visible{opacity:1;}
 
 /* ── Projection View ── */
-.body-card.proj-mode{padding:0;overflow:hidden;}
-.proj-wrap{display:flex;flex-direction:column;height:100%;overflow:hidden;}
+.body-card.proj-mode{padding:0;overflow:hidden;display:flex;flex-direction:column;}
+.body-card.proj-mode #list{flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0;}
+.proj-wrap{display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden;}
 .proj-toolbar{padding:8px 16px;border-bottom:1px solid rgba(0,0,0,0.05);display:flex;align-items:center;gap:8px;flex-shrink:0;flex-wrap:wrap;}
 .proj-scroll{flex:1;overflow:auto;-webkit-overflow-scrolling:touch;}
-.proj-inner{display:flex;flex-direction:column;min-width:100%;padding-bottom:500px;}
+.proj-inner{display:block;min-width:100%;}
+.proj-spacer{height:320px;}
 .proj-head-sticky{position:sticky;top:0;z-index:10;background:#FAFAF8;}
 .proj-year-row,.proj-month-row-hdr{display:flex;}
 .proj-corner{flex-shrink:0;border-bottom:1px solid rgba(0,0,0,0.07);}
@@ -1436,6 +1438,8 @@ function rProjection(){
   h+='<div class="proj-add-row-footer">'
     +'<button class="proj-btn-outline" onclick="openProjRowModal(null)" style="font-size:11px;padding:4px 10px;">+ Ligne</button>'
     +'</div>';
+
+  h+='<div class="proj-spacer"></div>';
 
   h+='</div></div></div>';
   el.innerHTML=h;
