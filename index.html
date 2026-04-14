@@ -227,7 +227,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
 .proj-wrap{display:flex;flex-direction:column;height:100%;overflow:hidden;}
 .proj-toolbar{padding:8px 16px;border-bottom:1px solid rgba(0,0,0,0.05);display:flex;align-items:center;gap:8px;flex-shrink:0;flex-wrap:wrap;}
 .proj-scroll{flex:1;overflow:auto;-webkit-overflow-scrolling:touch;}
-.proj-inner{display:inline-flex;flex-direction:column;min-width:100%;padding-bottom:40px;}
+.proj-inner{display:flex;flex-direction:column;min-width:100%;padding-bottom:40px;}
 .proj-head-sticky{position:sticky;top:0;z-index:10;background:#FAFAF8;}
 .proj-year-row,.proj-month-row-hdr{display:flex;}
 .proj-corner{flex-shrink:0;border-bottom:1px solid rgba(0,0,0,0.07);}
@@ -237,12 +237,15 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
 .proj-data-row{display:flex;border-bottom:1px solid rgba(0,0,0,0.05);min-height:42px;}
 .proj-data-row:hover .proj-row-body{background:rgba(0,0,0,0.01);}
 .proj-row-label-cell{flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 6px 0 12px;background:#F5F3EF;border-right:1px solid rgba(0,0,0,0.07);}
-.proj-row-name{font-size:12px;font-weight:500;color:#3D3B38;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.proj-label-inner{display:flex;flex-direction:column;flex:1;min-width:0;overflow:hidden;}
+.proj-row-name{font-size:11.5px;font-weight:600;color:#3D3B38;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.proj-row-year{font-size:10px;color:#B0ADA8;font-weight:400;margin-top:1px;white-space:nowrap;}
 .proj-row-dots{background:none;border:none;cursor:pointer;color:#C8C5BF;font-size:15px;padding:2px 3px;border-radius:3px;line-height:1;flex-shrink:0;}
 .proj-row-dots:hover{color:#8A8680;background:rgba(0,0,0,0.05);}
 .proj-row-body{position:relative;flex-shrink:0;}
 .proj-grid-cell{position:absolute;top:0;bottom:0;pointer-events:none;}
 .proj-grid-cell.year-sep{border-left:2px solid rgba(0,0,0,0.10);}
+.proj-grid-cell.sem-sep{border-left:2px solid rgba(0,0,0,0.12);}
 .proj-grid-cell.month-sep{border-left:1px solid rgba(0,0,0,0.04);}
 .proj-period{position:absolute;border-radius:5px;cursor:pointer;display:flex;align-items:center;padding:0 8px;font-size:11px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#fff;box-shadow:0 1px 4px rgba(0,0,0,0.18);transition:filter .15s,opacity .15s;}
 .proj-period.is-past{opacity:0.33;filter:grayscale(0.25);}
@@ -403,21 +406,34 @@ var supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL
 var deleteTimers={};
 
 // ── Projection data ──
-var PROJ_START_YEAR=2023;
-var PROJ_NUM_YEARS=4;
+var PROJ_START_YEAR=2022;
+var PROJ_NUM_YEARS=5;
 var PROJ_COL_W=44;
-var PROJ_LABEL_W=92;
-var PROJ_ROW_H=42;
+var PROJ_LABEL_W=150;
+var PROJ_ROW_H=46;
 var PROJ_MONTHS=['Sep','Oct','Nov','Déc','Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû'];
 var PROJ_CATS={education:{label:'Éducation',color:'#4A90D9'},professional:{label:'Professionnel',color:'#34C759'},projects:{label:'Projets',color:'#FF9500'}};
 var projRows=[
-  {id:'pr1',label:'PM',order:0},
-  {id:'pr2',label:'M1',order:1},
-  {id:'pr3',label:'P1 / P2',order:2},
-  {id:'pr4',label:'M2',order:3},
+  {id:'pr1',label:'PM — Pré-Master',order:0},
+  {id:'pr2',label:'M1 — Master 1',order:1},
+  {id:'pr3',label:'P1 / P2 — Césure',order:2},
+  {id:'pr4',label:'M2 — Master 2',order:3},
   {id:'pr5',label:"Fin d'études",order:4},
 ];
-var projPeriods=[];
+var projPeriods=[
+  {id:'pp1',rowId:'pr1',name:'Semestre 1',startDate:'2022-09',endDate:'2022-12',cat:'education',desc:''},
+  {id:'pp2',rowId:'pr1',name:'Semestre 2',startDate:'2023-01',endDate:'2023-05',cat:'education',desc:''},
+  {id:'pp3',rowId:'pr1',name:'Stage PM',startDate:'2023-06',endDate:'2023-08',cat:'professional',desc:''},
+  {id:'pp4',rowId:'pr2',name:'Semestre 1',startDate:'2023-09',endDate:'2023-12',cat:'education',desc:''},
+  {id:'pp5',rowId:'pr2',name:'Semestre 2',startDate:'2024-01',endDate:'2024-05',cat:'education',desc:''},
+  {id:'pp6',rowId:'pr2',name:'Stage M1',startDate:'2024-06',endDate:'2024-08',cat:'professional',desc:''},
+  {id:'pp7',rowId:'pr3',name:'Stage P1',startDate:'2024-09',endDate:'2025-02',cat:'professional',desc:'Sovereign Advisory'},
+  {id:'pp8',rowId:'pr3',name:'Stage P2',startDate:'2025-03',endDate:'2025-08',cat:'professional',desc:''},
+  {id:'pp9',rowId:'pr4',name:'Semestre 1',startDate:'2025-09',endDate:'2025-12',cat:'education',desc:''},
+  {id:'pp10',rowId:'pr4',name:'Semestre 2',startDate:'2026-01',endDate:'2026-05',cat:'education',desc:''},
+  {id:'pp11',rowId:'pr4',name:'Stage M2',startDate:'2026-06',endDate:'2026-08',cat:'professional',desc:''},
+  {id:'pp12',rowId:'pr5',name:"Stage fin d'études",startDate:'2026-09',endDate:'2027-06',cat:'professional',desc:''},
+];
 var _pPeriodId=null;
 var _pRowId=null;
 
@@ -473,7 +489,7 @@ function loadTasks(){
       if(Array.isArray(data.books)) books=data.books;
       if(typeof data.view==='string') currentView=data.view;
       if(Array.isArray(data.projRows)&&data.projRows.length) projRows=data.projRows;
-      if(Array.isArray(data.projPeriods)) projPeriods=data.projPeriods;
+      if(Array.isArray(data.projPeriods)&&data.projPeriods.length) projPeriods=data.projPeriods;
       if(typeof data.projStartYear==='number') PROJ_START_YEAR=data.projStartYear;
       if(typeof data.projNumYears==='number') PROJ_NUM_YEARS=data.projNumYears;
     }catch(e){}
@@ -1241,16 +1257,22 @@ function colToDate(col){
 // ── Projection render ──
 function rProjection(){
   var el=document.getElementById('list');
-  var total=PROJ_NUM_YEARS*12;
-  var bodyW=total*PROJ_COL_W;
+  var MONTH_W=52;   // width per month column
+  var LW=PROJ_LABEL_W; // label column width
+  var RH=PROJ_ROW_H;
+  var bodyW=12*MONTH_W;
 
   // Today
   var now=new Date();
-  var nowYM=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
-  var tCol=monthToCol(nowYM);
-  var tFrac=(now.getDate()-1)/new Date(now.getFullYear(),now.getMonth()+1,0).getDate();
-  var tPx=(tCol+tFrac)*PROJ_COL_W;
-  var tVisible=tCol>=0&&tCol<total;
+  var nowM=now.getMonth()+1; // 1-12
+  var nowY=now.getFullYear();
+  var nowAbsCol=monthToCol(nowY+'-'+String(nowM).padStart(2,'0'));
+  // Academic base year for today (Sep starts a new academic year)
+  var todayBaseYear=nowM>=9?nowY:nowY-1;
+  // Local column of today within its academic year (0=Sep … 11=Aug)
+  var todayLocalCol=nowM>=9?nowM-9:nowM+3;
+  var todayFrac=(now.getDate()-1)/new Date(nowY,nowM,0).getDate();
+  var todayLocalPx=(todayLocalCol+todayFrac)*MONTH_W;
 
   var h='<div class="proj-wrap">';
 
@@ -1262,82 +1284,83 @@ function rProjection(){
   Object.keys(PROJ_CATS).forEach(function(k){
     h+='<span class="proj-legend-lbl"><span class="proj-legend-dot" style="background:'+PROJ_CATS[k].color+'"></span>'+PROJ_CATS[k].label+'</span>';
   });
-  h+='</div>'
-    +'<button class="proj-extend-btn" onclick="PROJ_NUM_YEARS++;saveTasks();rProjection();" title="Étendre d\'un an">+1 an</button>'
-    +'</div>';
+  h+='</div></div>';
 
   // Scroll wrapper
   h+='<div class="proj-scroll"><div class="proj-inner">';
 
-  // Sticky header
+  // Sticky month header
   h+='<div class="proj-head-sticky">';
-
-  // Year row
-  h+='<div class="proj-year-row">';
-  h+='<div class="proj-corner" style="width:'+PROJ_LABEL_W+'px;flex-shrink:0;"></div>';
-  for(var y=0;y<PROJ_NUM_YEARS;y++){
-    var yr=PROJ_START_YEAR+y;
-    h+='<div class="proj-year-cell" style="width:'+(12*PROJ_COL_W)+'px;">'+yr+' – '+(yr+1)+'</div>';
-  }
-  h+='</div>';
-
-  // Month row
   h+='<div class="proj-month-row-hdr">';
-  h+='<div class="proj-corner" style="width:'+PROJ_LABEL_W+'px;flex-shrink:0;"></div>';
-  for(var c=0;c<total;c++){
-    var isToday=(c===tCol);
-    h+='<div class="proj-month-cell-hdr'+(isToday?' is-today-month':'')+'" style="width:'+PROJ_COL_W+'px;">'+PROJ_MONTHS[c%12]+'</div>';
-  }
+  h+='<div class="proj-corner" style="width:'+LW+'px;flex-shrink:0;"></div>';
+  PROJ_MONTHS.forEach(function(mn,mi){
+    var isSemBoundary=(mi===4); // boundary between Dec(3) and Jan(4)
+    h+='<div class="proj-month-cell-hdr'+(isSemBoundary?' sem-col-start':'')+'" style="width:'+MONTH_W+'px;'+(isSemBoundary?'border-left:2px solid rgba(0,0,0,0.15);':'')+'">'+mn+'</div>';
+  });
   h+='</div></div>';
 
-  // Data rows
+  // Data rows — one per academic year/phase
   var rows=projRows.slice().sort(function(a,b){return a.order-b.order;});
-  rows.forEach(function(row){
+  rows.forEach(function(row,idx){
+    var rowBaseYear=PROJ_START_YEAR+idx;
+    var rowAbsStart=idx*12;  // absolute month col where this row starts
+    var rowAbsEnd=rowAbsStart+11;
+    var isCurrentYear=(rowBaseYear===todayBaseYear);
+    var yearLabel=rowBaseYear+'\u2013'+(rowBaseYear+1);
+
     var periods=projPeriods.filter(function(p){return p.rowId===row.id;});
 
     h+='<div class="proj-data-row">';
-    h+='<div class="proj-row-label-cell" style="width:'+PROJ_LABEL_W+'px;height:'+PROJ_ROW_H+'px;">'
+    // Label cell
+    h+='<div class="proj-row-label-cell" style="width:'+LW+'px;height:'+RH+'px;">'
+      +'<div class="proj-label-inner">'
       +'<span class="proj-row-name">'+e(row.label)+'</span>'
+      +'<span class="proj-row-year">'+yearLabel+'</span>'
+      +'</div>'
       +'<button class="proj-row-dots" onclick="openProjRowModal(\''+row.id+'\')">⋯</button>'
       +'</div>';
 
-    h+='<div class="proj-row-body" style="width:'+bodyW+'px;height:'+PROJ_ROW_H+'px;">';
+    // Body
+    h+='<div class="proj-row-body" style="width:'+bodyW+'px;height:'+RH+'px;">';
 
     // Grid lines
-    for(var c2=0;c2<total;c2++){
-      var cls=(c2>0&&c2%12===0)?'year-sep':'month-sep';
-      h+='<div class="proj-grid-cell '+cls+'" style="left:'+(c2*PROJ_COL_W)+'px;width:'+PROJ_COL_W+'px;"></div>';
+    for(var mi=0;mi<12;mi++){
+      var cls2=mi===4?'sem-sep':'month-sep';
+      h+='<div class="proj-grid-cell '+cls2+'" style="left:'+(mi*MONTH_W)+'px;width:'+MONTH_W+'px;"></div>';
     }
 
-    // Today marker
-    if(tVisible){
-      h+='<div class="proj-today-marker" style="left:'+tPx+'px;">'
+    // Today marker (only on the current academic year row)
+    if(isCurrentYear){
+      h+='<div class="proj-today-marker" style="left:'+todayLocalPx+'px;">'
         +'<div class="proj-today-tick"></div>'
         +'</div>';
     }
 
-    // Period blocks — sort wider first so narrower ones render on top
+    // Period blocks — sort wider first so narrow ones render on top
     periods.slice().sort(function(a,b){
       return (monthToCol(b.endDate)-monthToCol(b.startDate))-(monthToCol(a.endDate)-monthToCol(a.startDate));
     }).forEach(function(p){
-      var sc=monthToCol(p.startDate);
-      var ec=monthToCol(p.endDate);
-      if(ec<0||sc>=total)return;
-      var sc2=Math.max(0,sc),ec2=Math.min(total-1,ec);
-      var leftPx=sc2*PROJ_COL_W;
-      var widthPx=(ec2-sc2+1)*PROJ_COL_W-2;
-      var isPast=ec<tCol||(ec===tCol&&tFrac>0.9);
+      var pAbsS=monthToCol(p.startDate);
+      var pAbsE=monthToCol(p.endDate);
+      // Skip if period doesn't overlap this row's year at all
+      if(pAbsE<rowAbsStart||pAbsS>rowAbsEnd)return;
+      // Clip to this row's 12-month span
+      var localS=Math.max(pAbsS,rowAbsStart)-rowAbsStart;
+      var localE=Math.min(pAbsE,rowAbsEnd)-rowAbsStart;
+      var leftPx=localS*MONTH_W;
+      var widthPx=(localE-localS+1)*MONTH_W-2;
+      var isPast=pAbsE<nowAbsCol;
       var cat=PROJ_CATS[p.cat]||PROJ_CATS.education;
       h+='<div class="proj-period'+(isPast?' is-past':'')+'" '
-        +'style="left:'+leftPx+'px;width:'+widthPx+'px;top:5px;height:'+(PROJ_ROW_H-10)+'px;background:'+cat.color+'" '
+        +'style="left:'+leftPx+'px;width:'+widthPx+'px;top:5px;height:'+(RH-10)+'px;background:'+cat.color+'" '
         +'onclick="openProjPeriodModal(\''+p.id+'\',null)" '
         +'title="'+e(p.name+(p.desc?' — '+p.desc:''))+'">'+e(p.name)+'</div>';
     });
 
-    h+='</div></div>';
+    h+='</div></div>'; // close body + row
   });
 
-  // Add-row footer
+  // Footer
   h+='<div class="proj-add-row-footer">'
     +'<button class="proj-btn-outline" onclick="openProjRowModal(null)" style="font-size:11px;padding:4px 10px;">+ Ligne</button>'
     +'</div>';
