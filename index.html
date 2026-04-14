@@ -227,7 +227,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
 .proj-wrap{display:flex;flex-direction:column;height:100%;overflow:hidden;}
 .proj-toolbar{padding:8px 16px;border-bottom:1px solid rgba(0,0,0,0.05);display:flex;align-items:center;gap:8px;flex-shrink:0;flex-wrap:wrap;}
 .proj-scroll{flex:1;overflow:auto;-webkit-overflow-scrolling:touch;}
-.proj-inner{display:flex;flex-direction:column;min-width:100%;padding-bottom:120px;}
+.proj-inner{display:flex;flex-direction:column;min-width:100%;padding-bottom:280px;}
 .proj-head-sticky{position:sticky;top:0;z-index:10;background:#FAFAF8;}
 .proj-year-row,.proj-month-row-hdr{display:flex;}
 .proj-corner{flex-shrink:0;border-bottom:1px solid rgba(0,0,0,0.07);}
@@ -238,8 +238,8 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
 .proj-data-row:hover .proj-row-body{background:rgba(0,0,0,0.01);}
 .proj-row-label-cell{flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 6px 0 12px;background:#F5F3EF;border-right:1px solid rgba(0,0,0,0.07);}
 .proj-label-inner{display:flex;flex-direction:column;flex:1;min-width:0;overflow:hidden;}
-.proj-row-name{font-size:11.5px;font-weight:600;color:#3D3B38;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.proj-row-year{font-size:10px;color:#B0ADA8;font-weight:400;margin-top:1px;white-space:nowrap;}
+.proj-row-name{font-size:12px;font-weight:600;color:#1C1C1E;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.proj-row-year{font-size:10px;color:#8A8680;font-weight:400;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .proj-row-dots{background:none;border:none;cursor:pointer;color:#C8C5BF;font-size:15px;padding:2px 3px;border-radius:3px;line-height:1;flex-shrink:0;}
 .proj-row-dots:hover{color:#8A8680;background:rgba(0,0,0,0.05);}
 .proj-row-body{position:relative;flex-shrink:0;}
@@ -249,9 +249,10 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
 .proj-grid-cell.month-sep{border-left:1px solid rgba(0,0,0,0.04);}
 .proj-period{position:absolute;border-radius:5px;cursor:pointer;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.18);transition:filter .15s;}
 .proj-period:hover{filter:brightness(1.06);}
-.proj-period-half{position:absolute;top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;padding:3px 22px 3px 8px;overflow:hidden;color:#fff;font-weight:500;}
-.proj-period-half .pn{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.25;font-weight:500;}
-.proj-period-half .pd{font-size:9px;opacity:0.82;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:400;line-height:1.2;}
+.proj-period-bg{position:absolute;top:0;bottom:0;pointer-events:none;}
+.proj-period-label{position:absolute;left:0;right:0;top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;padding:3px 22px 3px 8px;overflow:hidden;color:#fff;font-weight:500;pointer-events:none;z-index:2;}
+.proj-period-label .pn{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.25;font-weight:500;text-shadow:0 1px 2px rgba(0,0,0,0.25);}
+.proj-period-label .pd{font-size:9px;opacity:0.88;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:400;line-height:1.2;text-shadow:0 1px 2px rgba(0,0,0,0.25);}
 .proj-period-del{position:absolute;right:3px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.28);border:none;color:#fff;border-radius:3px;cursor:pointer;font-size:11px;line-height:1;padding:1px 4px;opacity:0;transition:opacity .12s;flex-shrink:0;}
 .proj-period:hover .proj-period-del{opacity:1;}
 .proj-period-del:hover{background:rgba(200,0,0,0.6);}
@@ -1268,8 +1269,8 @@ function rProjection(){
   var RH=PROJ_ROW_H;
   var mainEl=document.querySelector('.main');
   var availW=mainEl?mainEl.clientWidth:(window.innerWidth-240);
-  var MW=Math.max(44,Math.floor(availW/13)); // 13 colonnes égales : 1 label + 12 mois
-  var LW=MW;
+  var MW=Math.max(40,Math.floor(availW/14)); // 14 units: label=2×MW + 12 months
+  var LW=2*MW;
   var bodyW=12*MW;
 
   // Layer geometry (two visual rows inside each phase row)
@@ -1363,21 +1364,20 @@ function rProjection(){
         // How many px of this period are in the past
         var pastPx=Math.min(Math.max(Math.round(todaySplitLocalPx-leftPx),0),widthPx);
         var futurePx=widthPx-pastPx;
-        // Show label in the future (coloured) half only if it is wide enough; otherwise fall back to grey half
-        var LABEL_MIN=52;
-        var labelInFuture=futurePx>=LABEL_MIN;
-        // Build name+desc HTML (desc only in taller main band)
+        // Build name+desc HTML overlay (desc only in taller main band)
         var showDesc=height>=34&&p.desc;
-        function mkLabel(nm){return '<span class="pn" style="font-size:'+fontSize+'px;">'+nm+'</span>'+(showDesc?'<span class="pd">'+e(p.desc)+'</span>':'');}
+        var labelHTML='<span class="pn" style="font-size:'+fontSize+'px;">'+e(p.name)+'</span>'+(showDesc?'<span class="pd">'+e(p.desc)+'</span>':'');
         var del='<button class="proj-period-del" onclick="event.stopPropagation();deletePeriodDirect(\''+p.id+'\')" title="Supprimer">&#10005;</button>';
         h+='<div class="proj-period" '
           +'style="left:'+leftPx+'px;width:'+widthPx+'px;top:'+top+'px;height:'+height+'px;" '
           +'onclick="openProjPeriodModal(\''+p.id+'\',null)" '
           +'title="'+e(p.name+(p.desc?' — '+p.desc:''))+'">'
-          // Grey past half — carries the label when the future sliver is too narrow
-          +(pastPx>0?'<div class="proj-period-half" style="left:0;width:'+pastPx+'px;background:#B0ADA8;padding-right:'+(futurePx<=0?'22':'4')+'px;">'+(!labelInFuture?mkLabel(e(p.name)):'')+'</div>':'')
-          // Coloured future half — carries the label when wide enough
-          +(futurePx>0?'<div class="proj-period-half" style="left:'+pastPx+'px;width:'+futurePx+'px;background:'+cat.color+';">'+(labelInFuture?mkLabel(e(p.name)):'')+'</div>':'')
+          // Grey background for past portion
+          +(pastPx>0?'<div class="proj-period-bg" style="left:0;width:'+pastPx+'px;background:#B0ADA8;"></div>':'')
+          // Coloured background for future portion
+          +(futurePx>0?'<div class="proj-period-bg" style="left:'+pastPx+'px;width:'+futurePx+'px;background:'+cat.color+';"></div>':'')
+          // Single label overlay — always spans the full block, never shifts with today arrow
+          +'<div class="proj-period-label">'+labelHTML+'</div>'
           +del
           +'</div>';
       });
