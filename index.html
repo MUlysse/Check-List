@@ -232,9 +232,9 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
 .proj-year-row,.proj-month-row-hdr{display:flex;}
 .proj-corner{flex-shrink:0;border-bottom:1px solid rgba(0,0,0,0.07);}
 .proj-year-cell{font-size:10px;font-weight:700;color:#1C1C1E;text-align:center;padding:5px 0 4px;border-left:2px solid rgba(0,0,0,0.12);border-bottom:1px solid rgba(0,0,0,0.07);letter-spacing:0.04em;flex-shrink:0;}
-.proj-month-cell-hdr{font-size:9px;font-weight:500;color:#B0ADA8;text-align:center;padding:3px 0 4px;border-left:1px solid rgba(0,0,0,0.05);border-bottom:2px solid rgba(0,0,0,0.09);flex-shrink:0;letter-spacing:0.02em;}
+.proj-month-cell-hdr{font-size:7.5px;font-weight:500;color:#B0ADA8;text-align:center;padding:3px 1px 4px;border-left:1px solid rgba(0,0,0,0.05);border-bottom:2px solid rgba(0,0,0,0.09);flex-shrink:0;letter-spacing:-0.02em;overflow:hidden;white-space:nowrap;text-overflow:clip;}
 .proj-month-cell-hdr.is-today-month{color:#FF3B30;font-weight:700;}
-.proj-data-row{display:flex;border-bottom:1px solid rgba(0,0,0,0.05);min-height:42px;}
+.proj-data-row{display:flex;border-bottom:1px solid rgba(0,0,0,0.07);}
 .proj-data-row:hover .proj-row-body{background:rgba(0,0,0,0.01);}
 .proj-row-label-cell{flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 6px 0 12px;background:#F5F3EF;border-right:1px solid rgba(0,0,0,0.07);}
 .proj-label-inner{display:flex;flex-direction:column;flex:1;min-width:0;overflow:hidden;}
@@ -247,11 +247,15 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
 .proj-grid-cell.year-sep{border-left:2px solid rgba(0,0,0,0.10);}
 .proj-grid-cell.sem-sep{border-left:2px solid rgba(0,0,0,0.12);}
 .proj-grid-cell.month-sep{border-left:1px solid rgba(0,0,0,0.04);}
-.proj-period{position:absolute;border-radius:5px;cursor:pointer;display:flex;align-items:center;padding:0 8px;font-size:11px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#fff;box-shadow:0 1px 4px rgba(0,0,0,0.18);transition:filter .15s,opacity .15s;}
+.proj-period{position:absolute;border-radius:5px;cursor:pointer;display:flex;align-items:center;padding:0 22px 0 8px;font-size:11px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#fff;box-shadow:0 1px 4px rgba(0,0,0,0.18);transition:filter .15s,opacity .15s;}
 .proj-period.is-past{opacity:0.33;filter:grayscale(0.25);}
 .proj-period:hover{filter:brightness(1.08);}
+.proj-period-del{position:absolute;right:3px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.28);border:none;color:#fff;border-radius:3px;cursor:pointer;font-size:11px;line-height:1;padding:1px 4px;opacity:0;transition:opacity .12s;flex-shrink:0;}
+.proj-period:hover .proj-period-del{opacity:1;}
+.proj-period-del:hover{background:rgba(200,0,0,0.6);}
 .proj-today-marker{position:absolute;top:0;bottom:0;width:2px;background:#FF3B30;z-index:6;pointer-events:none;}
 .proj-today-tick{position:absolute;top:0;left:-4px;width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:6px solid #FF3B30;}
+.proj-today-label{position:absolute;top:4px;left:5px;font-size:8.5px;font-weight:700;color:#FF3B30;white-space:nowrap;letter-spacing:-0.01em;}
 .proj-add-row-footer{display:flex;padding:6px 0 6px 12px;}
 .proj-btn{padding:7px 14px;border-radius:7px;border:none;background:#4A90D9;color:#fff;font-size:12px;font-weight:600;cursor:pointer;transition:background .15s;white-space:nowrap;}
 .proj-btn:hover{background:#3A7DC7;}
@@ -408,10 +412,11 @@ var deleteTimers={};
 // ── Projection data ──
 var PROJ_START_YEAR=2022;
 var PROJ_NUM_YEARS=5;
-var PROJ_COL_W=44;
-var PROJ_LABEL_W=150;
-var PROJ_ROW_H=46;
-var PROJ_MONTHS=['Sep','Oct','Nov','Déc','Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû'];
+var PROJ_COL_W=65;
+var PROJ_LABEL_W=160;
+var PROJ_ROW_H=62;
+var PROJ_DATA_VERSION=3;
+var PROJ_MONTHS=['Septembre','Octobre','Novembre','Décembre','Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août'];
 var PROJ_CATS={education:{label:'Éducation',color:'#4A90D9'},professional:{label:'Professionnel',color:'#34C759'},projects:{label:'Projets',color:'#FF9500'}};
 var projRows=[
   {id:'pr1',label:'PM — Pré-Master',order:0},
@@ -421,18 +426,28 @@ var projRows=[
   {id:'pr5',label:"Fin d'études",order:4},
 ];
 var projPeriods=[
-  {id:'pp1',rowId:'pr1',name:'Semestre 1',startDate:'2022-09',endDate:'2022-12',cat:'education',desc:''},
-  {id:'pp2',rowId:'pr1',name:'Semestre 2',startDate:'2023-01',endDate:'2023-05',cat:'education',desc:''},
-  {id:'pp3',rowId:'pr1',name:'Stage PM',startDate:'2023-06',endDate:'2023-08',cat:'professional',desc:''},
-  {id:'pp4',rowId:'pr2',name:'Semestre 1',startDate:'2023-09',endDate:'2023-12',cat:'education',desc:''},
-  {id:'pp5',rowId:'pr2',name:'Semestre 2',startDate:'2024-01',endDate:'2024-05',cat:'education',desc:''},
-  {id:'pp6',rowId:'pr2',name:'Stage M1',startDate:'2024-06',endDate:'2024-08',cat:'professional',desc:''},
-  {id:'pp7',rowId:'pr3',name:'Stage P1',startDate:'2024-09',endDate:'2025-02',cat:'professional',desc:'Sovereign Advisory'},
-  {id:'pp8',rowId:'pr3',name:'Stage P2',startDate:'2025-03',endDate:'2025-08',cat:'professional',desc:''},
-  {id:'pp9',rowId:'pr4',name:'Semestre 1',startDate:'2025-09',endDate:'2025-12',cat:'education',desc:''},
-  {id:'pp10',rowId:'pr4',name:'Semestre 2',startDate:'2026-01',endDate:'2026-05',cat:'education',desc:''},
-  {id:'pp11',rowId:'pr4',name:'Stage M2',startDate:'2026-06',endDate:'2026-08',cat:'professional',desc:''},
+  // ── PM 2022-2023 ──
+  {id:'pp1', rowId:'pr1',name:'Semestre 1',      startDate:'2022-09',endDate:'2022-12',cat:'education',   desc:''},
+  {id:'pp2', rowId:'pr1',name:'Semestre 2',      startDate:'2023-01',endDate:'2023-05',cat:'education',   desc:''},
+  {id:'pp3', rowId:'pr1',name:'Stage PM',        startDate:'2023-06',endDate:'2023-08',cat:'professional',desc:''},
+  // ── M1 2023-2024 ──
+  {id:'pp4', rowId:'pr2',name:'Semestre 1 EDHEC (Nice)',startDate:'2023-09',endDate:'2023-12',cat:'education',desc:''},
+  {id:'pp5', rowId:'pr2',name:'Semestre 2',      startDate:'2024-01',endDate:'2024-05',cat:'education',   desc:''},
+  {id:'pp6', rowId:'pr2',name:'Stage M1',        startDate:'2024-06',endDate:'2024-08',cat:'professional',desc:''},
+  {id:'pp13',rowId:'pr2',name:'Onoris',          startDate:'2023-09',endDate:'2024-08',cat:'projects',    desc:'Fondation Onoris'},
+  // ── P1 / P2 Césure 2024-2025 ──
+  {id:'pp7', rowId:'pr3',name:'Sovereign Advisory',startDate:'2024-09',endDate:'2025-02',cat:'professional',desc:'Stage de césure P1'},
+  {id:'pp8', rowId:'pr3',name:'Stage P2',        startDate:'2025-03',endDate:'2025-08',cat:'professional',desc:'Stage de césure P2'},
+  {id:'pp14',rowId:'pr3',name:'Onoris',          startDate:'2024-09',endDate:'2025-08',cat:'projects',    desc:'Fondation Onoris'},
+  // ── M2 2025-2026 ──
+  {id:'pp9', rowId:'pr4',name:'Semestre 1',      startDate:'2025-09',endDate:'2025-12',cat:'education',   desc:''},
+  {id:'pp10',rowId:'pr4',name:'Semestre 2',      startDate:'2026-01',endDate:'2026-05',cat:'education',   desc:''},
+  {id:'pp11',rowId:'pr4',name:'Stage M2',        startDate:'2026-06',endDate:'2026-08',cat:'professional',desc:''},
+  {id:'pp15',rowId:'pr4',name:'Onoris',          startDate:'2025-09',endDate:'2026-08',cat:'projects',    desc:'Fondation Onoris'},
+  {id:'pp16',rowId:'pr4',name:'IHEDN',           startDate:'2025-09',endDate:'2026-05',cat:'projects',    desc:'Session nationale'},
+  // ── Fin d\'études 2026-2027 ──
   {id:'pp12',rowId:'pr5',name:"Stage fin d'études",startDate:'2026-09',endDate:'2027-06',cat:'professional',desc:''},
+  {id:'pp17',rowId:'pr5',name:'Onoris',          startDate:'2026-09',endDate:'2027-06',cat:'projects',    desc:'Fondation Onoris'},
 ];
 var _pPeriodId=null;
 var _pRowId=null;
@@ -489,9 +504,7 @@ function loadTasks(){
       if(Array.isArray(data.books)) books=data.books;
       if(typeof data.view==='string') currentView=data.view;
       if(Array.isArray(data.projRows)&&data.projRows.length) projRows=data.projRows;
-      if(Array.isArray(data.projPeriods)&&data.projPeriods.length) projPeriods=data.projPeriods;
-      if(typeof data.projStartYear==='number') PROJ_START_YEAR=data.projStartYear;
-      if(typeof data.projNumYears==='number') PROJ_NUM_YEARS=data.projNumYears;
+      if(Array.isArray(data.projPeriods)&&data.projPeriods.length&&data.projDataVersion===PROJ_DATA_VERSION) projPeriods=data.projPeriods;
     }catch(e){}
   }
   // Ensure all task categories are in TABS
@@ -501,7 +514,7 @@ function loadTasks(){
   CO = TABS.filter(x => !['All','Urgent','Completed',TODAY_TAB].includes(x));
 }
 function saveTasks(){
-  try{localStorage.setItem(STORAGE_KEY, JSON.stringify({tasks:tasks.filter(function(t){return t.cat!==SETTINGS_CAT;}),nid:nid,tab:tab,tabs:TABS,books:books,view:currentView,projRows:projRows,projPeriods:projPeriods,projStartYear:PROJ_START_YEAR,projNumYears:PROJ_NUM_YEARS}));}catch(e){}
+  try{localStorage.setItem(STORAGE_KEY, JSON.stringify({tasks:tasks.filter(function(t){return t.cat!==SETTINGS_CAT;}),nid:nid,tab:tab,tabs:TABS,books:books,view:currentView,projRows:projRows,projPeriods:projPeriods,projDataVersion:PROJ_DATA_VERSION}));}catch(e){}
 }
 function clearAutoDelete(id){
   if(deleteTimers[id]){ clearTimeout(deleteTimers[id]); delete deleteTimers[id]; }
@@ -1257,22 +1270,24 @@ function colToDate(col){
 // ── Projection render ──
 function rProjection(){
   var el=document.getElementById('list');
-  var MONTH_W=52;   // width per month column
-  var LW=PROJ_LABEL_W; // label column width
+  var MW=PROJ_COL_W;   // month column width
+  var LW=PROJ_LABEL_W;
   var RH=PROJ_ROW_H;
-  var bodyW=12*MONTH_W;
+  var bodyW=12*MW;
+
+  // Layer geometry (two visual rows inside each phase row)
+  var MAIN_TOP=5, MAIN_H=Math.floor(RH*0.52); // education / professional
+  var PROJ_TOP=MAIN_TOP+MAIN_H+4, PROJ_H=RH-PROJ_TOP-5; // projects band
 
   // Today
   var now=new Date();
-  var nowM=now.getMonth()+1; // 1-12
+  var nowM=now.getMonth()+1;
   var nowY=now.getFullYear();
   var nowAbsCol=monthToCol(nowY+'-'+String(nowM).padStart(2,'0'));
-  // Academic base year for today (Sep starts a new academic year)
   var todayBaseYear=nowM>=9?nowY:nowY-1;
-  // Local column of today within its academic year (0=Sep … 11=Aug)
   var todayLocalCol=nowM>=9?nowM-9:nowM+3;
   var todayFrac=(now.getDate()-1)/new Date(nowY,nowM,0).getDate();
-  var todayLocalPx=(todayLocalCol+todayFrac)*MONTH_W;
+  var todayLocalPx=(todayLocalCol+todayFrac)*MW;
 
   var h='<div class="proj-wrap">';
 
@@ -1286,7 +1301,6 @@ function rProjection(){
   });
   h+='</div></div>';
 
-  // Scroll wrapper
   h+='<div class="proj-scroll"><div class="proj-inner">';
 
   // Sticky month header
@@ -1294,24 +1308,25 @@ function rProjection(){
   h+='<div class="proj-month-row-hdr">';
   h+='<div class="proj-corner" style="width:'+LW+'px;flex-shrink:0;"></div>';
   PROJ_MONTHS.forEach(function(mn,mi){
-    var isSemBoundary=(mi===4); // boundary between Dec(3) and Jan(4)
-    h+='<div class="proj-month-cell-hdr'+(isSemBoundary?' sem-col-start':'')+'" style="width:'+MONTH_W+'px;'+(isSemBoundary?'border-left:2px solid rgba(0,0,0,0.15);':'')+'">'+mn+'</div>';
+    var isSem=(mi===4);
+    h+='<div class="proj-month-cell-hdr" style="width:'+MW+'px;'+(isSem?'border-left:2px solid rgba(0,0,0,0.18);font-weight:700;color:#8A8680;':'')+'">'+mn+'</div>';
   });
   h+='</div></div>';
 
-  // Data rows — one per academic year/phase
+  // Data rows
   var rows=projRows.slice().sort(function(a,b){return a.order-b.order;});
   rows.forEach(function(row,idx){
     var rowBaseYear=PROJ_START_YEAR+idx;
-    var rowAbsStart=idx*12;  // absolute month col where this row starts
+    var rowAbsStart=idx*12;
     var rowAbsEnd=rowAbsStart+11;
     var isCurrentYear=(rowBaseYear===todayBaseYear);
     var yearLabel=rowBaseYear+'\u2013'+(rowBaseYear+1);
 
-    var periods=projPeriods.filter(function(p){return p.rowId===row.id;});
+    var allPeriods=projPeriods.filter(function(p){return p.rowId===row.id;});
+    var mainPeriods=allPeriods.filter(function(p){return p.cat!=='projects';});
+    var projPers=allPeriods.filter(function(p){return p.cat==='projects';});
 
     h+='<div class="proj-data-row">';
-    // Label cell
     h+='<div class="proj-row-label-cell" style="width:'+LW+'px;height:'+RH+'px;">'
       +'<div class="proj-label-inner">'
       +'<span class="proj-row-name">'+e(row.label)+'</span>'
@@ -1320,53 +1335,63 @@ function rProjection(){
       +'<button class="proj-row-dots" onclick="openProjRowModal(\''+row.id+'\')">⋯</button>'
       +'</div>';
 
-    // Body
     h+='<div class="proj-row-body" style="width:'+bodyW+'px;height:'+RH+'px;">';
 
     // Grid lines
     for(var mi=0;mi<12;mi++){
-      var cls2=mi===4?'sem-sep':'month-sep';
-      h+='<div class="proj-grid-cell '+cls2+'" style="left:'+(mi*MONTH_W)+'px;width:'+MONTH_W+'px;"></div>';
+      h+='<div class="proj-grid-cell '+(mi===4?'sem-sep':'month-sep')+'" style="left:'+(mi*MW)+'px;width:'+MW+'px;"></div>';
     }
 
-    // Today marker (only on the current academic year row)
+    // Today marker
     if(isCurrentYear){
       h+='<div class="proj-today-marker" style="left:'+todayLocalPx+'px;">'
         +'<div class="proj-today-tick"></div>'
+        +'<span class="proj-today-label">O\u00f9 en suis-je\u00a0?</span>'
         +'</div>';
     }
 
-    // Period blocks — sort wider first so narrow ones render on top
-    periods.slice().sort(function(a,b){
-      return (monthToCol(b.endDate)-monthToCol(b.startDate))-(monthToCol(a.endDate)-monthToCol(a.startDate));
-    }).forEach(function(p){
-      var pAbsS=monthToCol(p.startDate);
-      var pAbsE=monthToCol(p.endDate);
-      // Skip if period doesn't overlap this row's year at all
-      if(pAbsE<rowAbsStart||pAbsS>rowAbsEnd)return;
-      // Clip to this row's 12-month span
-      var localS=Math.max(pAbsS,rowAbsStart)-rowAbsStart;
-      var localE=Math.min(pAbsE,rowAbsEnd)-rowAbsStart;
-      var leftPx=localS*MONTH_W;
-      var widthPx=(localE-localS+1)*MONTH_W-2;
-      var isPast=pAbsE<nowAbsCol;
-      var cat=PROJ_CATS[p.cat]||PROJ_CATS.education;
-      h+='<div class="proj-period'+(isPast?' is-past':'')+'" '
-        +'style="left:'+leftPx+'px;width:'+widthPx+'px;top:5px;height:'+(RH-10)+'px;background:'+cat.color+'" '
-        +'onclick="openProjPeriodModal(\''+p.id+'\',null)" '
-        +'title="'+e(p.name+(p.desc?' — '+p.desc:''))+'">'+e(p.name)+'</div>';
-    });
+    // Helper: render one set of periods at a given vertical position
+    function renderPeriods(list,top,height,fontSize){
+      list.slice().sort(function(a,b){
+        return (monthToCol(b.endDate)-monthToCol(b.startDate))-(monthToCol(a.endDate)-monthToCol(a.startDate));
+      }).forEach(function(p){
+        var pAbsS=monthToCol(p.startDate);
+        var pAbsE=monthToCol(p.endDate);
+        if(pAbsE<rowAbsStart||pAbsS>rowAbsEnd)return;
+        var localS=Math.max(pAbsS,rowAbsStart)-rowAbsStart;
+        var localE=Math.min(pAbsE,rowAbsEnd)-rowAbsStart;
+        var leftPx=localS*MW;
+        var widthPx=(localE-localS+1)*MW-2;
+        var isPast=pAbsE<nowAbsCol;
+        var cat=PROJ_CATS[p.cat]||PROJ_CATS.education;
+        h+='<div class="proj-period'+(isPast?' is-past':'')+'" '
+          +'style="left:'+leftPx+'px;width:'+widthPx+'px;top:'+top+'px;height:'+height+'px;'
+          +'background:'+cat.color+';font-size:'+fontSize+'px;" '
+          +'onclick="openProjPeriodModal(\''+p.id+'\',null)" '
+          +'title="'+e(p.name+(p.desc?' — '+p.desc:''))+'">'+e(p.name)
+          +'<button class="proj-period-del" onclick="event.stopPropagation();deletePeriodDirect(\''+p.id+'\')" title="Supprimer">&#10005;</button>'
+          +'</div>';
+      });
+    }
 
-    h+='</div></div>'; // close body + row
+    renderPeriods(mainPeriods, MAIN_TOP, MAIN_H, 11);  // education & professional
+    renderPeriods(projPers,   PROJ_TOP, PROJ_H, 10);   // projects band
+
+    h+='</div></div>';
   });
 
-  // Footer
   h+='<div class="proj-add-row-footer">'
     +'<button class="proj-btn-outline" onclick="openProjRowModal(null)" style="font-size:11px;padding:4px 10px;">+ Ligne</button>'
     +'</div>';
 
   h+='</div></div></div>';
   el.innerHTML=h;
+}
+
+// ── Delete period directly from block ──
+function deletePeriodDirect(id){
+  projPeriods=projPeriods.filter(function(p){return p.id!==id;});
+  saveTasks();rProjection();
 }
 
 // ── Période modal ──
