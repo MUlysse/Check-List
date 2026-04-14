@@ -227,32 +227,33 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
 .proj-wrap{display:flex;flex-direction:column;height:100%;overflow:hidden;}
 .proj-toolbar{padding:8px 16px;border-bottom:1px solid rgba(0,0,0,0.05);display:flex;align-items:center;gap:8px;flex-shrink:0;flex-wrap:wrap;}
 .proj-scroll{flex:1;overflow:auto;-webkit-overflow-scrolling:touch;}
-.proj-inner{display:flex;flex-direction:column;min-width:100%;padding-bottom:280px;}
+.proj-inner{display:flex;flex-direction:column;min-width:100%;padding-bottom:500px;}
 .proj-head-sticky{position:sticky;top:0;z-index:10;background:#FAFAF8;}
 .proj-year-row,.proj-month-row-hdr{display:flex;}
 .proj-corner{flex-shrink:0;border-bottom:1px solid rgba(0,0,0,0.07);}
 .proj-year-cell{font-size:10px;font-weight:700;color:#1C1C1E;text-align:center;padding:5px 0 4px;border-left:2px solid rgba(0,0,0,0.12);border-bottom:1px solid rgba(0,0,0,0.07);letter-spacing:0.04em;flex-shrink:0;}
 .proj-month-cell-hdr{font-size:10px;font-weight:500;color:#B0ADA8;text-align:center;padding:4px 2px 5px;border-left:1px solid rgba(0,0,0,0.05);border-bottom:2px solid rgba(0,0,0,0.09);flex-shrink:0;letter-spacing:-0.01em;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
 .proj-month-cell-hdr.is-today-month{color:#FF3B30;font-weight:700;}
-.proj-data-row{display:flex;border-bottom:1px solid rgba(0,0,0,0.07);}
+.proj-data-row{display:flex;border-bottom:2px solid rgba(0,0,0,0.13);}
 .proj-data-row:hover .proj-row-body{background:rgba(0,0,0,0.01);}
-.proj-row-label-cell{flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 6px 0 12px;background:#F5F3EF;border-right:1px solid rgba(0,0,0,0.07);}
+.proj-row-label-cell{flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 6px 0 12px;background:#F5F3EF;border-right:2px solid rgba(0,0,0,0.10);}
 .proj-label-inner{display:flex;flex-direction:column;flex:1;min-width:0;overflow:hidden;}
 .proj-row-name{font-size:12px;font-weight:600;color:#1C1C1E;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .proj-row-year{font-size:10px;color:#8A8680;font-weight:400;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.proj-row-age{font-size:9.5px;color:#B0ADA8;font-weight:400;margin-top:0;white-space:nowrap;}
 .proj-row-dots{background:none;border:none;cursor:pointer;color:#C8C5BF;font-size:15px;padding:2px 3px;border-radius:3px;line-height:1;flex-shrink:0;}
 .proj-row-dots:hover{color:#8A8680;background:rgba(0,0,0,0.05);}
 .proj-row-body{position:relative;flex-shrink:0;}
 .proj-grid-cell{position:absolute;top:0;bottom:0;pointer-events:none;}
 .proj-grid-cell.year-sep{border-left:2px solid rgba(0,0,0,0.10);}
-.proj-grid-cell.sem-sep{border-left:2px solid rgba(0,0,0,0.12);}
-.proj-grid-cell.month-sep{border-left:1px solid rgba(0,0,0,0.04);}
+.proj-grid-cell.sem-sep{border-left:2.5px solid rgba(0,0,0,0.22);}
+.proj-grid-cell.month-sep{border-left:1px solid rgba(0,0,0,0.06);}
 .proj-period{position:absolute;border-radius:5px;cursor:pointer;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.18);transition:filter .15s;}
 .proj-period:hover{filter:brightness(1.06);}
 .proj-period-bg{position:absolute;top:0;bottom:0;pointer-events:none;}
-.proj-period-label{position:absolute;left:0;right:0;top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;padding:3px 22px 3px 8px;overflow:hidden;color:#fff;font-weight:500;pointer-events:none;z-index:2;}
-.proj-period-label .pn{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.25;font-weight:500;text-shadow:0 1px 2px rgba(0,0,0,0.25);}
-.proj-period-label .pd{font-size:9px;opacity:0.88;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:400;line-height:1.2;text-shadow:0 1px 2px rgba(0,0,0,0.25);}
+.proj-period-label{position:absolute;left:0;right:0;top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:2px 20px;overflow:hidden;color:#fff;font-weight:500;pointer-events:none;z-index:2;}
+.proj-period-label .pn{white-space:nowrap;overflow:hidden;line-height:1.25;font-weight:600;text-shadow:0 1px 2px rgba(0,0,0,0.28);max-width:100%;}
+.proj-period-label .pd{opacity:0.90;margin-top:1px;white-space:nowrap;overflow:hidden;font-weight:400;line-height:1.2;text-shadow:0 1px 2px rgba(0,0,0,0.22);max-width:100%;}
 .proj-period-del{position:absolute;right:3px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.28);border:none;color:#fff;border-radius:3px;cursor:pointer;font-size:11px;line-height:1;padding:1px 4px;opacity:0;transition:opacity .12s;flex-shrink:0;}
 .proj-period:hover .proj-period-del{opacity:1;}
 .proj-period-del:hover{background:rgba(200,0,0,0.6);}
@@ -269,6 +270,26 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
 .proj-legend-lbl{font-size:11px;color:#8A8680;display:flex;align-items:center;gap:4px;}
 .proj-extend-btn{padding:4px 10px;border-radius:6px;border:1px solid #E0DDD8;background:transparent;color:#8A8680;font-size:11px;cursor:pointer;margin-left:auto;}
 .proj-extend-btn:hover{background:#F5F3EF;color:#3D3B38;}
+/* ── Long-term goals sidebar checklist ── */
+.proj-goals-wrap{display:flex;flex-direction:column;flex:1;overflow:hidden;padding:4px 8px 8px;}
+.proj-goals-title{font-size:10.5px;font-weight:600;color:#8A8680;letter-spacing:0.07em;text-transform:uppercase;padding:10px 6px 6px;}
+.proj-goal-add{display:flex;gap:5px;padding:0 2px 8px;}
+.proj-goal-add input{flex:1;border:1px solid #D5D2CC;border-radius:7px;padding:6px 9px;font-size:12px;background:#EAE8E4;outline:none;color:#1C1C1E;min-width:0;}
+.proj-goal-add input:focus{border-color:#8A8680;background:#E5E2DC;}
+.proj-goal-add button{background:#8A8680;border:none;color:#fff;border-radius:7px;padding:6px 10px;font-size:16px;line-height:1;cursor:pointer;flex-shrink:0;}
+.proj-goal-add button:hover{background:#6A6660;}
+.proj-goals-list{overflow-y:auto;flex:1;}
+.proj-goals-list::-webkit-scrollbar{width:3px;}
+.proj-goals-list::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.10);border-radius:2px;}
+.goal-row{display:flex;align-items:flex-start;gap:7px;padding:6px 6px;border-radius:8px;transition:background .1s;position:relative;}
+.goal-row:hover{background:rgba(0,0,0,0.05);}
+.goal-chk{appearance:none;-webkit-appearance:none;width:15px;height:15px;border-radius:50%;border:1.5px solid #C8C5BF;background:#EAE8E2;cursor:pointer;transition:all .15s;flex-shrink:0;margin-top:2px;}
+.goal-chk:checked{background:#C8C5BF;border-color:#B0ADA8;}
+.goal-txt{flex:1;font-size:12px;color:#3D3B38;line-height:1.4;word-break:break-word;}
+.goal-row.done .goal-txt{color:#B0ADA8;}
+.goal-del{background:none;border:none;color:#C8C5BF;cursor:pointer;font-size:12px;padding:0 2px;border-radius:3px;opacity:0;transition:opacity .12s;flex-shrink:0;line-height:1;margin-top:2px;}
+.goal-row:hover .goal-del{opacity:1;}
+.goal-del:hover{color:#FF3B30;}
 </style>
 </head>
 <body>
@@ -416,8 +437,10 @@ var PROJ_START_YEAR=2024;
 var PROJ_NUM_YEARS=5;
 var PROJ_COL_W=65;
 var PROJ_LABEL_W=160;
-var PROJ_ROW_H=76;
+var PROJ_ROW_H=96;
 var PROJ_DATA_VERSION=4;
+var PROJ_BIRTH_YEAR=2003; // né le 29/03/2003
+var projGoals=[];
 var PROJ_MONTHS=['Septembre','Octobre','Novembre','Décembre','Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août'];
 var PROJ_CATS={education:{label:'Éducation',color:'#4A90D9'},professional:{label:'Professionnel',color:'#34C759'},projects:{label:'Projets',color:'#FF9500'}};
 var projRows=[
@@ -507,6 +530,7 @@ function loadTasks(){
       if(typeof data.view==='string') currentView=data.view;
       if(Array.isArray(data.projRows)&&data.projRows.length) projRows=data.projRows;
       if(Array.isArray(data.projPeriods)&&data.projPeriods.length&&data.projDataVersion===PROJ_DATA_VERSION) projPeriods=data.projPeriods;
+      if(Array.isArray(data.projGoals)) projGoals=data.projGoals;
     }catch(e){}
   }
   // Ensure all task categories are in TABS
@@ -516,7 +540,7 @@ function loadTasks(){
   CO = TABS.filter(x => !['All','Urgent','Completed',TODAY_TAB].includes(x));
 }
 function saveTasks(){
-  try{localStorage.setItem(STORAGE_KEY, JSON.stringify({tasks:tasks.filter(function(t){return t.cat!==SETTINGS_CAT;}),nid:nid,tab:tab,tabs:TABS,books:books,view:currentView,projRows:projRows,projPeriods:projPeriods,projDataVersion:PROJ_DATA_VERSION}));}catch(e){}
+  try{localStorage.setItem(STORAGE_KEY, JSON.stringify({tasks:tasks.filter(function(t){return t.cat!==SETTINGS_CAT;}),nid:nid,tab:tab,tabs:TABS,books:books,view:currentView,projRows:projRows,projPeriods:projPeriods,projDataVersion:PROJ_DATA_VERSION,projGoals:projGoals}));}catch(e){}
 }
 function clearAutoDelete(id){
   if(deleteTimers[id]){ clearTimeout(deleteTimers[id]); delete deleteTimers[id]; }
@@ -610,6 +634,7 @@ async function loadTasksRemote(){
         CO = TABS.filter(function(x){return !['All','Urgent','Completed',TODAY_TAB].includes(x);});
         if(Array.isArray(s.projRows)&&s.projRows.length) projRows=s.projRows;
         if(Array.isArray(s.projPeriods)&&s.projPeriods.length&&s.projDataVersion===PROJ_DATA_VERSION) projPeriods=s.projPeriods;
+        if(Array.isArray(s.projGoals)) projGoals=s.projGoals;
       }catch(e){}
     }
     var merged = rows.map(function(rt){
@@ -739,7 +764,8 @@ function render(){
   rViewBar();
   var bc=document.querySelector('.body-card');
   if(currentView==='Books'){
-    document.getElementById('tabs-wrap').style.display='none';
+    var twb=document.getElementById('tabs-wrap');
+    if(twb){twb.style.display='none';twb.style.flexDirection='';twb.style.padding='';}
     if(bc){bc.classList.remove('proj-mode');}
     var mti=document.getElementById('main-title-icon');
     var mtt=document.getElementById('main-title-text');
@@ -747,15 +773,17 @@ function render(){
     if(mtt)mtt.textContent='Books';
     rBooks();
   } else if(currentView==='Projection'){
-    document.getElementById('tabs-wrap').style.display='none';
+    document.getElementById('tabs-wrap').style.display='block';
     if(bc){bc.classList.add('proj-mode');}
     var mti=document.getElementById('main-title-icon');
     var mtt=document.getElementById('main-title-text');
     if(mti){mti.textContent='◫';mti.style.background='#8A8680';mti.style.color='#fff';}
     if(mtt)mtt.textContent='Projection';
+    rProjectionGoals();
     rProjection();
   } else {
-    document.getElementById('tabs-wrap').style.display='block';
+    var tw2=document.getElementById('tabs-wrap');
+    if(tw2){tw2.style.display='block';tw2.style.flexDirection='';tw2.style.padding='';}
     if(bc){bc.classList.remove('proj-mode');}
     rTabs();
     rTasks();
@@ -808,7 +836,7 @@ async function saveSettingsRemote(){
   if(!supabaseClient) return;
   const { data: { user } } = await supabaseClient.auth.getUser();
   if (!user) return;
-  var settingsData = JSON.stringify({tabs: TABS, tab: tab, projRows: projRows, projPeriods: projPeriods, projDataVersion: PROJ_DATA_VERSION});
+  var settingsData = JSON.stringify({tabs: TABS, tab: tab, projRows: projRows, projPeriods: projPeriods, projDataVersion: PROJ_DATA_VERSION, projGoals: projGoals});
   var payload={cat:SETTINGS_CAT,text:settingsData,prio:'L',done:true,user_id:user.id};
   if(settingsId){
     await updateRemoteTask(settingsId,{text:settingsData});
@@ -1262,10 +1290,18 @@ function colToDate(col){
   return y+'-'+String(m).padStart(2,'0');
 }
 
+// ── Font fitting helper — shrinks font until text fits in available px ──
+function fitFontSize(text, widthPx, maxSize) {
+  var avail = Math.max(widthPx - 28, 14); // leave room for padding
+  for (var sz = maxSize; sz >= 7; sz--) {
+    if (text.length * sz * 0.56 <= avail) return sz;
+  }
+  return 7;
+}
+
 // ── Projection render ──
 function rProjection(){
   var el=document.getElementById('list');
-  var LW=PROJ_LABEL_W;
   var RH=PROJ_ROW_H;
   var mainEl=document.querySelector('.main');
   var availW=mainEl?mainEl.clientWidth:(window.innerWidth-240);
@@ -1273,9 +1309,10 @@ function rProjection(){
   var LW=2*MW;
   var bodyW=12*MW;
 
-  // Layer geometry (two visual rows inside each phase row)
-  var MAIN_TOP=5, MAIN_H=Math.floor(RH*0.52); // education / professional
-  var PROJ_TOP=MAIN_TOP+MAIN_H+4, PROJ_H=RH-PROJ_TOP-5; // projects band
+  // Three separate bands per row:
+  var EDU_TOP=4,  EDU_H=26;   // Éducation (top)
+  var PRO_TOP=32, PRO_H=26;   // Professionnel (middle)
+  var PROJ_TOP=62, PROJ_H=24; // Projets (bottom)
 
   // Today
   var now=new Date();
@@ -1307,7 +1344,7 @@ function rProjection(){
   h+='<div class="proj-corner" style="width:'+LW+'px;flex-shrink:0;"></div>';
   PROJ_MONTHS.forEach(function(mn,mi){
     var isSem=(mi===4);
-    h+='<div class="proj-month-cell-hdr" style="width:'+MW+'px;'+(isSem?'border-left:2px solid rgba(0,0,0,0.18);font-weight:700;color:#8A8680;':'')+'">'+mn+'</div>';
+    h+='<div class="proj-month-cell-hdr" style="width:'+MW+'px;'+(isSem?'border-left:3px solid rgba(0,0,0,0.22);font-weight:700;color:#5A5755;':'')+'">'+mn+'</div>';
   });
   h+='</div></div>';
 
@@ -1321,14 +1358,20 @@ function rProjection(){
     var yearLabel=rowBaseYear+'\u2013'+(rowBaseYear+1);
 
     var allPeriods=projPeriods.filter(function(p){return p.rowId===row.id;});
-    var mainPeriods=allPeriods.filter(function(p){return p.cat!=='projects';});
+    var eduPers=allPeriods.filter(function(p){return p.cat==='education';});
+    var proPers=allPeriods.filter(function(p){return p.cat==='professional';});
     var projPers=allPeriods.filter(function(p){return p.cat==='projects';});
+
+    // Age at September of rowBaseYear (birthday 29/03 is before September so already turned)
+    var ageAtStart=rowBaseYear-PROJ_BIRTH_YEAR;
+    var ageLabel='('+ageAtStart+'\u2013'+(ageAtStart+1)+' ans)';
 
     h+='<div class="proj-data-row">';
     h+='<div class="proj-row-label-cell" style="width:'+LW+'px;height:'+RH+'px;">'
       +'<div class="proj-label-inner">'
       +'<span class="proj-row-name">'+e(row.label)+'</span>'
       +'<span class="proj-row-year">'+yearLabel+'</span>'
+      +'<span class="proj-row-age">'+ageLabel+'</span>'
       +'</div>'
       +'<button class="proj-row-dots" onclick="openProjRowModal(\''+row.id+'\')">⋯</button>'
       +'</div>';
@@ -1349,7 +1392,7 @@ function rProjection(){
 
     // Helper: render one set of periods — splits each at today's pixel position
     var todaySplitLocalPx=(nowAbsCol-rowAbsStart+todayFrac)*MW; // px of today within this row
-    function renderPeriods(list,top,height,fontSize){
+    function renderPeriods(list,top,height,baseSize){
       list.slice().sort(function(a,b){
         return (monthToCol(b.endDate)-monthToCol(b.startDate))-(monthToCol(a.endDate)-monthToCol(a.startDate));
       }).forEach(function(p){
@@ -1361,30 +1404,31 @@ function rProjection(){
         var leftPx=localS*MW;
         var widthPx=(localE-localS+1)*MW-2;
         var cat=PROJ_CATS[p.cat]||PROJ_CATS.education;
-        // How many px of this period are in the past
+        // Split at today
         var pastPx=Math.min(Math.max(Math.round(todaySplitLocalPx-leftPx),0),widthPx);
         var futurePx=widthPx-pastPx;
-        // Build name+desc HTML overlay (desc only in taller main band)
-        var showDesc=height>=34&&p.desc;
-        var labelHTML='<span class="pn" style="font-size:'+fontSize+'px;">'+e(p.name)+'</span>'+(showDesc?'<span class="pd">'+e(p.desc)+'</span>':'');
+        // Font size fitting — shrink to avoid ellipsis
+        var nameFS=fitFontSize(p.name, widthPx, baseSize);
+        var showDesc=height>=20&&p.desc;
+        var descFS=Math.max(nameFS-2, 7);
+        var labelHTML='<span class="pn" style="font-size:'+nameFS+'px;">'+e(p.name)+'</span>'
+          +(showDesc?'<span class="pd" style="font-size:'+descFS+'px;">'+e(p.desc)+'</span>':'');
         var del='<button class="proj-period-del" onclick="event.stopPropagation();deletePeriodDirect(\''+p.id+'\')" title="Supprimer">&#10005;</button>';
         h+='<div class="proj-period" '
           +'style="left:'+leftPx+'px;width:'+widthPx+'px;top:'+top+'px;height:'+height+'px;" '
           +'onclick="openProjPeriodModal(\''+p.id+'\',null)" '
           +'title="'+e(p.name+(p.desc?' — '+p.desc:''))+'">'
-          // Grey background for past portion
           +(pastPx>0?'<div class="proj-period-bg" style="left:0;width:'+pastPx+'px;background:#B0ADA8;"></div>':'')
-          // Coloured background for future portion
           +(futurePx>0?'<div class="proj-period-bg" style="left:'+pastPx+'px;width:'+futurePx+'px;background:'+cat.color+';"></div>':'')
-          // Single label overlay — always spans the full block, never shifts with today arrow
           +'<div class="proj-period-label">'+labelHTML+'</div>'
           +del
           +'</div>';
       });
     }
 
-    renderPeriods(mainPeriods, MAIN_TOP, MAIN_H, 11);  // education & professional
-    renderPeriods(projPers,   PROJ_TOP, PROJ_H, 10);   // projects band
+    renderPeriods(eduPers,  EDU_TOP,  EDU_H,  11); // Éducation
+    renderPeriods(proPers,  PRO_TOP,  PRO_H,  11); // Professionnel
+    renderPeriods(projPers, PROJ_TOP, PROJ_H, 10); // Projets
 
     h+='</div></div>';
   });
@@ -1482,6 +1526,53 @@ function deleteProjRow(){
   projRows=projRows.filter(function(r){return r.id!==_pRowId;});
   projPeriods=projPeriods.filter(function(p){return p.rowId!==_pRowId;});
   closeProjRowModal();saveTasks();saveSettingsRemote();rProjection();
+}
+
+// ── Long-term goals sidebar ──
+function rProjectionGoals(){
+  var el=document.getElementById('tabs');
+  if(!el)return;
+  var h='<div class="proj-goals-title">Objectifs long terme</div>'
+    +'<div class="proj-goal-add">'
+    +'<input type="text" id="goal-input" placeholder="Ajouter un objectif..." onkeydown="if(event.key===\'Enter\')addProjGoal()">'
+    +'<button onclick="addProjGoal()">+</button>'
+    +'</div>'
+    +'<div class="proj-goals-list">';
+  if(!projGoals.length){
+    h+='<div style="padding:12px 6px;font-size:11.5px;color:#B0ADA8;text-align:center;">Aucun objectif pour l\'instant</div>';
+  }
+  projGoals.forEach(function(g){
+    h+='<div class="goal-row'+(g.done?' done':'')+'">'
+      +'<input type="checkbox" class="goal-chk"'+(g.done?' checked':'')+' onchange="toggleProjGoal(\''+g.id+'\',this.checked)">'
+      +'<span class="goal-txt">'+e(g.text)+'</span>'
+      +'<button class="goal-del" onclick="deleteProjGoal(\''+g.id+'\')">&times;</button>'
+      +'</div>';
+  });
+  h+='</div>';
+  el.innerHTML=h;
+  // Make tabs-wrap a proper flex column for goals
+  var tw=document.getElementById('tabs-wrap');
+  if(tw){tw.style.display='flex';tw.style.flexDirection='column';tw.style.padding='0';}
+}
+function addProjGoal(){
+  var inp=document.getElementById('goal-input');
+  if(!inp)return;
+  var txt=inp.value.trim();
+  if(!txt)return;
+  projGoals.push({id:newId(),text:txt,done:false});
+  inp.value='';
+  saveTasks();saveSettingsRemote();rProjectionGoals();
+  // refocus input
+  var ni=document.getElementById('goal-input');if(ni)ni.focus();
+}
+function toggleProjGoal(id,val){
+  var g=projGoals.find(function(x){return x.id===id;});
+  if(g)g.done=val;
+  saveTasks();saveSettingsRemote();rProjectionGoals();
+}
+function deleteProjGoal(id){
+  projGoals=projGoals.filter(function(x){return x.id!==id;});
+  saveTasks();saveSettingsRemote();rProjectionGoals();
 }
 </script>
 
