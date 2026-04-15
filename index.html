@@ -361,8 +361,8 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
 .mobile-nav-icon{font-size:20px;line-height:1.2;}
 
 /* ── Hamburger + Nav Drawer ── */
-.hamburger-btn{display:none;background:none;border:none;cursor:pointer;color:#8A8680;font-size:20px;padding:4px 8px 4px 2px;border-radius:7px;line-height:1;-webkit-tap-highlight-color:transparent;transition:background .12s;}
-.hamburger-btn:hover{background:rgba(0,0,0,0.07);}
+.hamburger-btn{display:none;background:rgba(0,0,0,0.08);border:none;cursor:pointer;color:#1C1C1E;font-size:22px;padding:6px 10px;border-radius:8px;line-height:1;-webkit-tap-highlight-color:transparent;transition:background .12s;}
+.hamburger-btn:hover{background:rgba(0,0,0,0.14);}
 .nav-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.28);z-index:200;-webkit-tap-highlight-color:transparent;}
 .nav-overlay.open{display:block;}
 .nav-drawer{position:fixed;top:0;left:0;bottom:0;width:260px;background:#EAE8E2;z-index:201;transform:translateX(-100%);transition:transform .22s cubic-bezier(.4,0,.2,1);box-shadow:4px 0 20px rgba(0,0,0,0.15);display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0);}
@@ -397,7 +397,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
   <!-- SIDEBAR -->
   <div class="sidebar">
     <div class="sidebar-header">
-      <button class="hamburger-btn" onclick="openNavDrawer()" aria-label="Menu">&#8801;</button>
+      <button class="hamburger-btn" onclick="openNavDrawer()" aria-label="Menu">☰</button>
       <div class="app-name">Louis'Checklist</div>
       <div class="sidebar-actions">
         <div class="sync-dot" id="sync-dot"></div>
