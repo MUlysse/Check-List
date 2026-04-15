@@ -297,6 +297,41 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
 .goal-del{background:none;border:none;color:#C8C5BF;cursor:pointer;font-size:12px;padding:0 2px;border-radius:3px;opacity:0;transition:opacity .12s;flex-shrink:0;line-height:1;margin-top:2px;}
 .goal-row:hover .goal-del{opacity:1;}
 .goal-del:hover{color:#FF3B30;}
+
+/* ── Networking View ── */
+.body-card.net-mode{padding:0;}
+.net-toolbar{display:flex;align-items:center;gap:10px;padding:10px 20px;border-bottom:1px solid rgba(0,0,0,0.05);background:#fff;position:sticky;top:0;z-index:5;}
+.net-search{padding:7px 11px;border:1px solid #E0DDD8;border-radius:8px;font-size:13px;background:#FAFAF8;color:#1C1C1E;outline:none;width:220px;transition:border-color .15s,box-shadow .15s;}
+.net-search:focus{border-color:#4A90D9;box-shadow:0 0 0 3px rgba(74,144,217,0.10);}
+.net-company-group{margin-bottom:0;border-bottom:1px solid rgba(0,0,0,0.06);}
+.net-company-hdr{display:flex;align-items:center;gap:10px;padding:12px 20px 8px;background:#FAFAF8;border-bottom:1px solid rgba(0,0,0,0.05);}
+.net-company-name{font-size:12px;font-weight:700;color:#1C1C1E;letter-spacing:0.04em;text-transform:uppercase;}
+.net-company-count{font-size:11px;color:#B0ADA8;font-weight:500;}
+.net-table{width:100%;border-collapse:collapse;table-layout:fixed;}
+.net-table th{font-size:10px;font-weight:600;color:#B0ADA8;letter-spacing:0.07em;text-transform:uppercase;padding:6px 12px;text-align:left;border-bottom:1px solid rgba(0,0,0,0.06);white-space:nowrap;}
+.net-table td{padding:9px 12px;border-bottom:1px solid rgba(0,0,0,0.04);vertical-align:middle;font-size:13px;color:#1C1C1E;}
+.net-table tr:last-child td{border-bottom:none;}
+.net-table tr:hover td{background:rgba(0,0,0,0.015);}
+.net-photo{width:32px;height:32px;border-radius:50%;overflow:hidden;background:#E8EDF5;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#4A90D9;flex-shrink:0;}
+.net-photo img{width:100%;height:100%;object-fit:cover;display:block;}
+.net-name{font-weight:600;color:#1C1C1E;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.net-pos{font-size:11.5px;color:#8A8680;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.net-prox{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:5px;font-size:10.5px;font-weight:600;white-space:nowrap;}
+.net-prox::before{content:'';width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.net-prox.fort{background:#E8F5E9;color:#2E7D32;}.net-prox.fort::before{background:#2E7D32;}
+.net-prox.moyen{background:#FFF3E0;color:#BF5900;}.net-prox.moyen::before{background:#E65100;}
+.net-prox.faible{background:#F5F5F5;color:#8A8680;}.net-prox.faible::before{background:#B0ADA8;}
+.net-date{font-size:12px;color:#8A8680;white-space:nowrap;}
+.net-notes{font-size:11.5px;color:#5A5755;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;}
+.net-li-btn{background:none;border:none;cursor:pointer;color:#0A66C2;font-size:12px;font-weight:700;padding:3px 6px;border-radius:4px;transition:background .12s;text-decoration:none;display:inline-flex;align-items:center;font-family:Georgia,serif;}
+.net-li-btn:hover{background:rgba(10,102,194,0.10);}
+.net-act-btn{background:none;border:none;cursor:pointer;color:#C8C5BF;font-size:13px;padding:2px 4px;border-radius:4px;opacity:0;transition:opacity .12s,color .12s;line-height:1;}
+.net-table tr:hover .net-act-btn{opacity:1;}
+.net-act-btn:hover{color:#4A90D9;background:rgba(74,144,217,0.08);}
+.net-act-btn.del:hover{color:#FF3B30;background:rgba(255,59,48,0.07);}
+.net-sidebar-title{font-size:10.5px;font-weight:600;color:#8A8680;letter-spacing:0.07em;text-transform:uppercase;padding:10px 6px 6px;}
+.net-stat-row{display:flex;align-items:center;gap:8px;padding:5px 6px;font-size:12px;color:#3D3B38;}
+.net-stat-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
 </style>
 </head>
 <body>
@@ -316,6 +351,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
       <button class="view-btn active" data-view="Checklist" onclick="setView('Checklist')">Checklist</button>
       <button class="view-btn" data-view="Books" onclick="setView('Books')">Books</button>
       <button class="view-btn" data-view="Projection" onclick="setView('Projection')">Projection</button>
+      <button class="view-btn" data-view="Networking" onclick="setView('Networking')">Réseau</button>
     </div>
     <div class="tabs-wrap" id="tabs-wrap">
       <div class="tabs" id="tabs"></div>
@@ -402,6 +438,48 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
   </div>
 </div>
 
+<!-- NETWORKING: modal contact -->
+<div class="backdrop" id="contact-bd" onclick="if(event.target===this)closeContactModal()">
+  <div class="modal">
+    <div class="modal-title" id="contact-modal-title">Nouveau contact <button class="modal-close" onclick="closeContactModal()">&#10005;</button></div>
+    <div class="modal-row">
+      <input type="text" id="ct-fname" placeholder="Prénom" autocomplete="off">
+      <input type="text" id="ct-lname" placeholder="Nom" autocomplete="off">
+    </div>
+    <div class="modal-row">
+      <input type="text" id="ct-company" placeholder="Entreprise / Banque" autocomplete="off" list="ct-company-list">
+      <datalist id="ct-company-list"></datalist>
+    </div>
+    <div class="modal-row">
+      <input type="text" id="ct-pos" placeholder="Poste" autocomplete="off">
+    </div>
+    <div class="modal-row">
+      <input type="text" id="ct-date" placeholder="Date de relation (jj/mm/aaaa)" autocomplete="off">
+      <select id="ct-prox">
+        <option value="Fort">Fort</option>
+        <option value="Moyen">Moyen</option>
+        <option value="Faible">Faible</option>
+      </select>
+    </div>
+    <div class="modal-row">
+      <input type="text" id="ct-linkedin" placeholder="URL LinkedIn" autocomplete="off">
+    </div>
+    <div class="modal-row">
+      <input type="text" id="ct-photo" placeholder="URL photo de profil" autocomplete="off">
+    </div>
+    <div class="modal-row">
+      <textarea id="ct-notes" placeholder="Notes..." style="flex:1;min-height:68px;padding:9px 11px;border:1px solid #E0DDD8;border-radius:8px;font-size:13.5px;color:#1C1C1E;background:#FAFAF8;outline:none;resize:vertical;font-family:inherit;transition:border-color .15s;"></textarea>
+    </div>
+    <div class="modal-row" id="ct-row-edit" style="display:none;gap:8px">
+      <button class="add-btn" onclick="saveContact()" style="flex:1">Enregistrer</button>
+      <button class="proj-btn-del" onclick="deleteContact()">Supprimer</button>
+    </div>
+    <div class="modal-row" id="ct-row-new">
+      <button class="add-btn" onclick="saveContact()" style="flex:1">+ Ajouter</button>
+    </div>
+  </div>
+</div>
+
 <script>
 var tasks=[
   {id:1, cat:'Onoris',    text:"Finaliser l'article Dubai Resilience",              prio:'U',done:false},
@@ -437,7 +515,12 @@ var SUPABASE_TABLE='tasks';
 var SUPABASE_TABLE_BOOKS='books';
 var SUPABASE_BUCKET='book-covers';
 var books=[];
+var contacts=[];
 var currentView='Checklist';
+var SUPABASE_TABLE_CONTACTS='contacts';
+var PROX_ORDER={'Fort':0,'Moyen':1,'Faible':2};
+var netSearch='';
+var _editContactId=null;
 var BOOK_STATUS_LABELS={reading:'En lecture',to_read:'A lire',read:'Lu'};
 var BOOK_STATUS_ORDER=['reading','to_read','read'];
 var supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
@@ -538,6 +621,7 @@ function loadTasks(){
         if(Array.isArray(data.tabs)){TABS=data.tabs;if(TABS.indexOf('All')<0)TABS.unshift('All');if(TABS.indexOf(TODAY_TAB)<0)TABS.splice(1,0,TODAY_TAB);if(TABS.indexOf('Urgent')<0)TABS.splice(2,0,'Urgent');}
       }
       if(Array.isArray(data.books)) books=data.books;
+      if(Array.isArray(data.contacts)) contacts=data.contacts;
       if(typeof data.view==='string') currentView=data.view;
       if(Array.isArray(data.projRows)&&data.projRows.length) projRows=data.projRows;
       if(Array.isArray(data.projPeriods)&&data.projPeriods.length&&data.projDataVersion===PROJ_DATA_VERSION) projPeriods=data.projPeriods;
@@ -551,7 +635,7 @@ function loadTasks(){
   CO = TABS.filter(x => !['All','Urgent','Completed',TODAY_TAB].includes(x));
 }
 function saveTasks(){
-  try{localStorage.setItem(STORAGE_KEY, JSON.stringify({tasks:tasks.filter(function(t){return t.cat!==SETTINGS_CAT;}),nid:nid,tab:tab,tabs:TABS,books:books,view:currentView,projRows:projRows,projPeriods:projPeriods,projDataVersion:PROJ_DATA_VERSION,projGoals:projGoals}));}catch(e){}
+  try{localStorage.setItem(STORAGE_KEY, JSON.stringify({tasks:tasks.filter(function(t){return t.cat!==SETTINGS_CAT;}),nid:nid,tab:tab,tabs:TABS,books:books,contacts:contacts,view:currentView,projRows:projRows,projPeriods:projPeriods,projDataVersion:PROJ_DATA_VERSION,projGoals:projGoals}));}catch(e){}
 }
 function clearAutoDelete(id){
   if(deleteTimers[id]){ clearTimeout(deleteTimers[id]); delete deleteTimers[id]; }
@@ -591,7 +675,7 @@ function setSyncState(state){
 function initSupabase(){
   if(!supabaseClient) return;
   setSyncState('syncing');
-  Promise.all([loadTasksRemote(), loadBooksRemote()]).then(function(){ setSyncState(); }).catch(function(e){ console.warn('Supabase load failed',e); setSyncState('error'); }).finally(function(){ subscribeToRemoteChanges(); });
+  Promise.all([loadTasksRemote(), loadBooksRemote(), loadContactsRemote()]).then(function(){ setSyncState(); }).catch(function(e){ console.warn('Supabase load failed',e); setSyncState('error'); }).finally(function(){ subscribeToRemoteChanges(); });
 }
 async function loadBooksRemote(){
   if(!supabaseClient) return;
@@ -750,6 +834,9 @@ function subscribeToRemoteChanges(){
   channel.on('postgres_changes',{event:'INSERT',schema:'public',table:SUPABASE_TABLE_BOOKS},function(){ loadBooksRemote(); });
   channel.on('postgres_changes',{event:'UPDATE',schema:'public',table:SUPABASE_TABLE_BOOKS},function(){ loadBooksRemote(); });
   channel.on('postgres_changes',{event:'DELETE',schema:'public',table:SUPABASE_TABLE_BOOKS},function(){ loadBooksRemote(); });
+  channel.on('postgres_changes',{event:'INSERT',schema:'public',table:SUPABASE_TABLE_CONTACTS},function(){ loadContactsRemote(); });
+  channel.on('postgres_changes',{event:'UPDATE',schema:'public',table:SUPABASE_TABLE_CONTACTS},function(){ loadContactsRemote(); });
+  channel.on('postgres_changes',{event:'DELETE',schema:'public',table:SUPABASE_TABLE_CONTACTS},function(){ loadContactsRemote(); });
   channel.subscribe();
 }
 window.addEventListener('storage', function(ev){
@@ -782,7 +869,7 @@ function render(){
   if(currentView==='Books'){
     var twb=document.getElementById('tabs-wrap');
     if(twb){twb.style.display='flex';twb.style.flexDirection='column';twb.style.padding='0';}
-    if(bc){bc.classList.remove('proj-mode');}
+    if(bc){bc.classList.remove('proj-mode');bc.classList.remove('net-mode');}
     var mti=document.getElementById('main-title-icon');
     var mtt=document.getElementById('main-title-text');
     if(mti){var bi=getTabIcon('Books');mti.textContent=bi.icon;mti.style.background=bi.bg;mti.style.color='#fff';}
@@ -791,17 +878,27 @@ function render(){
     rBooks();
   } else if(currentView==='Projection'){
     document.getElementById('tabs-wrap').style.display='block';
-    if(bc){bc.classList.add('proj-mode');}
+    if(bc){bc.classList.add('proj-mode');bc.classList.remove('net-mode');}
     var mti=document.getElementById('main-title-icon');
     var mtt=document.getElementById('main-title-text');
     if(mti){mti.textContent='◫';mti.style.background='#8A8680';mti.style.color='#fff';}
     if(mtt)mtt.textContent='Projection';
     rProjectionGoals();
     rProjection();
+  } else if(currentView==='Networking'){
+    var twn=document.getElementById('tabs-wrap');
+    if(twn){twn.style.display='flex';twn.style.flexDirection='column';twn.style.padding='0';}
+    if(bc){bc.classList.remove('proj-mode');bc.classList.add('net-mode');}
+    var mti=document.getElementById('main-title-icon');
+    var mtt=document.getElementById('main-title-text');
+    if(mti){mti.textContent='◎';mti.style.background='#4A90D9';mti.style.color='#fff';}
+    if(mtt)mtt.textContent='Réseau';
+    rNetworkingSidebar();
+    rNetworking();
   } else {
     var tw2=document.getElementById('tabs-wrap');
     if(tw2){tw2.style.display='block';tw2.style.flexDirection='';tw2.style.padding='';}
-    if(bc){bc.classList.remove('proj-mode');}
+    if(bc){bc.classList.remove('proj-mode');bc.classList.remove('net-mode');}
     rTabs();
     rTasks();
     var _ico=getTabIcon(tab);var _mti=document.getElementById('main-title-icon');var _mtt=document.getElementById('main-title-text');if(_mti){_mti.textContent=_ico.icon;_mti.style.background=_ico.bg;_mti.style.color='#fff';}if(_mtt)_mtt.textContent=tab;
@@ -987,7 +1084,7 @@ function e(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replac
 
 function rGauge(){
   var footer=document.querySelector('.sidebar-footer');
-  if(currentView==='Projection'){if(footer)footer.style.display='none';return;}
+  if(currentView==='Projection'||currentView==='Networking'){if(footer)footer.style.display='none';return;}
   if(footer)footer.style.display='';
   var dnEl=document.getElementById('dn'),totEl=document.getElementById('tot');
   var fill=document.getElementById('gauge-fill');
@@ -1030,7 +1127,7 @@ function ed(id){
 }
 async function sv(id){var i=document.getElementById('ei'+id);if(!i)return;var v=i.value.trim();if(!v)return;var t=tasks.find(function(t){return t.id===id;});if(t)t.text=v;render();saveTasks(); if(supabaseClient) await updateRemoteTask(id,{text:v});}
 
-function openModal(){if(currentView==='Projection'){openProjPeriodModal(null,null);return;}if(currentView==='Books'){openBookModal();return;}document.getElementById('bd').classList.add('open');document.querySelectorAll('.apb').forEach(function(b){b.classList.remove('sel');});np='M';na=false;setTimeout(function(){document.getElementById('new-task').focus();},80);}
+function openModal(){if(currentView==='Projection'){openProjPeriodModal(null,null);return;}if(currentView==='Books'){openBookModal();return;}if(currentView==='Networking'){openContactModal(null);return;}document.getElementById('bd').classList.add('open');document.querySelectorAll('.apb').forEach(function(b){b.classList.remove('sel');});np='M';na=false;setTimeout(function(){document.getElementById('new-task').focus();},80);}
 function closeModal(){document.getElementById('bd').classList.remove('open');}
 function bdClick(ev){if(ev.target===document.getElementById('bd'))closeModal();}
 
@@ -1268,7 +1365,7 @@ function editBook(id){
 
 function pfc(){var sp=['All','Urgent','Completed'];document.getElementById('new-cat').value=sp.indexOf(tab)<0?tab:'';}
 
-document.addEventListener('keydown',function(e){if(e.ctrlKey&&e.key==='r'){e.preventDefault();location.reload();}if(e.key==='Escape'){closeModal();closeBookModal();closeProjPeriodModal();closeProjRowModal();}});
+document.addEventListener('keydown',function(e){if(e.ctrlKey&&e.key==='r'){e.preventDefault();location.reload();}if(e.key==='Escape'){closeModal();closeBookModal();closeProjPeriodModal();closeProjRowModal();closeContactModal();}});
 window.addEventListener('resize',function(){if(currentView==='Projection')rProjection();});
 
 // ── Pull-to-refresh (iPhone) — déclenché uniquement depuis le header sidebar ──
@@ -1310,6 +1407,233 @@ document.getElementById('login-password').addEventListener('keydown',function(e)
     showLogin();
   }
 })();
+
+// ── Networking ──
+function newContactId(){return Date.now()+Math.floor(Math.random()*1000);}
+
+function rNetworkingSidebar(){
+  var el=document.getElementById('tabs');
+  if(!el)return;
+  var total=contacts.length;
+  var fort=contacts.filter(function(c){return c.prox==='Fort';}).length;
+  var moyen=contacts.filter(function(c){return c.prox==='Moyen';}).length;
+  var faible=contacts.filter(function(c){return c.prox==='Faible';}).length;
+  var companies=[];contacts.forEach(function(c){if(c.company&&companies.indexOf(c.company)<0)companies.push(c.company);});
+  var h='<div class="net-sidebar-title">Vue d\'ensemble</div>';
+  h+='<div class="net-stat-row"><div class="net-stat-dot" style="background:#4A90D9"></div><span style="flex:1">Total contacts</span><span style="font-weight:600;color:#1C1C1E;">'+total+'</span></div>';
+  h+='<div class="net-stat-row"><div class="net-stat-dot" style="background:#8A8680"></div><span style="flex:1">Entreprises</span><span style="font-weight:600;color:#1C1C1E;">'+companies.length+'</span></div>';
+  h+='<div class="net-sidebar-title" style="margin-top:6px">Par proximité</div>';
+  h+='<div class="net-stat-row"><div class="net-stat-dot" style="background:#2E7D32"></div><span style="flex:1">Fort</span><span style="font-weight:600;color:#1C1C1E;">'+fort+'</span></div>';
+  h+='<div class="net-stat-row"><div class="net-stat-dot" style="background:#E65100"></div><span style="flex:1">Moyen</span><span style="font-weight:600;color:#1C1C1E;">'+moyen+'</span></div>';
+  h+='<div class="net-stat-row"><div class="net-stat-dot" style="background:#B0ADA8"></div><span style="flex:1">Faible</span><span style="font-weight:600;color:#1C1C1E;">'+faible+'</span></div>';
+  el.innerHTML=h;
+}
+
+function rNetworking(){
+  var el=document.getElementById('list');
+  if(!el)return;
+  var q=netSearch.toLowerCase().trim();
+  var filtered=contacts.filter(function(c){
+    if(!q)return true;
+    return (c.fname+' '+c.lname+' '+c.company+' '+c.pos+' '+c.notes).toLowerCase().indexOf(q)>=0;
+  });
+  // Sort within company by proximity then name
+  filtered.sort(function(a,b){
+    var ca=a.company||'',cb=b.company||'';
+    if(ca!==cb)return ca.localeCompare(cb,'fr');
+    var pa=PROX_ORDER[a.prox]!==undefined?PROX_ORDER[a.prox]:99;
+    var pb=PROX_ORDER[b.prox]!==undefined?PROX_ORDER[b.prox]:99;
+    if(pa!==pb)return pa-pb;
+    return (a.lname+' '+a.fname).localeCompare(b.lname+' '+b.fname,'fr');
+  });
+  // Group by company
+  var groups=[],seenCompanies=[];
+  filtered.forEach(function(c){
+    var co=c.company&&c.company.trim()?c.company.trim():'(Sans entreprise)';
+    if(seenCompanies.indexOf(co)<0){seenCompanies.push(co);groups.push({company:co,contacts:[]});}
+    groups[seenCompanies.indexOf(co)].contacts.push(c);
+  });
+  var h='<div class="net-toolbar">'
+    +'<input class="net-search" type="text" placeholder="Rechercher…" value="'+e(netSearch)+'" oninput="netSearch=this.value;rNetworking()" autocomplete="off">'
+    +'<span style="flex:1"></span>'
+    +'<button class="add-btn" style="margin:0;padding:7px 14px;font-size:13px" onclick="openContactModal(null)">+ Ajouter</button>'
+    +'</div>';
+  if(!filtered.length){
+    h+='<div class="empty"><div class="empty-icon">&#128100;</div><div class="empty-txt">'+(contacts.length?'Aucun contact trouvé.':'Aucun contact enregistré.')+'</div></div>';
+    el.innerHTML=h;return;
+  }
+  groups.forEach(function(g){
+    h+='<div class="net-company-group">'
+      +'<div class="net-company-hdr"><span class="net-company-name">'+e(g.company)+'</span><span class="net-company-count">'+g.contacts.length+' contact'+(g.contacts.length>1?'s':'')+'</span></div>'
+      +'<table class="net-table"><thead><tr>'
+      +'<th style="width:40px"></th>'
+      +'<th style="width:25%">Nom</th>'
+      +'<th style="width:22%">Poste</th>'
+      +'<th style="width:14%">Proximité</th>'
+      +'<th style="width:12%">Rencontré</th>'
+      +'<th>Notes</th>'
+      +'<th style="width:60px"></th>'
+      +'</tr></thead><tbody>';
+    g.contacts.forEach(function(c){
+      var initials=((c.fname||'').charAt(0)+(c.lname||'').charAt(0)).toUpperCase();
+      var photo=c.photo?'<img src="'+e(c.photo)+'" alt="">':'<span>'+e(initials)+'</span>';
+      var proxCls=(c.prox||'faible').toLowerCase();
+      var proxLabel=c.prox||'Faible';
+      var liBtn=c.linkedin?'<a class="net-li-btn" href="'+e(c.linkedin)+'" target="_blank" rel="noopener" title="LinkedIn">in</a>':'';
+      var cid=e(String(c.id));
+      h+='<tr onclick="openContactModal(\''+cid+'\')" style="cursor:pointer">'
+        +'<td><div class="net-photo">'+photo+'</div></td>'
+        +'<td><div class="net-name">'+e(c.fname+' '+c.lname)+'</div>'+(c.pos?'<div class="net-pos">'+e(c.pos)+'</div>':'')+'</td>'
+        +'<td>'+(c.pos?'<div class="net-pos" style="font-size:12px">'+e(c.pos)+'</div>':'')+'</td>'
+        +'<td><span class="net-prox '+proxCls+'">'+e(proxLabel)+'</span></td>'
+        +'<td><span class="net-date">'+e(c.date||'—')+'</span></td>'
+        +'<td><span class="net-notes">'+e(c.notes||'')+'</span></td>'
+        +'<td style="white-space:nowrap">'+liBtn
+        +'<button class="net-act-btn del" title="Supprimer" onclick="event.stopPropagation();deleteContactDirect(\''+cid+'\')">&#10005;</button>'
+        +'</td>'
+        +'</tr>';
+    });
+    h+='</tbody></table></div>';
+  });
+  el.innerHTML=h;
+}
+
+function openContactModal(id){
+  _editContactId=id?String(id):null;
+  var modal=document.getElementById('contact-bd');
+  var titleEl=document.getElementById('contact-modal-title');
+  var rowEdit=document.getElementById('ct-row-edit');
+  var rowNew=document.getElementById('ct-row-new');
+  if(_editContactId){
+    var c=contacts.find(function(x){return String(x.id)===_editContactId;});
+    if(!c)return;
+    document.getElementById('ct-fname').value=c.fname||'';
+    document.getElementById('ct-lname').value=c.lname||'';
+    document.getElementById('ct-company').value=c.company||'';
+    document.getElementById('ct-pos').value=c.pos||'';
+    document.getElementById('ct-date').value=c.date||'';
+    document.getElementById('ct-prox').value=c.prox||'Faible';
+    document.getElementById('ct-linkedin').value=c.linkedin||'';
+    document.getElementById('ct-photo').value=c.photo||'';
+    document.getElementById('ct-notes').value=c.notes||'';
+    if(titleEl)titleEl.childNodes[0].textContent='Modifier le contact ';
+    if(rowEdit)rowEdit.style.display='flex';
+    if(rowNew)rowNew.style.display='none';
+  } else {
+    document.getElementById('ct-fname').value='';
+    document.getElementById('ct-lname').value='';
+    document.getElementById('ct-company').value='';
+    document.getElementById('ct-pos').value='';
+    document.getElementById('ct-date').value='';
+    document.getElementById('ct-prox').value='Faible';
+    document.getElementById('ct-linkedin').value='';
+    document.getElementById('ct-photo').value='';
+    document.getElementById('ct-notes').value='';
+    if(titleEl)titleEl.childNodes[0].textContent='Nouveau contact ';
+    if(rowEdit)rowEdit.style.display='none';
+    if(rowNew)rowNew.style.display='';
+  }
+  // Populate company datalist
+  var dl=document.getElementById('ct-company-list');
+  if(dl){var cos=[];contacts.forEach(function(c){if(c.company&&cos.indexOf(c.company)<0)cos.push(c.company);});dl.innerHTML=cos.map(function(c){return'<option value="'+e(c)+'">';}).join('');}
+  modal.classList.add('open');
+  setTimeout(function(){document.getElementById('ct-fname').focus();},80);
+}
+
+function closeContactModal(){
+  var modal=document.getElementById('contact-bd');
+  if(modal)modal.classList.remove('open');
+  _editContactId=null;
+}
+
+async function saveContact(){
+  var fname=document.getElementById('ct-fname').value.trim();
+  var lname=document.getElementById('ct-lname').value.trim();
+  var company=document.getElementById('ct-company').value.trim();
+  var pos=document.getElementById('ct-pos').value.trim();
+  var date=document.getElementById('ct-date').value.trim();
+  var prox=document.getElementById('ct-prox').value;
+  var linkedin=document.getElementById('ct-linkedin').value.trim();
+  var photo=document.getElementById('ct-photo').value.trim();
+  var notes=document.getElementById('ct-notes').value.trim();
+  if(!fname&&!lname){
+    var fi=document.getElementById('ct-fname');
+    fi.style.borderColor='#C0392B';setTimeout(function(){fi.style.borderColor='';},1200);return;
+  }
+  if(_editContactId){
+    var c=contacts.find(function(x){return String(x.id)===_editContactId;});
+    if(c){c.fname=fname;c.lname=lname;c.company=company;c.pos=pos;c.date=date;c.prox=prox;c.linkedin=linkedin;c.photo=photo;c.notes=notes;}
+    closeContactModal();saveTasks();render();
+    if(supabaseClient&&c) await updateRemoteContact(c.id,contactToPayload(c));
+  } else {
+    var nc={id:newContactId(),fname:fname,lname:lname,company:company,pos:pos,date:date,prox:prox,linkedin:linkedin,photo:photo,notes:notes};
+    contacts.push(nc);
+    closeContactModal();saveTasks();render();
+    if(supabaseClient) await insertRemoteContact(nc);
+  }
+}
+
+async function deleteContact(){
+  if(!_editContactId)return;
+  if(!confirm('Supprimer ce contact ?'))return;
+  contacts=contacts.filter(function(c){return String(c.id)!==_editContactId;});
+  var delId=_editContactId;
+  closeContactModal();saveTasks();render();
+  if(supabaseClient) await deleteRemoteContact(delId);
+}
+
+async function deleteContactDirect(id){
+  if(!confirm('Supprimer ce contact ?'))return;
+  contacts=contacts.filter(function(c){return String(c.id)!==String(id);});
+  saveTasks();render();
+  if(supabaseClient) await deleteRemoteContact(id);
+}
+
+function contactToPayload(c){
+  return {fname:c.fname||'',lname:c.lname||'',company:c.company||'',pos:c.pos||'',date:c.date||'',prox:c.prox||'Faible',linkedin:c.linkedin||'',photo:c.photo||'',notes:c.notes||''};
+}
+
+async function loadContactsRemote(){
+  if(!supabaseClient)return;
+  const { data: { user } } = await supabaseClient.auth.getUser();
+  if(!user)return;
+  var res=await supabaseClient.from(SUPABASE_TABLE_CONTACTS).select().eq('user_id',user.id).order('id',{ascending:true});
+  if(res.error)throw res.error;
+  if(Array.isArray(res.data)){
+    contacts=res.data.map(function(c){
+      return {id:c.id,fname:c.fname||'',lname:c.lname||'',company:c.company||'',pos:c.pos||'',date:c.date||'',prox:c.prox||'Faible',linkedin:c.linkedin||'',photo:c.photo||'',notes:c.notes||''};
+    });
+    saveTasks();
+    if(currentView==='Networking')render();
+  }
+}
+
+async function insertRemoteContact(c){
+  if(!supabaseClient)return;
+  setSyncState('syncing');
+  const { data: { user } } = await supabaseClient.auth.getUser();
+  if(!user)return;
+  var payload=Object.assign({user_id:user.id},contactToPayload(c));
+  var res=await supabaseClient.from(SUPABASE_TABLE_CONTACTS).insert([payload]).select();
+  if(res.error){console.warn('Supabase contact insert failed',res.error);setSyncState('error');}
+  else{setSyncState();await loadContactsRemote();}
+}
+
+async function updateRemoteContact(id,changes){
+  if(!supabaseClient)return;
+  setSyncState('syncing');
+  var res=await supabaseClient.from(SUPABASE_TABLE_CONTACTS).update(changes).eq('id',id);
+  if(res.error){console.warn('Supabase contact update failed',res.error);setSyncState('error');}
+  else{setSyncState();}
+}
+
+async function deleteRemoteContact(id){
+  if(!supabaseClient)return;
+  setSyncState('syncing');
+  var res=await supabaseClient.from(SUPABASE_TABLE_CONTACTS).delete().eq('id',id);
+  if(res.error){console.warn('Supabase contact delete failed',res.error);setSyncState('error');}
+  else{setSyncState();}
+}
 </script>
 
 <!-- PROJECTION: modal période -->
