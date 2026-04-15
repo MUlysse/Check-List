@@ -192,6 +192,11 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
 /* Deadline */
 .dl-badge{font-size:10px;color:#FF9500;font-weight:500;margin-top:2px;}
 
+/* ── Book grid layout ── */
+.book-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;padding-bottom:2px;}
+@media(min-width:1400px){.book-grid{grid-template-columns:repeat(3,1fr);}}
+.book-cat-tag{display:inline-block;font-size:10px;color:#8A8680;background:#F0EDE8;border-radius:4px;padding:1px 6px;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
+
 /* ── Mobile ── */
 @media(max-width:680px){
   .app{flex-direction:column;}
@@ -364,6 +369,10 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
     </div>
     <div class="modal-row">
       <input type="text" id="new-author" placeholder="Auteur" autocomplete="off">
+    </div>
+    <div class="modal-row">
+      <input type="text" id="new-book-cat" placeholder="Catégorie (ex: Histoire, Finance...)" autocomplete="off" list="book-cat-list">
+      <datalist id="book-cat-list"></datalist>
     </div>
     <div class="modal-row">
       <select id="new-status">
@@ -601,7 +610,8 @@ async function loadBooksRemote(){
         author: b.author || '',
         status: b.status || 'to_read',
         coverUrl: b.cover_url || localCovers[b.id] || '',
-        sortOrder: typeof b.sort_order === 'number' ? b.sort_order : 0
+        sortOrder: typeof b.sort_order === 'number' ? b.sort_order : 0,
+        category: b.category || ''
       };
     });
     books.sort(function(a,b){ var d=(b.sortOrder||0)-(a.sortOrder||0); if(d!==0)return d; if(typeof a.id==='number'&&typeof b.id==='number')return b.id-a.id; return String(b.id).localeCompare(String(a.id)); });
@@ -767,12 +777,13 @@ function render(){
   var bc=document.querySelector('.body-card');
   if(currentView==='Books'){
     var twb=document.getElementById('tabs-wrap');
-    if(twb){twb.style.display='none';twb.style.flexDirection='';twb.style.padding='';}
+    if(twb){twb.style.display='flex';twb.style.flexDirection='column';twb.style.padding='0';}
     if(bc){bc.classList.remove('proj-mode');}
     var mti=document.getElementById('main-title-icon');
     var mtt=document.getElementById('main-title-text');
     if(mti){var bi=getTabIcon('Books');mti.textContent=bi.icon;mti.style.background=bi.bg;mti.style.color='#fff';}
     if(mtt)mtt.textContent='Books';
+    rBooksChart();
     rBooks();
   } else if(currentView==='Projection'){
     document.getElementById('tabs-wrap').style.display='block';
@@ -864,6 +875,61 @@ function rTasks(){
   el.innerHTML=h;
 }
 
+function rBooksChart(){
+  var el=document.getElementById('tabs');
+  if(!el)return;
+  var tw=document.getElementById('tabs-wrap');
+  if(tw){tw.style.display='flex';tw.style.flexDirection='column';tw.style.padding='0';}
+  var CHART_COLORS=['#4A90D9','#34C759','#FF9500','#FF3B30','#AF52DE','#5AC8FA','#FFCC00','#FF6B35','#8A8680'];
+  // Group books by category
+  var catMap={};
+  books.forEach(function(b){
+    var cat=b.category&&b.category.trim()?b.category:'Sans catégorie';
+    if(!catMap[cat])catMap[cat]={total:0,read:0};
+    catMap[cat].total++;
+    if(b.status==='read')catMap[cat].read++;
+  });
+  var catNames=Object.keys(catMap);
+  var totalRead=books.filter(function(b){return b.status==='read';}).length;
+  var h='<div class="proj-goals-title">Livres par catégorie</div>';
+  if(!books.length){el.innerHTML=h+'<div style="padding:14px 6px;font-size:11.5px;color:#B0ADA8;text-align:center;">Aucun livre</div>';return;}
+  // SVG donut — slices based on total books per category (read shown in legend)
+  var readSlices=catNames.map(function(c,i){return{name:c,count:catMap[c].read,total:catMap[c].total,color:CHART_COLORS[i%CHART_COLORS.length]};}).filter(function(s){return s.count>0;});
+  var sz=120,cx=60,cy=60,ro=50,ri=30;
+  var svg='<svg width="'+sz+'" height="'+sz+'" viewBox="0 0 '+sz+' '+sz+'">';
+  if(!totalRead||!readSlices.length){
+    svg+='<circle cx="'+cx+'" cy="'+cy+'" r="'+((ro+ri)/2)+'" fill="none" stroke="#E5E2DC" stroke-width="'+(ro-ri)+'"/>';
+  } else {
+    var angle=-Math.PI/2;
+    readSlices.forEach(function(s){
+      var slice=(s.count/totalRead)*2*Math.PI;
+      var ea=angle+slice;
+      var x1=cx+ro*Math.cos(angle),y1=cy+ro*Math.sin(angle);
+      var x2=cx+ro*Math.cos(ea),y2=cy+ro*Math.sin(ea);
+      var xi1=cx+ri*Math.cos(angle),yi1=cy+ri*Math.sin(angle);
+      var xi2=cx+ri*Math.cos(ea),yi2=cy+ri*Math.sin(ea);
+      var la=slice>Math.PI?1:0;
+      svg+='<path d="M '+xi1+' '+yi1+' L '+x1+' '+y1+' A '+ro+' '+ro+' 0 '+la+' 1 '+x2+' '+y2+' L '+xi2+' '+yi2+' A '+ri+' '+ri+' 0 '+la+' 0 '+xi1+' '+yi1+' Z" fill="'+s.color+'"/>';
+      angle=ea;
+    });
+  }
+  svg+='<text x="'+cx+'" y="'+(cy-5)+'" text-anchor="middle" font-size="17" font-weight="700" fill="#1C1C1E">'+totalRead+'</text>';
+  svg+='<text x="'+cx+'" y="'+(cy+9)+'" text-anchor="middle" font-size="8" fill="#8A8680">lus</text>';
+  svg+='</svg>';
+  h+='<div style="display:flex;justify-content:center;padding:8px 0 4px;">'+svg+'</div>';
+  h+='<div style="padding:0 6px 8px;overflow-y:auto;flex:1;">';
+  catNames.forEach(function(c,i){
+    var info=catMap[c];
+    h+='<div style="display:flex;align-items:center;gap:6px;padding:3px 2px;font-size:11px;color:#3D3B38;">'
+      +'<div style="width:8px;height:8px;border-radius:2px;background:'+CHART_COLORS[i%CHART_COLORS.length]+';flex-shrink:0;"></div>'
+      +'<span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+e(c)+'</span>'
+      +'<span style="color:#8A8680;font-weight:600;white-space:nowrap;">'+info.read+' / '+info.total+'</span>'
+      +'</div>';
+  });
+  h+='</div>';
+  el.innerHTML=h;
+}
+
 function rBooks(){
   var el=document.getElementById('list');
   if(!books.length){el.innerHTML='<div class="empty"><div class="empty-icon">&#128214;</div><div class="empty-txt">Aucun livre enregistré.</div></div>';return;}
@@ -873,8 +939,9 @@ function rBooks(){
     if(!group.length) return;
     group.sort(function(a,b){ var d=(b.sortOrder||0)-(a.sortOrder||0); if(d!==0)return d; if(typeof a.id==='number'&&typeof b.id==='number')return b.id-a.id; return String(b.id).localeCompare(String(a.id)); });
     h+='<div class="book-status-group"><div class="book-status-heading" data-status="'+status+'"><div class="ps-dot"></div><span>'+BOOK_STATUS_LABELS[status]+'</span></div>';
+    h+='<div class="book-grid">';
     group.forEach(function(b){var sid=e(String(b.id));var sst=e(status);h+='<div class="book-row" data-book-id="'+sid+'" data-book-status="'+sst+'" onpointerdown="bookPointerDown(event,\''+sid+'\',\''+sst+'\')" onpointermove="bookPointerMove(event)" onpointerup="bookPointerUp(event)" onpointercancel="bookPointerUp(event)">'+rhBook(b)+'</div>';});
-    h+='</div>';
+    h+='</div></div>';
   });
   el.innerHTML=h;
 }
@@ -891,6 +958,7 @@ function rhBook(b){
     +'<div class="book-card"><div class="book-info">'
     +'<div class="book-title">'+e(b.title)+'</div>'
     +'<div class="book-author">'+e(b.author)+'</div>'
+    +(b.category?'<div class="book-cat-tag">'+e(b.category)+'</div>':'')
     +'<div class="book-actions">'+actions+'</div>'
     +'</div></div>';
 }
@@ -962,7 +1030,16 @@ function openModal(){if(currentView==='Projection'){openProjPeriodModal(null,nul
 function closeModal(){document.getElementById('bd').classList.remove('open');}
 function bdClick(ev){if(ev.target===document.getElementById('bd'))closeModal();}
 
-function openBookModal(){document.getElementById('book-bd').classList.add('open');document.getElementById('book-bd').removeAttribute('data-editing');document.getElementById('book-modal-action').textContent='+ Ajouter le livre';setTimeout(function(){document.getElementById('new-title').focus();},80);}
+function openBookModal(){
+  document.getElementById('book-bd').classList.add('open');
+  document.getElementById('book-bd').removeAttribute('data-editing');
+  document.getElementById('book-modal-action').textContent='+ Ajouter le livre';
+  var catEl=document.getElementById('new-book-cat');
+  if(catEl)catEl.value='';
+  var dl=document.getElementById('book-cat-list');
+  if(dl){var cats=[];books.forEach(function(b){if(b.category&&cats.indexOf(b.category)<0)cats.push(b.category);});dl.innerHTML=cats.map(function(c){return'<option value="'+e(c)+'">';}).join('');}
+  setTimeout(function(){document.getElementById('new-title').focus();},80);
+}
 function closeBookModal(){document.getElementById('book-bd').classList.remove('open');document.getElementById('book-bd').removeAttribute('data-editing');document.getElementById('book-modal-action').textContent='+ Ajouter le livre';}
 function bookBdClick(ev){if(ev.target===document.getElementById('book-bd'))closeBookModal();}
 
@@ -985,16 +1062,18 @@ async function addBook(){
   var authorEl=document.getElementById('new-author');
   var coverEl=document.getElementById('new-cover');
   var statusEl=document.getElementById('new-status');
+  var catEl=document.getElementById('new-book-cat');
   var title=titleEl.value.trim();
   var author=authorEl.value.trim();
   var status=statusEl.value;
+  var category=catEl?catEl.value.trim():'';
   if(!title){titleEl.style.borderColor='#C0392B';setTimeout(function(){titleEl.style.borderColor='';},1200);}
   if(!author){authorEl.style.borderColor='#C0392B';setTimeout(function(){authorEl.style.borderColor='';},1200);}
   if(!title||!author)return;
   var editing = document.getElementById('book-bd').getAttribute('data-editing');
   var book = editing ? books.find(function(b){return String(b.id)===String(editing);}) : null;
   if(book){
-    book.title=title; book.author=author; book.status=status;
+    book.title=title; book.author=author; book.status=status; book.category=category;
     var file = coverEl.files && coverEl.files[0];
     if(file){
       var dataUrl = await fileToDataUrl(file);
@@ -1006,10 +1085,10 @@ async function addBook(){
     }
     document.getElementById('book-bd').removeAttribute('data-editing');
     closeBookModal();saveTasks();render();
-    if(supabaseClient) await updateRemoteBook(book.id,{title:book.title,author:book.author,status:book.status,cover_url:book.coverUrl});
+    if(supabaseClient) await updateRemoteBook(book.id,{title:book.title,author:book.author,status:book.status,cover_url:book.coverUrl,category:book.category||''});
     return;
   }
-  var newBook={id:newId(),title:title,author:author,status:status,coverUrl:'',sortOrder:bookNextSortOrder(status)};
+  var newBook={id:newId(),title:title,author:author,status:status,coverUrl:'',sortOrder:bookNextSortOrder(status),category:category};
   var file = coverEl.files && coverEl.files[0];
   if(file){
     var dataUrl = await fileToDataUrl(file);
@@ -1021,7 +1100,7 @@ async function addBook(){
   }
   books.push(newBook);
   saveTasks();
-  titleEl.value='';authorEl.value='';coverEl.value='';statusEl.value='to_read';
+  titleEl.value='';authorEl.value='';coverEl.value='';statusEl.value='to_read';if(catEl)catEl.value='';
   closeBookModal();render();
   if(supabaseClient) await insertRemoteBook(newBook);
 }
@@ -1061,7 +1140,7 @@ async function insertRemoteBook(book){
   if (!user) return;
   // Never send base64 data URLs to Supabase — they exceed API limits
   var remoteUrl = book.coverUrl && !book.coverUrl.startsWith('data:') ? book.coverUrl : '';
-  var payload={title:book.title,author:book.author,status:book.status,cover_url:remoteUrl,sort_order:book.sortOrder||0,user_id:user.id};
+  var payload={title:book.title,author:book.author,status:book.status,cover_url:remoteUrl,sort_order:book.sortOrder||0,category:book.category||'',user_id:user.id};
   var res = await supabaseClient.from(SUPABASE_TABLE_BOOKS).insert([payload]).select();
   if(res.error){
     var payload2={title:book.title,author:book.author,status:book.status,user_id:user.id};
@@ -1178,6 +1257,7 @@ function editBook(id){
   document.getElementById('new-author').value = book.author;
   document.getElementById('new-status').value = book.status;
   document.getElementById('new-cover').value = '';
+  var ce=document.getElementById('new-book-cat');if(ce)ce.value=book.category||'';
   document.getElementById('book-modal-action').textContent='Enregistrer les modifications';
   document.getElementById('book-bd').setAttribute('data-editing', id);
 }
@@ -1213,6 +1293,7 @@ document.getElementById('new-task').addEventListener('keydown',function(e){if(e.
 document.getElementById('new-title').addEventListener('keydown',function(e){if(e.key==='Enter')addBook();});
 document.getElementById('new-author').addEventListener('keydown',function(e){if(e.key==='Enter')addBook();});
 document.getElementById('new-status').addEventListener('keydown',function(e){if(e.key==='Enter')addBook();});
+document.getElementById('new-book-cat').addEventListener('keydown',function(e){if(e.key==='Enter')addBook();});
 document.getElementById('login-email').addEventListener('keydown',function(e){if(e.key==='Enter')document.getElementById('login-password').focus();});
 document.getElementById('login-password').addEventListener('keydown',function(e){if(e.key==='Enter')login();});
 
