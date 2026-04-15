@@ -600,9 +600,13 @@ async function loadBooksRemote(){
   var res = await supabaseClient.from(SUPABASE_TABLE_BOOKS).select().eq('user_id', user.id).order('id',{ascending:true});
   if(res.error) throw res.error;
   if(Array.isArray(res.data)){
-    // Preserve local data-URL covers (they are never sent to Supabase)
+    // Preserve local data-URL covers and categories (not always in Supabase)
     var localCovers = {};
-    books.forEach(function(b){ if(b.coverUrl && b.coverUrl.startsWith('data:')) localCovers[b.id] = b.coverUrl; });
+    var localCategories = {};
+    books.forEach(function(b){
+      if(b.coverUrl && b.coverUrl.startsWith('data:')) localCovers[b.id] = b.coverUrl;
+      if(b.category) localCategories[b.id] = b.category;
+    });
     books = res.data.map(function(b){
       return {
         id: b.id,
@@ -611,7 +615,7 @@ async function loadBooksRemote(){
         status: b.status || 'to_read',
         coverUrl: b.cover_url || localCovers[b.id] || '',
         sortOrder: typeof b.sort_order === 'number' ? b.sort_order : 0,
-        category: b.category || ''
+        category: b.category || localCategories[b.id] || ''
       };
     });
     books.sort(function(a,b){ var d=(b.sortOrder||0)-(a.sortOrder||0); if(d!==0)return d; if(typeof a.id==='number'&&typeof b.id==='number')return b.id-a.id; return String(b.id).localeCompare(String(a.id)); });
