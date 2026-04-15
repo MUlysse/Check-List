@@ -202,6 +202,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
   .app{flex-direction:column;}
   .sidebar{width:100%;min-width:unset;border-right:none;border-bottom:1px solid rgba(0,0,0,.07);height:auto;}
   .sidebar-header{padding:10px 14px 4px;}
+  .hamburger-btn{display:flex;}
   .view-bar{display:none;}
   .tabs-wrap{padding:2px 6px 4px;overflow-x:auto;overflow-y:hidden;}
   .tabs{display:flex;flex-direction:row;gap:3px;width:max-content;}
@@ -343,8 +344,8 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
 .net-stat-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
 .net-company-logo{width:22px;height:22px;border-radius:5px;object-fit:contain;flex-shrink:0;background:#fff;padding:1px;}
 /* ── Networking full-width overlay ── */
-.app.net-view .sidebar{position:relative;z-index:10;}
-#net-full-overlay{position:fixed;left:0;right:0;bottom:0;z-index:2;overflow-y:auto;background:#fff;display:none;}
+#net-full-overlay{position:fixed;left:0;right:0;bottom:0;z-index:20;overflow-y:auto;background:#fff;display:none;}
+.app.net-view .sidebar{position:relative;z-index:1;}
 #net-full-overlay::-webkit-scrollbar{width:5px;}
 #net-full-overlay::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.12);border-radius:3px;}
 /* ── Mobile bottom nav (Things-style) ── */
@@ -352,6 +353,23 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
 .mobile-nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:none;border:none;cursor:pointer;padding:7px 4px 6px;color:#8A8680;font-size:9.5px;font-weight:500;transition:color .12s;-webkit-tap-highlight-color:transparent;}
 .mobile-nav-btn.active{color:#4A90D9;}
 .mobile-nav-icon{font-size:20px;line-height:1.2;}
+
+/* ── Hamburger + Nav Drawer ── */
+.hamburger-btn{display:none;background:none;border:none;cursor:pointer;color:#8A8680;font-size:20px;padding:4px 8px 4px 2px;border-radius:7px;line-height:1;-webkit-tap-highlight-color:transparent;transition:background .12s;}
+.hamburger-btn:hover{background:rgba(0,0,0,0.07);}
+.nav-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.28);z-index:200;-webkit-tap-highlight-color:transparent;}
+.nav-overlay.open{display:block;}
+.nav-drawer{position:fixed;top:0;left:0;bottom:0;width:260px;background:#EAE8E2;z-index:201;transform:translateX(-100%);transition:transform .22s cubic-bezier(.4,0,.2,1);box-shadow:4px 0 20px rgba(0,0,0,0.15);display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0);}
+.nav-drawer.open{transform:translateX(0);}
+.nav-drawer-header{display:flex;align-items:center;justify-content:space-between;padding:18px 16px 12px;}
+.nav-drawer-title{font-size:12px;font-weight:700;color:#8A8680;letter-spacing:0.07em;text-transform:uppercase;}
+.nav-drawer-close{background:none;border:none;cursor:pointer;color:#8A8680;font-size:18px;padding:4px 6px;border-radius:6px;line-height:1;-webkit-tap-highlight-color:transparent;}
+.nav-drawer-items{flex:1;padding:4px 10px 20px;display:flex;flex-direction:column;gap:3px;}
+.nav-drawer-item{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:11px;cursor:pointer;background:none;border:none;text-align:left;width:100%;color:#3D3B38;font-size:15px;font-weight:400;transition:background .12s;-webkit-tap-highlight-color:transparent;}
+.nav-drawer-item:hover{background:rgba(0,0,0,0.05);}
+.nav-drawer-item.active{background:#FFFFFF;box-shadow:0 1px 3px rgba(0,0,0,0.10);color:#1C1C1E;font-weight:600;}
+.nav-drawer-item-icon{font-size:20px;width:32px;text-align:center;flex-shrink:0;}
+.nav-drawer-item-label{flex:1;}
 /* ── Mobile overrides for projection & networking ── */
 @media(max-width:680px){
   .app.proj-view .sidebar{order:2;}
@@ -378,6 +396,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
   <!-- SIDEBAR -->
   <div class="sidebar">
     <div class="sidebar-header">
+      <button class="hamburger-btn" onclick="openNavDrawer()" aria-label="Menu">&#8801;</button>
       <div class="app-name">Louis'Checklist</div>
       <div class="sidebar-actions">
         <div class="sync-dot" id="sync-dot"></div>
@@ -677,6 +696,8 @@ function loadTasks(){
   tasks.forEach(function(t){ if(cats.indexOf(t.cat)<0) cats.push(t.cat); });
   cats.forEach(function(c){ if(TABS.indexOf(c)<0 && c !== 'Completed') TABS.push(c); });
   CO = TABS.filter(x => !['All','Urgent','Completed',TODAY_TAB].includes(x));
+  // Sanitize: today and prio=U are mutually exclusive
+  tasks.forEach(function(t){ if(t.today && t.prio==='U') t.prio='M'; });
 }
 function saveTasks(){
   try{localStorage.setItem(STORAGE_KEY, JSON.stringify({tasks:tasks.filter(function(t){return t.cat!==SETTINGS_CAT;}),nid:nid,tab:tab,tabs:TABS,books:books,contacts:contacts,view:currentView,projRows:projRows,projPeriods:projPeriods,projDataVersion:PROJ_DATA_VERSION,projGoals:projGoals}));}catch(e){}
@@ -747,6 +768,21 @@ async function loadBooksRemote(){
       };
     });
     books.sort(function(a,b){ var d=(b.sortOrder||0)-(a.sortOrder||0); if(d!==0)return d; if(typeof a.id==='number'&&typeof b.id==='number')return b.id-a.id; return String(b.id).localeCompare(String(a.id)); });
+    // Migrate local categories up to Supabase for books missing them
+    var { data: { user: u2 } } = await supabaseClient.auth.getUser();
+    var migrationPromises = [];
+    books.forEach(function(bk){
+      if(bk.category && localCategories[bk.id]){
+        // Check if the remote was missing the category (came from localCategories fallback)
+        var remote = res.data.find(function(r){return r.id===bk.id;});
+        if(remote && !remote.category){
+          migrationPromises.push(
+            supabaseClient.from(SUPABASE_TABLE_BOOKS).update({category:bk.category}).eq('id',bk.id).eq('user_id',u2.id)
+          );
+        }
+      }
+    });
+    if(migrationPromises.length) await Promise.all(migrationPromises);
     saveTasks();
     render();
   }
@@ -784,7 +820,7 @@ async function loadTasksRemote(){
     var merged = rows.map(function(rt){
       var local = localById[rt.id];
       if(local){
-        if(local.today && !rt.today) rt.today = local.today;
+        if(local.today && !rt.today){ rt.today = local.today; if(rt.prio==='U') rt.prio='M'; }
         if(local.doneAt && !rt.doneAt) rt.doneAt = local.doneAt;
         delete localById[rt.id];
       }
@@ -792,6 +828,8 @@ async function loadTasksRemote(){
     });
     Object.keys(localById).forEach(function(id){ merged.push(localById[id]); });
     tasks = merged.filter(function(t){return t.cat !== SETTINGS_CAT;});
+    // Sanitize: today and prio=U are mutually exclusive
+    tasks.forEach(function(t){ if(t.today && t.prio==='U') t.prio='M'; });
     // Ensure all task categories are in TABS
     var cats = [];
     tasks.forEach(function(t){ if(cats.indexOf(t.cat)<0) cats.push(t.cat); });
@@ -962,9 +1000,21 @@ function render(){
 }
 
 function rViewBar(){
-  document.querySelectorAll('#view-bar .view-btn, #mobile-nav .mobile-nav-btn').forEach(function(b){
+  document.querySelectorAll('#view-bar .view-btn, #mobile-nav .mobile-nav-btn, #nav-drawer .nav-drawer-item').forEach(function(b){
     b.classList.toggle('active', b.getAttribute('data-view')===currentView);
   });
+}
+function openNavDrawer(){
+  document.getElementById('nav-overlay').classList.add('open');
+  document.getElementById('nav-drawer').classList.add('open');
+}
+function closeNavDrawer(){
+  document.getElementById('nav-overlay').classList.remove('open');
+  document.getElementById('nav-drawer').classList.remove('open');
+}
+function navDrawerGo(view){
+  closeNavDrawer();
+  setView(view);
 }
 
 function getTabIcon(name){
@@ -1439,8 +1489,8 @@ function editBook(id){
 
 function pfc(){var sp=['All','Urgent','Completed'];document.getElementById('new-cat').value=sp.indexOf(tab)<0?tab:'';}
 
-document.addEventListener('keydown',function(e){if(e.ctrlKey&&e.key==='r'){e.preventDefault();location.reload();}if(e.key==='Escape'){closeModal();closeBookModal();closeProjPeriodModal();closeProjRowModal();closeContactModal();}});
-window.addEventListener('resize',function(){if(currentView==='Projection')rProjection();});
+document.addEventListener('keydown',function(e){if(e.ctrlKey&&e.key==='r'){e.preventDefault();location.reload();}if(e.key==='Escape'){closeModal();closeBookModal();closeProjPeriodModal();closeProjRowModal();closeContactModal();closeNavDrawer();}});
+window.addEventListener('resize',function(){if(currentView==='Projection')rProjection();if(currentView==='Networking')rNetworking();});
 
 // ── Pull-to-refresh (iPhone) ──
 (function(){
@@ -1827,7 +1877,7 @@ function rProjection(){
   var RH=PROJ_ROW_H;
   var mainEl=document.querySelector('.main');
   var availW=mainEl?mainEl.clientWidth:(window.innerWidth-240);
-  var MW=Math.max(40,Math.floor(availW/14)); // 14 units: label=2×MW + 12 months
+  var MW=Math.max(40,Math.floor((availW-28)/14)); // 14 units: label=2×MW + 12 months; -28 for right margin
   var LW=2*MW;
   var bodyW=12*MW;
 
@@ -2150,6 +2200,21 @@ function deleteProjGoal(id){
 <!-- BOTTOM BAR -->
 <div class="bottom-bar">
   <span class="bottom-label"></span>
+</div>
+
+<!-- NAV DRAWER (mobile) -->
+<div class="nav-overlay" id="nav-overlay" onclick="closeNavDrawer()"></div>
+<div class="nav-drawer" id="nav-drawer">
+  <div class="nav-drawer-header">
+    <span class="nav-drawer-title">Louis'Checklist</span>
+    <button class="nav-drawer-close" onclick="closeNavDrawer()">&#10005;</button>
+  </div>
+  <div class="nav-drawer-items">
+    <button class="nav-drawer-item" data-view="Checklist" onclick="navDrawerGo('Checklist')"><span class="nav-drawer-item-icon">☰</span><span class="nav-drawer-item-label">Checklist</span></button>
+    <button class="nav-drawer-item" data-view="Books" onclick="navDrawerGo('Books')"><span class="nav-drawer-item-icon">☷</span><span class="nav-drawer-item-label">Books</span></button>
+    <button class="nav-drawer-item" data-view="Projection" onclick="navDrawerGo('Projection')"><span class="nav-drawer-item-icon">◫</span><span class="nav-drawer-item-label">Projection</span></button>
+    <button class="nav-drawer-item" data-view="Networking" onclick="navDrawerGo('Networking')"><span class="nav-drawer-item-icon">◎</span><span class="nav-drawer-item-label">Réseau</span></button>
+  </div>
 </div>
 </body>
 </html>
