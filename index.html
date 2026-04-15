@@ -202,7 +202,6 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
   .app{flex-direction:column;}
   .sidebar{width:100%;min-width:unset;border-right:none;border-bottom:1px solid rgba(0,0,0,.07);height:auto;}
   .sidebar-header{padding:10px 14px 4px;}
-  .hamburger-btn{display:flex;}
   .view-bar{display:none;}
   .tabs-wrap{padding:2px 6px 4px;overflow-x:auto;overflow-y:hidden;}
   .tabs{display:flex;flex-direction:row;gap:3px;width:max-content;}
@@ -216,7 +215,6 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
   .main-title{font-size:20px;}
   .body-card{padding:4px 12px 96px;}
   .fab{bottom:70px;right:16px;width:42px;height:42px;}
-  .mobile-nav{display:flex;}
   #net-full-overlay{bottom:58px!important;}
   .modal{padding:18px 16px;}
   .modal-row{flex-wrap:wrap;}
@@ -355,13 +353,13 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
 #net-full-overlay::-webkit-scrollbar{width:5px;}
 #net-full-overlay::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.12);border-radius:3px;}
 /* ── Mobile bottom nav (Things-style) ── */
-.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(234,232,226,0.97);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid rgba(0,0,0,0.09);z-index:51;padding-bottom:env(safe-area-inset-bottom,0);}
+.mobile-nav{display:flex;position:fixed;bottom:0;left:0;right:0;background:rgba(234,232,226,0.97);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid rgba(0,0,0,0.09);z-index:51;padding-bottom:env(safe-area-inset-bottom,0);}
 .mobile-nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:none;border:none;cursor:pointer;padding:7px 4px 6px;color:#8A8680;font-size:9.5px;font-weight:500;transition:color .12s;-webkit-tap-highlight-color:transparent;}
 .mobile-nav-btn.active{color:#4A90D9;}
 .mobile-nav-icon{font-size:20px;line-height:1.2;}
 
 /* ── Hamburger + Nav Drawer ── */
-.hamburger-btn{display:none;background:rgba(0,0,0,0.08);border:none;cursor:pointer;color:#1C1C1E;font-size:22px;padding:6px 10px;border-radius:8px;line-height:1;-webkit-tap-highlight-color:transparent;transition:background .12s;}
+.hamburger-btn{display:flex;background:rgba(0,0,0,0.08);border:none;cursor:pointer;color:#1C1C1E;font-size:22px;padding:6px 10px;border-radius:8px;line-height:1;-webkit-tap-highlight-color:transparent;transition:background .12s;}
 .hamburger-btn:hover{background:rgba(0,0,0,0.14);}
 .nav-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.28);z-index:200;-webkit-tap-highlight-color:transparent;}
 .nav-overlay.open{display:block;}
@@ -387,6 +385,10 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
   .net-photo{width:40px;height:40px;}
   .net-contact-notes-preview{display:none;}
   .net-act-btn{opacity:1!important;}
+}
+@media(min-width:681px){
+  .mobile-nav{display:none;}
+  .hamburger-btn{display:none;}
 }
 </style>
 </head>
