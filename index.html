@@ -227,7 +227,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
 .body-card.proj-mode #list{flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0;}
 .proj-wrap{display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden;}
 .proj-toolbar{padding:8px 16px;border-bottom:1px solid rgba(0,0,0,0.05);display:flex;align-items:center;gap:8px;flex-shrink:0;flex-wrap:wrap;}
-.proj-scroll{flex:1;overflow:auto;-webkit-overflow-scrolling:touch;}
+.proj-scroll{flex:1;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;}
 .proj-inner{display:block;min-width:100%;}
 .proj-spacer{height:320px;}
 .proj-head-sticky{position:sticky;top:0;z-index:10;background:#FAFAF8;}
@@ -253,7 +253,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
 .proj-period{position:absolute;border-radius:5px;cursor:pointer;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.18);transition:filter .15s;}
 .proj-period:hover{filter:brightness(1.06);}
 .proj-period-bg{position:absolute;top:0;bottom:0;pointer-events:none;}
-.proj-period-label{position:absolute;left:0;right:0;top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:2px 20px;overflow:hidden;color:#fff;font-weight:500;pointer-events:none;z-index:2;}
+.proj-period-label{position:absolute;left:0;right:0;top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:1px 5px;overflow:hidden;color:#fff;font-weight:500;pointer-events:none;z-index:2;}
 .proj-period-label .pn{white-space:nowrap;overflow:hidden;line-height:1.25;font-weight:600;text-shadow:0 1px 2px rgba(0,0,0,0.28);max-width:100%;}
 .proj-period-label .pd{opacity:0.90;margin-top:1px;white-space:nowrap;overflow:hidden;font-weight:400;line-height:1.2;text-shadow:0 1px 2px rgba(0,0,0,0.22);max-width:100%;}
 .proj-period-del{position:absolute;right:3px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.28);border:none;color:#fff;border-radius:3px;cursor:pointer;font-size:11px;line-height:1;padding:1px 4px;opacity:0;transition:opacity .12s;flex-shrink:0;}
@@ -1294,7 +1294,7 @@ function colToDate(col){
 
 // ── Font fitting helper — shrinks font until text fits in available px ──
 function fitFontSize(text, widthPx, maxSize) {
-  var avail = Math.max(widthPx - 28, 14); // leave room for padding
+  var avail = Math.max(widthPx - 12, 10); // 5px left + 5px right padding + 2px safety
   for (var sz = maxSize; sz >= 7; sz--) {
     if (text.length * sz * 0.56 <= avail) return sz;
   }
