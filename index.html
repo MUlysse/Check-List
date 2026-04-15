@@ -313,30 +313,36 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
 .net-toolbar{display:flex;align-items:center;gap:10px;padding:10px 20px;border-bottom:1px solid rgba(0,0,0,0.05);background:#fff;position:sticky;top:0;z-index:5;}
 .net-search{padding:7px 11px;border:1px solid #E0DDD8;border-radius:8px;font-size:13px;background:#FAFAF8;color:#1C1C1E;outline:none;width:220px;transition:border-color .15s,box-shadow .15s;}
 .net-search:focus{border-color:#4A90D9;box-shadow:0 0 0 3px rgba(74,144,217,0.10);}
-.net-company-group{margin-bottom:0;border-bottom:1px solid rgba(0,0,0,0.06);}
-.net-company-hdr{display:flex;align-items:center;gap:10px;padding:12px 20px 8px;background:#FAFAF8;border-bottom:1px solid rgba(0,0,0,0.05);}
-.net-company-name{font-size:12px;font-weight:700;color:#1C1C1E;letter-spacing:0.04em;text-transform:uppercase;}
-.net-company-count{font-size:11px;color:#B0ADA8;font-weight:500;}
-.net-table{width:100%;border-collapse:collapse;table-layout:fixed;}
-.net-table th{font-size:10px;font-weight:600;color:#B0ADA8;letter-spacing:0.07em;text-transform:uppercase;padding:6px 12px;text-align:left;border-bottom:1px solid rgba(0,0,0,0.06);white-space:nowrap;}
-.net-table td{padding:11px 12px;border-bottom:1px solid rgba(0,0,0,0.04);vertical-align:middle;font-size:13px;color:#1C1C1E;}
-.net-table tr:last-child td{border-bottom:none;}
-.net-table tr:hover td{background:rgba(0,0,0,0.015);}
-.net-photo{width:34px;height:34px;border-radius:50%;overflow:hidden;background:#E8EDF5;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#4A90D9;flex-shrink:0;}
+/* Company groups — thick stripe separates groups, tight header-to-contact */
+.net-company-group{margin-bottom:0;}
+.net-company-group+.net-company-group{border-top:10px solid #F0EDE8;}
+.net-company-hdr{display:flex;align-items:center;gap:10px;padding:14px 22px 10px;background:#FAFAF8;border-bottom:1px solid rgba(0,0,0,0.05);}
+.net-company-name{font-size:10.5px;font-weight:700;color:#8A8680;letter-spacing:0.09em;text-transform:uppercase;}
+.net-company-count{font-size:11px;color:#C8C5BF;font-weight:500;}
+/* Contact rows — card-style list, no table */
+.net-contact-list{display:flex;flex-direction:column;}
+.net-contact-row{display:flex;align-items:center;gap:16px;padding:16px 22px;border-bottom:1px solid rgba(0,0,0,0.045);cursor:pointer;transition:background .12s;}
+.net-contact-row:last-child{border-bottom:none;}
+.net-contact-row:hover{background:rgba(0,0,0,0.018);}
+.net-photo{width:48px;height:48px;border-radius:50%;overflow:hidden;background:#E8EDF5;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:600;color:#4A90D9;flex-shrink:0;}
 .net-photo img{width:100%;height:100%;object-fit:cover;display:block;}
-.net-name{font-size:13.5px;font-weight:600;color:#1C1C1E;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.net-pos{font-size:11.5px;color:#B0ADA8;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.net-contact-info{flex:1;min-width:0;}
+.net-name{font-size:14px;font-weight:600;color:#1C1C1E;}
+.net-pos{font-size:12px;color:#B0ADA8;margin-top:3px;}
+.net-contact-notes-preview{font-size:11.5px;color:#8A8680;margin-top:5px;display:-webkit-box;-webkit-line-clamp:2;line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.45;}
+.net-contact-right{display:flex;align-items:center;gap:12px;flex-shrink:0;}
+.net-contact-meta{display:flex;flex-direction:column;align-items:flex-end;gap:5px;}
 .net-prox{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:5px;font-size:10.5px;font-weight:600;white-space:nowrap;}
 .net-prox::before{content:'';width:6px;height:6px;border-radius:50%;flex-shrink:0;}
 .net-prox.fort{background:#E8F5E9;color:#2E7D32;}.net-prox.fort::before{background:#2E7D32;}
 .net-prox.moyen{background:#FFF3E0;color:#BF5900;}.net-prox.moyen::before{background:#E65100;}
 .net-prox.faible{background:#F5F5F5;color:#8A8680;}.net-prox.faible::before{background:#B0ADA8;}
-.net-date{font-size:12px;color:#8A8680;white-space:nowrap;}
-.net-notes{font-size:11.5px;color:#5A5755;overflow:hidden;white-space:normal;display:-webkit-box;-webkit-line-clamp:3;line-clamp:3;-webkit-box-orient:vertical;}
+.net-date{font-size:11.5px;color:#B0ADA8;white-space:nowrap;}
+.net-contact-actions{display:flex;align-items:center;gap:2px;opacity:0;transition:opacity .12s;}
+.net-contact-row:hover .net-contact-actions{opacity:1;}
 .net-li-btn{background:none;border:none;cursor:pointer;color:#0A66C2;font-size:12px;font-weight:700;padding:3px 6px;border-radius:4px;transition:background .12s;text-decoration:none;display:inline-flex;align-items:center;font-family:Georgia,serif;}
 .net-li-btn:hover{background:rgba(10,102,194,0.10);}
-.net-act-btn{background:none;border:none;cursor:pointer;color:#C8C5BF;font-size:13px;padding:2px 4px;border-radius:4px;opacity:0;transition:opacity .12s,color .12s;line-height:1;}
-.net-table tr:hover .net-act-btn{opacity:1;}
+.net-act-btn{background:none;border:none;cursor:pointer;color:#C8C5BF;font-size:13px;padding:2px 4px;border-radius:4px;transition:color .12s;line-height:1;}
 .net-act-btn:hover{color:#4A90D9;background:rgba(74,144,217,0.08);}
 .net-act-btn.del:hover{color:#FF3B30;background:rgba(255,59,48,0.07);}
 .net-sidebar-title{font-size:10.5px;font-weight:600;color:#8A8680;letter-spacing:0.07em;text-transform:uppercase;padding:10px 6px 6px;}
@@ -377,14 +383,9 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
   .net-search{flex:1;width:auto;min-width:0;}
   .net-company-hdr{padding:8px 12px 6px;}
   .net-company-name{font-size:11px;}
-  .net-table thead{display:none;}
-  .net-table,.net-table tbody{display:block;width:100%;}
-  .net-table tr{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid rgba(0,0,0,0.06);}
-  .net-table tr:hover td{background:transparent;}
-  .net-table td{display:flex;align-items:center;padding:0;border:none;background:transparent;}
-  .net-td-pos,.net-td-date,.net-td-notes{display:none!important;}
-  .net-td-name{flex:1;min-width:0;overflow:hidden;}
-  .net-td-actions{flex-shrink:0;margin-left:auto;}
+  .net-contact-row{padding:12px 14px;}
+  .net-photo{width:40px;height:40px;}
+  .net-contact-notes-preview{display:none;}
   .net-act-btn{opacity:1!important;}
 }
 </style>
@@ -820,8 +821,10 @@ async function loadTasksRemote(){
     var merged = rows.map(function(rt){
       var local = localById[rt.id];
       if(local){
-        if(local.today && !rt.today){ rt.today = local.today; if(rt.prio==='U') rt.prio='M'; }
+        // Preserve local done=true if remote hasn't caught up yet (race condition protection)
+        if(local.done && local.doneAt && !rt.done) { rt.done = true; }
         if(local.doneAt && !rt.doneAt) rt.doneAt = local.doneAt;
+        if(local.today && !rt.today){ rt.today = local.today; if(rt.prio==='U') rt.prio='M'; }
         delete localById[rt.id];
       }
       return rt;
@@ -899,23 +902,28 @@ async function updateRemoteTask(id,changes){
     if(/doneAt/.test(msg)) delete next.doneAt;
     if(JSON.stringify(next)!==JSON.stringify(changes)) res=await supabaseClient.from(SUPABASE_TABLE).update(next).eq('id',id);
   }
-  if(res.error){ console.warn('Supabase update failed',res.error); await loadTasksRemote(); setSyncState('error'); } else { await loadTasksRemote(); setSyncState(); }
+  if(res.error){ console.warn('Supabase update failed',res.error); setSyncState('error'); } else { setSyncState(); }
+  // No loadTasksRemote() here — real-time subscription handles cross-device sync
+  // Calling it immediately would race with Supabase and revert local changes
 }
 async function deleteRemoteTask(id){
   if(!supabaseClient) return;
   setSyncState('syncing');
   var res=await supabaseClient.from(SUPABASE_TABLE).delete().eq('id',id);
-  if(res.error){ console.warn('Supabase delete failed',res.error); setSyncState('error'); } else { await loadTasksRemote(); setSyncState(); }
+  if(res.error){ console.warn('Supabase delete failed',res.error); setSyncState('error'); } else { setSyncState(); }
 }
+var _rtTaskTimer=null,_rtBooksTimer=null;
+function scheduleTaskRefresh(){ if(_rtTaskTimer)clearTimeout(_rtTaskTimer); _rtTaskTimer=setTimeout(function(){_rtTaskTimer=null;loadTasksRemote();},1500); }
+function scheduleBooksRefresh(){ if(_rtBooksTimer)clearTimeout(_rtBooksTimer); _rtBooksTimer=setTimeout(function(){_rtBooksTimer=null;loadBooksRemote();},1500); }
 function subscribeToRemoteChanges(){
   if(!supabaseClient) return;
   var channel=supabaseClient.channel('realtime-tasks');
-  channel.on('postgres_changes',{event:'INSERT',schema:'public',table:SUPABASE_TABLE},function(){ loadTasksRemote(); });
-  channel.on('postgres_changes',{event:'UPDATE',schema:'public',table:SUPABASE_TABLE},function(){ loadTasksRemote(); });
-  channel.on('postgres_changes',{event:'DELETE',schema:'public',table:SUPABASE_TABLE},function(){ loadTasksRemote(); });
-  channel.on('postgres_changes',{event:'INSERT',schema:'public',table:SUPABASE_TABLE_BOOKS},function(){ loadBooksRemote(); });
-  channel.on('postgres_changes',{event:'UPDATE',schema:'public',table:SUPABASE_TABLE_BOOKS},function(){ loadBooksRemote(); });
-  channel.on('postgres_changes',{event:'DELETE',schema:'public',table:SUPABASE_TABLE_BOOKS},function(){ loadBooksRemote(); });
+  channel.on('postgres_changes',{event:'INSERT',schema:'public',table:SUPABASE_TABLE},function(){ scheduleTaskRefresh(); });
+  channel.on('postgres_changes',{event:'UPDATE',schema:'public',table:SUPABASE_TABLE},function(){ scheduleTaskRefresh(); });
+  channel.on('postgres_changes',{event:'DELETE',schema:'public',table:SUPABASE_TABLE},function(){ scheduleTaskRefresh(); });
+  channel.on('postgres_changes',{event:'INSERT',schema:'public',table:SUPABASE_TABLE_BOOKS},function(){ scheduleBooksRefresh(); });
+  channel.on('postgres_changes',{event:'UPDATE',schema:'public',table:SUPABASE_TABLE_BOOKS},function(){ scheduleBooksRefresh(); });
+  channel.on('postgres_changes',{event:'DELETE',schema:'public',table:SUPABASE_TABLE_BOOKS},function(){ scheduleBooksRefresh(); });
   channel.on('postgres_changes',{event:'INSERT',schema:'public',table:SUPABASE_TABLE_CONTACTS},function(){ loadContactsRemote(); });
   channel.on('postgres_changes',{event:'UPDATE',schema:'public',table:SUPABASE_TABLE_CONTACTS},function(){ loadContactsRemote(); });
   channel.on('postgres_changes',{event:'DELETE',schema:'public',table:SUPABASE_TABLE_CONTACTS},function(){ loadContactsRemote(); });
@@ -1626,15 +1634,7 @@ function rNetworking(){
     var logoTag=logoUrl?'<img class="net-company-logo" src="'+e(logoUrl)+'" alt="" loading="lazy" onerror="this.style.display=\'none\'">':'';
     gh+='<div class="net-company-group">'
       +'<div class="net-company-hdr">'+logoTag+'<span class="net-company-name">'+e(g.company)+'</span><span class="net-company-count">'+g.contacts.length+' contact'+(g.contacts.length>1?'s':'')+'</span></div>'
-      +'<table class="net-table"><thead><tr>'
-      +'<th style="width:40px"></th>'
-      +'<th>Nom</th>'
-      +'<th style="width:20%">Poste</th>'
-      +'<th style="width:13%">Proximité</th>'
-      +'<th style="width:13%">Rencontré</th>'
-      +'<th style="width:22%">Notes</th>'
-      +'<th style="width:56px"></th>'
-      +'</tr></thead><tbody>';
+      +'<div class="net-contact-list">';
     g.contacts.forEach(function(c){
       var initials=((c.fname||'').charAt(0)+(c.lname||'').charAt(0)).toUpperCase();
       var photo=c.photo?'<img src="'+e(c.photo)+'" alt="">':'<span>'+e(initials)+'</span>';
@@ -1642,19 +1642,26 @@ function rNetworking(){
       var proxLabel=c.prox||'Faible';
       var liBtn=c.linkedin?'<a class="net-li-btn" href="'+e(c.linkedin)+'" target="_blank" rel="noopener" title="LinkedIn">in</a>':'';
       var cid=e(String(c.id));
-      gh+='<tr onclick="openContactModal(\''+cid+'\')" style="cursor:pointer">'
-        +'<td><div class="net-photo">'+photo+'</div></td>'
-        +'<td class="net-td-name"><div class="net-name">'+e((c.fname+' '+c.lname).trim())+'</div>'+(c.pos?'<div class="net-pos">'+e(c.pos)+'</div>':'')+'</td>'
-        +'<td class="net-td-pos">'+(c.pos?'<span style="font-size:12px;color:#8A8680;">'+e(c.pos)+'</span>':'')+'</td>'
-        +'<td class="net-td-prox"><span class="net-prox '+proxCls+'">'+e(proxLabel)+'</span></td>'
-        +'<td class="net-td-date"><span class="net-date">'+e(c.date||'—')+'</span></td>'
-        +'<td class="net-td-notes"><span class="net-notes">'+e(c.notes||'')+'</span></td>'
-        +'<td class="net-td-actions" style="white-space:nowrap">'+liBtn
+      gh+='<div class="net-contact-row" onclick="openContactModal(\''+cid+'\')">'
+        +'<div class="net-photo">'+photo+'</div>'
+        +'<div class="net-contact-info">'
+        +'<div class="net-name">'+e((c.fname+' '+c.lname).trim())+'</div>'
+        +(c.pos?'<div class="net-pos">'+e(c.pos)+'</div>':'')
+        +(c.notes?'<div class="net-contact-notes-preview">'+e(c.notes)+'</div>':'')
+        +'</div>'
+        +'<div class="net-contact-right">'
+        +'<div class="net-contact-meta">'
+        +'<span class="net-prox '+proxCls+'">'+e(proxLabel)+'</span>'
+        +(c.date?'<span class="net-date">'+e(c.date)+'</span>':'')
+        +'</div>'
+        +'<div class="net-contact-actions">'
+        +liBtn
         +'<button class="net-act-btn del" title="Supprimer" onclick="event.stopPropagation();deleteContactDirect(\''+cid+'\')">&#10005;</button>'
-        +'</td>'
-        +'</tr>';
+        +'</div>'
+        +'</div>'
+        +'</div>';
     });
-    gh+='</tbody></table></div>';
+    gh+='</div></div>';
   });
   overlay.innerHTML=gh;
 }
