@@ -57,8 +57,8 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
 .tb-btn:hover{background:rgba(0,0,0,0.07);}
 
 /* ── View Toggle ── */
-.view-bar{display:flex;gap:2px;padding:5px 10px 4px;margin:0 4px;}
-.view-btn{flex:1;padding:5px 6px;border:none;border-radius:7px;background:transparent;color:#8A8680;font-size:12px;font-weight:500;cursor:pointer;transition:background .15s,color .15s;}
+.view-bar{display:grid;grid-template-columns:1fr 1fr;gap:2px;padding:5px 10px 4px;margin:0 4px;}
+.view-btn{padding:5px 4px;border:none;border-radius:7px;background:transparent;color:#8A8680;font-size:11.5px;font-weight:500;cursor:pointer;transition:background .15s,color .15s;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .view-btn.active{background:rgba(255,255,255,0.85);color:#1C1C1E;box-shadow:0 1px 2px rgba(0,0,0,0.10);}
 
 /* ── Sidebar Nav ── */
@@ -332,6 +332,24 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
 .net-sidebar-title{font-size:10.5px;font-weight:600;color:#8A8680;letter-spacing:0.07em;text-transform:uppercase;padding:10px 6px 6px;}
 .net-stat-row{display:flex;align-items:center;gap:8px;padding:5px 6px;font-size:12px;color:#3D3B38;}
 .net-stat-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.net-company-logo{width:22px;height:22px;border-radius:5px;object-fit:contain;flex-shrink:0;background:#fff;padding:1px;}
+/* ── Mobile overrides for projection & networking ── */
+@media(max-width:680px){
+  .app.proj-view .sidebar{order:2;}
+  .net-toolbar{padding:8px 12px;gap:8px;flex-wrap:wrap;}
+  .net-search{flex:1;width:auto;min-width:0;}
+  .net-company-hdr{padding:8px 12px 6px;}
+  .net-company-name{font-size:11px;}
+  .net-table thead{display:none;}
+  .net-table,.net-table tbody{display:block;width:100%;}
+  .net-table tr{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid rgba(0,0,0,0.06);}
+  .net-table tr:hover td{background:transparent;}
+  .net-table td{display:flex;align-items:center;padding:0;border:none;background:transparent;}
+  .net-td-pos,.net-td-date,.net-td-notes{display:none!important;}
+  .net-td-name{flex:1;min-width:0;overflow:hidden;}
+  .net-td-actions{flex-shrink:0;margin-left:auto;}
+  .net-act-btn{opacity:1!important;}
+}
 </style>
 </head>
 <body>
@@ -351,7 +369,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
       <button class="view-btn active" data-view="Checklist" onclick="setView('Checklist')">Checklist</button>
       <button class="view-btn" data-view="Books" onclick="setView('Books')">Books</button>
       <button class="view-btn" data-view="Projection" onclick="setView('Projection')">Projection</button>
-      <button class="view-btn" data-view="Networking" onclick="setView('Networking')">Réseau</button>
+      <button class="view-btn" data-view="Networking" onclick="setView('Networking')">Networking</button>
     </div>
     <div class="tabs-wrap" id="tabs-wrap">
       <div class="tabs" id="tabs"></div>
@@ -866,7 +884,9 @@ function tc(x){if(x==='All')return tasks.filter(function(t){return!t.done;}).len
 function render(){
   rViewBar();
   var bc=document.querySelector('.body-card');
+  var appEl=document.querySelector('.app');
   if(currentView==='Books'){
+    if(appEl)appEl.classList.remove('proj-view');
     var twb=document.getElementById('tabs-wrap');
     if(twb){twb.style.display='flex';twb.style.flexDirection='column';twb.style.padding='0';}
     if(bc){bc.classList.remove('proj-mode');bc.classList.remove('net-mode');}
@@ -877,6 +897,7 @@ function render(){
     rBooksChart();
     rBooks();
   } else if(currentView==='Projection'){
+    if(appEl)appEl.classList.add('proj-view');
     document.getElementById('tabs-wrap').style.display='block';
     if(bc){bc.classList.add('proj-mode');bc.classList.remove('net-mode');}
     var mti=document.getElementById('main-title-icon');
@@ -886,16 +907,17 @@ function render(){
     rProjectionGoals();
     rProjection();
   } else if(currentView==='Networking'){
+    if(appEl)appEl.classList.remove('proj-view');
     var twn=document.getElementById('tabs-wrap');
-    if(twn){twn.style.display='flex';twn.style.flexDirection='column';twn.style.padding='0';}
+    if(twn){twn.style.display='none';}
     if(bc){bc.classList.remove('proj-mode');bc.classList.add('net-mode');}
     var mti=document.getElementById('main-title-icon');
     var mtt=document.getElementById('main-title-text');
     if(mti){mti.textContent='◎';mti.style.background='#4A90D9';mti.style.color='#fff';}
-    if(mtt)mtt.textContent='Réseau';
-    rNetworkingSidebar();
+    if(mtt)mtt.textContent='Networking';
     rNetworking();
   } else {
+    if(appEl)appEl.classList.remove('proj-view');
     var tw2=document.getElementById('tabs-wrap');
     if(tw2){tw2.style.display='block';tw2.style.flexDirection='';tw2.style.padding='';}
     if(bc){bc.classList.remove('proj-mode');bc.classList.remove('net-mode');}
@@ -1429,6 +1451,15 @@ function rNetworkingSidebar(){
   el.innerHTML=h;
 }
 
+function companyLogoUrl(name){
+  if(!name||name==='(Sans entreprise)')return '';
+  var d=name.toLowerCase()
+    .replace(/[àâä]/g,'a').replace(/[éèêë]/g,'e').replace(/[îï]/g,'i').replace(/[ôö]/g,'o').replace(/[ùûü]/g,'u').replace(/ç/g,'c')
+    .replace(/\b(sa|sas|sarl|sca|group|groupe|banque|bank|holding|partners|advisor|advisory|capital|management|asset|invest|finance|financial)\b/g,'')
+    .replace(/[^a-z0-9\s]/g,'').trim().replace(/\s+/g,'');
+  return d?'https://logo.clearbit.com/'+d+'.com':'';
+}
+
 function rNetworking(){
   var el=document.getElementById('list');
   if(!el)return;
@@ -1437,7 +1468,6 @@ function rNetworking(){
     if(!q)return true;
     return (c.fname+' '+c.lname+' '+c.company+' '+c.pos+' '+c.notes).toLowerCase().indexOf(q)>=0;
   });
-  // Sort within company by proximity then name
   filtered.sort(function(a,b){
     var ca=a.company||'',cb=b.company||'';
     if(ca!==cb)return ca.localeCompare(cb,'fr');
@@ -1446,7 +1476,6 @@ function rNetworking(){
     if(pa!==pb)return pa-pb;
     return (a.lname+' '+a.fname).localeCompare(b.lname+' '+b.fname,'fr');
   });
-  // Group by company
   var groups=[],seenCompanies=[];
   filtered.forEach(function(c){
     var co=c.company&&c.company.trim()?c.company.trim():'(Sans entreprise)';
@@ -1463,16 +1492,18 @@ function rNetworking(){
     el.innerHTML=h;return;
   }
   groups.forEach(function(g){
+    var logoUrl=companyLogoUrl(g.company);
+    var logoTag=logoUrl?'<img class="net-company-logo" src="'+e(logoUrl)+'" alt="" loading="lazy" onerror="this.style.display=\'none\'">':'';
     h+='<div class="net-company-group">'
-      +'<div class="net-company-hdr"><span class="net-company-name">'+e(g.company)+'</span><span class="net-company-count">'+g.contacts.length+' contact'+(g.contacts.length>1?'s':'')+'</span></div>'
+      +'<div class="net-company-hdr">'+logoTag+'<span class="net-company-name">'+e(g.company)+'</span><span class="net-company-count">'+g.contacts.length+' contact'+(g.contacts.length>1?'s':'')+'</span></div>'
       +'<table class="net-table"><thead><tr>'
       +'<th style="width:40px"></th>'
-      +'<th style="width:25%">Nom</th>'
-      +'<th style="width:22%">Poste</th>'
-      +'<th style="width:14%">Proximité</th>'
-      +'<th style="width:12%">Rencontré</th>'
-      +'<th>Notes</th>'
-      +'<th style="width:60px"></th>'
+      +'<th>Nom</th>'
+      +'<th style="width:20%">Poste</th>'
+      +'<th style="width:13%">Proximité</th>'
+      +'<th style="width:13%">Rencontré</th>'
+      +'<th style="width:22%">Notes</th>'
+      +'<th style="width:56px"></th>'
       +'</tr></thead><tbody>';
     g.contacts.forEach(function(c){
       var initials=((c.fname||'').charAt(0)+(c.lname||'').charAt(0)).toUpperCase();
@@ -1483,12 +1514,12 @@ function rNetworking(){
       var cid=e(String(c.id));
       h+='<tr onclick="openContactModal(\''+cid+'\')" style="cursor:pointer">'
         +'<td><div class="net-photo">'+photo+'</div></td>'
-        +'<td><div class="net-name">'+e(c.fname+' '+c.lname)+'</div>'+(c.pos?'<div class="net-pos">'+e(c.pos)+'</div>':'')+'</td>'
-        +'<td>'+(c.pos?'<div class="net-pos" style="font-size:12px">'+e(c.pos)+'</div>':'')+'</td>'
-        +'<td><span class="net-prox '+proxCls+'">'+e(proxLabel)+'</span></td>'
-        +'<td><span class="net-date">'+e(c.date||'—')+'</span></td>'
-        +'<td><span class="net-notes">'+e(c.notes||'')+'</span></td>'
-        +'<td style="white-space:nowrap">'+liBtn
+        +'<td class="net-td-name"><div class="net-name">'+e((c.fname+' '+c.lname).trim())+'</div>'+(c.pos?'<div class="net-pos">'+e(c.pos)+'</div>':'')+'</td>'
+        +'<td class="net-td-pos">'+(c.pos?'<span style="font-size:12px;color:#8A8680;">'+e(c.pos)+'</span>':'')+'</td>'
+        +'<td class="net-td-prox"><span class="net-prox '+proxCls+'">'+e(proxLabel)+'</span></td>'
+        +'<td class="net-td-date"><span class="net-date">'+e(c.date||'—')+'</span></td>'
+        +'<td class="net-td-notes"><span class="net-notes">'+e(c.notes||'')+'</span></td>'
+        +'<td class="net-td-actions" style="white-space:nowrap">'+liBtn
         +'<button class="net-act-btn del" title="Supprimer" onclick="event.stopPropagation();deleteContactDirect(\''+cid+'\')">&#10005;</button>'
         +'</td>'
         +'</tr>';
