@@ -741,11 +741,11 @@ function scheduleAutoDelete(task){
   deleteTimers[task.id] = setTimeout(function(){ autoDeleteTask(task.id); }, delay);
 }
 function autoDeleteTask(id){
-  var t = tasks.find(function(t){return t.id===id;});
+  var t = tasks.find(function(t){return String(t.id)===String(id);});
   if(!t||!t.done) return;
   var elapsed = Date.now() - Number(t.doneAt || 0);
   if(elapsed < 24*60*60*1000){ scheduleAutoDelete(t); return; }
-  tasks = tasks.filter(function(t){return t.id!==id;});
+  tasks = tasks.filter(function(t){return String(t.id)!==String(id);});
   clearAutoDelete(id);
   render();
   saveTasks();
@@ -993,6 +993,7 @@ function render(){
     if(appEl)appEl.classList.remove('proj-view');
     var twb=document.getElementById('tabs-wrap');
     if(twb){twb.style.display='flex';twb.style.flexDirection='column';twb.style.padding='0';}
+    var ctmB=document.getElementById('cat-treemap');if(ctmB)ctmB.style.display='none';
     if(bc){bc.classList.remove('proj-mode');bc.classList.remove('net-mode');}
     var mti=document.getElementById('main-title-icon');
     var mtt=document.getElementById('main-title-text');
@@ -1003,6 +1004,7 @@ function render(){
   } else if(currentView==='Projection'){
     if(appEl)appEl.classList.add('proj-view');
     document.getElementById('tabs-wrap').style.display='block';
+    var ctmP=document.getElementById('cat-treemap');if(ctmP)ctmP.style.display='none';
     if(bc){bc.classList.add('proj-mode');bc.classList.remove('net-mode');}
     var mti=document.getElementById('main-title-icon');
     var mtt=document.getElementById('main-title-text');
@@ -1322,19 +1324,19 @@ function setTab(x){var ico=getTabIcon(x);var mti=document.getElementById("main-t
 function mobGoList(){var a=document.querySelector('.app');if(a)a.classList.add('mob-list');var fab=document.querySelector('.fab');if(fab)fab.style.display='';}
 function mobBack(){var a=document.querySelector('.app');if(a)a.classList.remove('mob-list');var fab=document.querySelector('.fab');if(fab)fab.style.display='none';}
 function setView(v){currentView=v;render();saveTasks();}
-async function tgl(id,v){var t=tasks.find(function(t){return t.id===id;});if(t){t.done=v;if(v){t.doneAt=Date.now();scheduleAutoDelete(t);}else{delete t.doneAt;clearAutoDelete(id);}}render();saveTasks(); if(supabaseClient) await updateRemoteTask(id,{done:v,doneAt:v?t.doneAt:null});}
-async function sp(id,p){var t=tasks.find(function(t){return t.id===id;});if(t){if(t.prio===p){t.prio='M';}else{t.prio=p;t.today=false;}t.done=false;delete t.doneAt;clearAutoDelete(id);}render();saveTasks();if(supabaseClient) await updateRemoteTask(id,{prio:t?t.prio:'M',done:false,doneAt:null,today:t?!!t.today:false});}
-async function st(id){var t=tasks.find(function(t){return t.id===id;});if(t){t.today=!t.today;if(t.today)t.prio='M';}render();saveTasks();if(supabaseClient) await updateRemoteTask(id,{today:t.today,prio:t.prio});}
-async function dt(id){tasks=tasks.filter(function(t){return t.id!==id;});render();saveTasks(); if(supabaseClient) await deleteRemoteTask(id);}
+async function tgl(id,v){var t=tasks.find(function(t){return String(t.id)===String(id);});if(t){t.done=v;if(v){t.doneAt=Date.now();scheduleAutoDelete(t);}else{delete t.doneAt;clearAutoDelete(id);}}render();saveTasks(); if(supabaseClient) await updateRemoteTask(id,{done:v,doneAt:v?t.doneAt:null});}
+async function sp(id,p){var t=tasks.find(function(t){return String(t.id)===String(id);});if(t){if(t.prio===p){t.prio='M';}else{t.prio=p;t.today=false;}t.done=false;delete t.doneAt;clearAutoDelete(id);}render();saveTasks();if(supabaseClient) await updateRemoteTask(id,{prio:t?t.prio:'M',done:false,doneAt:null,today:t?!!t.today:false});}
+async function st(id){var t=tasks.find(function(t){return String(t.id)===String(id);});if(t){t.today=!t.today;if(t.today)t.prio='M';}render();saveTasks();if(supabaseClient) await updateRemoteTask(id,{today:t.today,prio:t.prio});}
+async function dt(id){tasks=tasks.filter(function(t){return String(t.id)!==String(id);});render();saveTasks(); if(supabaseClient) await deleteRemoteTask(id);}
 
 function ed(id){
-  var t=tasks.find(function(t){return t.id===id;});if(!t)return;
+  var t=tasks.find(function(t){return String(t.id)===String(id);});if(!t)return;
   var sp=document.getElementById('s'+id);if(!sp)return;
   var w=sp.parentElement;
   w.innerHTML='<input class="rt-input" id="ei'+id+'" value="'+e(t.text)+'" onkeydown="if(event.key===\'Enter\')sv(\''+id+'\');if(event.key===\'Escape\')render();" autofocus><button class="save-btn" onclick="sv(\''+id+'\')">OK</button>';
   document.getElementById('ei'+id).focus();
 }
-async function sv(id){var i=document.getElementById('ei'+id);if(!i)return;var v=i.value.trim();if(!v)return;var t=tasks.find(function(t){return t.id===id;});if(t)t.text=v;render();saveTasks(); if(supabaseClient) await updateRemoteTask(id,{text:v});}
+async function sv(id){var i=document.getElementById('ei'+id);if(!i)return;var v=i.value.trim();if(!v)return;var t=tasks.find(function(t){return String(t.id)===String(id);});if(t)t.text=v;render();saveTasks(); if(supabaseClient) await updateRemoteTask(id,{text:v});}
 
 function openModal(){if(currentView==='Projection'){openProjPeriodModal(null,null);return;}if(currentView==='Books'){openBookModal();return;}if(currentView==='Networking'){openContactModal(null);return;}document.getElementById('bd').classList.add('open');document.querySelectorAll('.apb').forEach(function(b){b.classList.remove('sel');});np='M';na=false;setTimeout(function(){document.getElementById('new-task').focus();},80);}
 function closeModal(){document.getElementById('bd').classList.remove('open');}
