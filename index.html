@@ -73,6 +73,16 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
 .tab-badge{font-size:11px;font-weight:500;color:#8A8680;min-width:18px;text-align:right;}
 .tab.active .tab-badge{color:#5A5755;}
 
+/* ── Category Treemap ── */
+#cat-treemap{margin:4px 0 0;padding:0 2px;}
+.tm-label{font-size:10px;font-weight:600;color:#B0ADA8;letter-spacing:0.08em;text-transform:uppercase;padding:8px 2px 5px;}
+.tm-map{position:relative;border-radius:8px;overflow:hidden;}
+.tm-cell{position:absolute;cursor:pointer;display:flex;flex-direction:column;justify-content:flex-end;padding:5px 7px;transition:filter .15s,box-shadow .15s;overflow:hidden;box-sizing:border-box;}
+.tm-cell:hover{filter:brightness(1.12);}
+.tm-cell.active{box-shadow:inset 0 0 0 2.5px rgba(255,255,255,0.6);}
+.tm-cell-name{font-size:10.5px;font-weight:600;color:rgba(255,255,255,0.95);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.25;}
+.tm-cell-count{font-size:9.5px;color:rgba(255,255,255,0.70);line-height:1.25;}
+
 /* ── Sidebar Footer ── */
 .sidebar-footer{padding:10px 14px 14px;border-top:1px solid rgba(0,0,0,0.06);}
 .prog-label{font-size:11px;color:#8A8680;margin-bottom:5px;display:flex;align-items:center;gap:3px;}
@@ -414,6 +424,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
     </div>
     <div class="tabs-wrap" id="tabs-wrap">
       <div class="tabs" id="tabs"></div>
+      <div id="cat-treemap"></div>
     </div>
     <div class="sidebar-footer">
       <div class="prog-label"><em id="dn">0</em> / <span id="tot">0</span> <span id="gauge-label">faites</span></div>
@@ -1027,25 +1038,82 @@ function navDrawerGo(view){
   setView(view);
 }
 
+function getCatTreemapColor(name){
+  if(name==='EDHEC') return '#E53935';
+  if(name==='Onoris') return '#4A90D9';
+  if(name==='Sovereign') return '#D4A017';
+  if(['Logistique','Perso','Wish List','Business'].indexOf(name)>=0) return '#34C759';
+  return '#8A8680';
+}
 function getTabIcon(name){
   var icons={'All':{bg:'#4A90D9',icon:'☰'},'Completed':{bg:'#34C759',icon:'✓'},'Aujourd\'hui':{bg:'#34C759',icon:'★'},'Urgent':{bg:'#FF9500',icon:'!'}};
   if(icons[name]) return icons[name];
-  return {bg:'#8A8680',icon:name.charAt(0).toUpperCase()};
+  return {bg:getCatTreemapColor(name),icon:name.charAt(0).toUpperCase()};
 }
 function rTabs(){
-  var ts=vtabs();
-  if(ts.indexOf(tab)<0)tab='All';
+  var SYSTEM=['All',TODAY_TAB,'Urgent','Completed'];
+  var ts=vtabs().filter(function(x){return SYSTEM.indexOf(x)>=0;});
+  if(ts.indexOf(tab)<0&&SYSTEM.indexOf(tab)>=0) tab='All';
   var h='';
   ts.forEach(function(x){
-        var ico=getTabIcon(x);
+    var ico=getTabIcon(x);
     var cnt=tc(x);
-    h+='<div class="tab'+(tab===x?' active':'')+'" data-tab="'+x+'" onclick="setTab(this.dataset.tab)" draggable="true" ondragstart="dragStart(event)" ondragover="dragOver(event)" ondrop="drop(event)" onpointerdown="tabPointerDown(event)" onpointermove="tabPointerMove(event)" onpointerup="tabPointerUp(event)" onpointercancel="tabPointerUp(event)">'
+    h+='<div class="tab'+(tab===x?' active':'')+'" data-tab="'+x+'" onclick="setTab(this.dataset.tab)">'
       +'<div class="tab-icon" style="background:'+ico.bg+';color:#fff">'+ico.icon+'</div>'
       +'<span class="tab-label">'+x+'</span>'
       +(cnt>0?'<span class="tab-badge">'+cnt+'</span>':'')
       +'</div>';
   });
   document.getElementById('tabs').innerHTML=h;
+  rCategoryTreemap();
+}
+function rCategoryTreemap(){
+  var el=document.getElementById('cat-treemap');
+  if(!el) return;
+  var SYSTEM=['All',TODAY_TAB,'Urgent','Completed'];
+  var seen={}, cats=[];
+  otabs().forEach(function(x){
+    if(SYSTEM.indexOf(x)>=0||seen[x]) return;
+    seen[x]=true;
+    var cnt=tc(x);
+    if(cnt>0) cats.push({name:x,count:cnt});
+  });
+  if(!cats.length){el.style.display='none';return;}
+  el.style.display='block';
+  cats.sort(function(a,b){return b.count-a.count;});
+  var W=el.offsetWidth||220;
+  var mapH=Math.min(Math.max(cats.length*42,130),260);
+  function layout(items,x,y,w,h){
+    if(!items.length) return [];
+    if(items.length===1) return [{item:items[0],x:x,y:y,w:w,h:h}];
+    var tot=items.reduce(function(s,i){return s+i.count;},0);
+    var half=tot/2,sum=0,split=1;
+    for(var i=0;i<items.length-1;i++){sum+=items[i].count;if(sum>=half){split=i+1;break;}}
+    var L=items.slice(0,split),R=items.slice(split);
+    var lt=L.reduce(function(s,i){return s+i.count;},0);
+    var ratio=lt/tot;
+    var res=[];
+    if(w>=h){var lw=Math.round(w*ratio);res=res.concat(layout(L,x,y,lw,h));res=res.concat(layout(R,x+lw,y,w-lw,h));}
+    else{var lh=Math.round(h*ratio);res=res.concat(layout(L,x,y,w,lh));res=res.concat(layout(R,x,y+lh,w,h-lh));}
+    return res;
+  }
+  var cells=layout(cats,0,0,W,mapH);
+  var G=2;
+  var html='<div class="tm-label">Catégories</div><div class="tm-map" style="height:'+mapH+'px;">';
+  html+=cells.map(function(c){
+    var color=getCatTreemapColor(c.item.name);
+    var isActive=tab===c.item.name;
+    var gx=c.x+(c.x>0?G/2:0);
+    var gy=c.y+(c.y>0?G/2:0);
+    var gw=c.w-(c.x>0?G/2:0)-(c.x+c.w<W?G/2:0);
+    var gh=c.h-(c.y>0?G/2:0)-(c.y+c.h<mapH?G/2:0);
+    return '<div class="tm-cell'+(isActive?' active':'')+'" style="left:'+gx+'px;top:'+gy+'px;width:'+gw+'px;height:'+gh+'px;background:'+color+';" data-tab="'+c.item.name+'" onclick="setTab(this.dataset.tab)">'
+      +'<span class="tm-cell-name">'+c.item.name+'</span>'
+      +(gh>26?'<span class="tm-cell-count">'+c.item.count+'</span>':'')
+      +'</div>';
+  }).join('');
+  html+='</div>';
+  el.innerHTML=html;
 }
 var draggedTab=null;
 var dropTarget=null;
