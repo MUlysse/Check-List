@@ -851,19 +851,29 @@ async function loadTasksRemote(){
         if(local.done && local.doneAt && !rt.done) { rt.done = true; }
         if(local.doneAt && !rt.doneAt) rt.doneAt = local.doneAt;
         if(local.today && !rt.today){ rt.today = local.today; if(rt.prio==='U') rt.prio='M'; }
-        delete localById[rt.id];
       }
       return rt;
     });
-    Object.keys(localById).forEach(function(id){ merged.push(localById[id]); });
+    // Supabase is the single source of truth — local-only tasks are discarded.
+    // Exception: preserve tasks added within the last 60s that haven't been confirmed yet
+    // (handles the race between optimistic add and realtime refresh).
+    var now60=Date.now()-60000;
+    Object.keys(localById).forEach(function(id){
+      var t=localById[id];
+      if(t._pendingAt&&t._pendingAt>now60) merged.push(t);
+    });
     tasks = merged.filter(function(t){return t.cat !== SETTINGS_CAT;});
     // Sanitize: today and prio=U are mutually exclusive
     tasks.forEach(function(t){ if(t.today && t.prio==='U') t.prio='M'; });
-    // Ensure all task categories are in TABS
-    var cats = [];
-    tasks.forEach(function(t){ if(cats.indexOf(t.cat)<0) cats.push(t.cat); });
-    cats.forEach(function(c){ if(TABS.indexOf(c)<0 && c !== 'Completed') TABS.push(c); });
-    CO = TABS.filter(function(x){return !['All','Urgent','Completed',TODAY_TAB].includes(x);});
+    // Rebuild TABS/CO from actual remote categories (drop orphaned local-only categories)
+    var SYSTEM_TABS=['All',TODAY_TAB,'Urgent','Completed'];
+    var remoteCats=[];
+    tasks.forEach(function(t){ if(remoteCats.indexOf(t.cat)<0) remoteCats.push(t.cat); });
+    TABS=TABS.filter(function(x){
+      return SYSTEM_TABS.indexOf(x)>=0 || remoteCats.indexOf(x)>=0;
+    });
+    remoteCats.forEach(function(c){ if(TABS.indexOf(c)<0 && c!=='Completed') TABS.push(c); });
+    CO = TABS.filter(function(x){return SYSTEM_TABS.indexOf(x)<0;});
     saveTasks();
     render();
     scheduleAllAutoDelete();
@@ -1364,7 +1374,7 @@ async function addTask(){
   if(!cat){ce.style.borderColor='#C0392B';setTimeout(function(){ce.style.borderColor='';},1200);}
   if(!txt){te.style.borderColor='#C0392B';setTimeout(function(){te.style.borderColor='';},1200);}
   if(!cat||!txt)return;
-  var task={id:newId(),cat:cat,text:txt,prio:np,done:false,today:na,doneAt:undefined};
+  var task={id:newId(),cat:cat,text:txt,prio:np,done:false,today:na,doneAt:undefined,_pendingAt:Date.now()};
   tasks.push(task);
   te.value='';na=false;pfc();closeModal();render();saveTasks(); if(supabaseClient) await insertRemoteTask(task);
 }
