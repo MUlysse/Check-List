@@ -122,7 +122,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
 
 /* Circular checkbox — Things 3 style */
 .chk-wrap{flex-shrink:0;}
-.chk{appearance:none;-webkit-appearance:none;width:20px;height:20px;border-radius:50%;border:1.5px solid #C8C5BF;background:#fff;cursor:pointer;transition:all .15s;position:relative;}
+.chk{appearance:none;-webkit-appearance:none;width:20px;height:20px;border-radius:50%;border:1.5px solid #C8C5BF;background:#fff;cursor:pointer;transition:all .15s;position:relative;-webkit-tap-highlight-color:transparent;}
 .chk:checked{background:#34C759;border-color:#34C759;}
 .chk:checked::after{content:'';position:absolute;left:6px;top:3px;width:5px;height:9px;border:2px solid #fff;border-top:none;border-left:none;transform:rotate(40deg);}
 .chk:hover:not(:checked){border-color:#8A8680;}
@@ -1289,7 +1289,7 @@ function rh(t,hc,s){
   var todayCls=t.today?' on':'';
   var urgCls=t.prio==='U'?' on':'';
   return '<div class="row '+(t.done?'done':'')+' '+s+'" id="r'+t.id+'">'
-    +'<div class="chk-wrap"><input type="checkbox" class="chk"'+(t.done?' checked':'')+' onchange="tgl(\''+t.id+'\',this.checked)"></div>'
+    +'<div class="chk-wrap"><input type="checkbox" class="chk"'+(t.done?' checked':'')+' onclick="tgl(\''+t.id+'\',this.checked)"></div>'
     +'<div class="rt-wrap"><span class="rt" id="s'+t.id+'">'+e(t.text)+'</span>'+catSpan+'</div>'
     +'<button class="edit-btn" onclick="ed(\''+t.id+'\')">&#9999;</button>'
     +'<div class="act">'
@@ -1348,7 +1348,7 @@ function ed(id){
 }
 async function sv(id){var i=document.getElementById('ei'+id);if(!i)return;var v=i.value.trim();if(!v)return;var t=tasks.find(function(t){return String(t.id)===String(id);});if(t)t.text=v;render();saveTasks(); if(supabaseClient) await updateRemoteTask(id,{text:v});}
 
-function openModal(){if(currentView==='Projection'){openProjPeriodModal(null,null);return;}if(currentView==='Books'){openBookModal();return;}if(currentView==='Networking'){openContactModal(null);return;}document.getElementById('bd').classList.add('open');document.querySelectorAll('.apb').forEach(function(b){b.classList.remove('sel');});np='M';na=false;setTimeout(function(){document.getElementById('new-task').focus();},80);}
+function openModal(){if(currentView==='Projection'){openProjPeriodModal(null,null);return;}if(currentView==='Books'){openBookModal();return;}if(currentView==='Networking'){openContactModal(null);return;}document.getElementById('bd').classList.add('open');document.querySelectorAll('.apb').forEach(function(b){b.classList.remove('sel');});np='M';na=false;if(isTodayTab(tab)){na=true;var ab=document.querySelector('#bd .apb.A');if(ab)ab.classList.add('sel');}setTimeout(function(){document.getElementById('new-task').focus();},80);}
 function closeModal(){document.getElementById('bd').classList.remove('open');}
 function bdClick(ev){if(ev.target===document.getElementById('bd'))closeModal();}
 
@@ -1595,7 +1595,7 @@ function editBook(id){
   document.getElementById('book-bd').setAttribute('data-editing', id);
 }
 
-function pfc(){var sp=['All','Urgent','Completed'];document.getElementById('new-cat').value=sp.indexOf(tab)<0?tab:'';}
+function pfc(){var sp=['All','Urgent','Completed'];document.getElementById('new-cat').value=(sp.indexOf(tab)<0&&!isTodayTab(tab))?tab:'';}
 
 document.addEventListener('keydown',function(e){if(e.ctrlKey&&e.key==='r'){e.preventDefault();location.reload();}if(e.key==='Escape'){closeModal();closeBookModal();closeProjPeriodModal();closeProjRowModal();closeContactModal();closeNavDrawer();}});
 window.addEventListener('resize',function(){if(currentView==='Projection')rProjection();if(currentView==='Networking')rNetworking();});
