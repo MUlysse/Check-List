@@ -340,6 +340,10 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
 .net-co-tag-logo{width:12px;height:12px;border-radius:2px;object-fit:contain;}
 .net-co-logo-blk{width:44px;height:auto;align-self:stretch;min-height:44px;border-radius:8px;background:#fff;border:1px solid rgba(0,0,0,0.09);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;font-size:15px;font-weight:700;color:#8A8680;text-transform:uppercase;}
 .net-co-logo-blk img{width:100%;height:100%;object-fit:contain;padding:6px;box-sizing:border-box;display:block;}
+.net-drag-handle{width:14px;display:flex;align-items:center;justify-content:center;color:#D0CCC6;font-size:11px;cursor:grab;flex-shrink:0;transition:color .12s;user-select:none;-webkit-user-select:none;}
+.net-drag-handle:hover{color:#8A8680;}
+.net-contact-dragging{opacity:.5;box-shadow:0 8px 24px rgba(0,0,0,0.14)!important;}
+.net-contact-drag-over{border-color:#4A90D9!important;box-shadow:0 0 0 2px rgba(74,144,217,.25)!important;}
 /* Contact card */
 .net-contact-row{display:flex;align-items:stretch;gap:9px;padding:10px 11px;border-radius:9px;background:#FAFAF8;border:1px solid rgba(0,0,0,0.07);cursor:pointer;transition:box-shadow .12s,border-color .12s,background .12s;}
 .net-contact-row:last-child{border-bottom:1px solid rgba(0,0,0,0.07);}
@@ -1726,20 +1730,9 @@ function rNetworking(){
     if(!q)return true;
     return (c.fname+' '+c.lname+' '+c.company+' '+c.pos+' '+c.notes).toLowerCase().indexOf(q)>=0;
   });
-  filtered.sort(function(a,b){
-    var ca=a.company||'',cb=b.company||'';
-    if(ca!==cb)return ca.localeCompare(cb,'fr');
-    var pa=PROX_ORDER[a.prox]!==undefined?PROX_ORDER[a.prox]:99;
-    var pb=PROX_ORDER[b.prox]!==undefined?PROX_ORDER[b.prox]:99;
-    if(pa!==pb)return pa-pb;
-    return (a.lname+' '+a.fname).localeCompare(b.lname+' '+b.fname,'fr');
-  });
-  var groups=[],seenCompanies=[];
-  filtered.forEach(function(c){
-    var co=c.company&&c.company.trim()?c.company.trim():'(Sans entreprise)';
-    if(seenCompanies.indexOf(co)<0){seenCompanies.push(co);groups.push({company:co,contacts:[]});}
-    groups[seenCompanies.indexOf(co)].contacts.push(c);
-  });
+  var needsInit=contacts.some(function(c){return c.sortOrder===undefined;});
+  if(needsInit){contacts.forEach(function(c,i){if(c.sortOrder===undefined)c.sortOrder=i;});saveTasks();}
+  filtered.sort(function(a,b){return (a.sortOrder||0)-(b.sortOrder||0);});
 
   // Toolbar stays in the normal flow (inside .main, respects sidebar width)
   el.innerHTML='<div class="net-toolbar" id="net-toolbar-el">'
@@ -1785,7 +1778,8 @@ function rNetworking(){
        +'<span style="display:none">'+coInitial+'</span>'
       :'<span>'+coInitial+'</span>';
     var coLogoBlock=c.company?'<div class="net-co-logo-blk">'+coLogoContent+'</div>':'';
-    gh+='<div class="net-contact-row" onclick="openContactModal(\''+cid+'\')">'
+    gh+='<div class="net-contact-row" data-contact-id="'+cid+'" onclick="if(!event.target.closest(\'.net-drag-handle\'))openContactModal(\''+cid+'\')" onpointerdown="contactPointerDown(event,\''+cid+'\')" onpointermove="contactPointerMove(event)" onpointerup="contactPointerUp(event)" onpointercancel="contactPointerUp(event)">'
+      +'<div class="net-drag-handle">⠿</div>'
       +coLogoBlock
       +'<div class="net-photo">'+photo+'</div>'
       +'<div class="net-contact-info">'
@@ -1930,10 +1924,13 @@ async function loadContactsRemote(){
   var res=await supabaseClient.from(SUPABASE_TABLE_CONTACTS).select().eq('user_id',user.id).order('id',{ascending:true});
   if(res.error)throw res.error;
   if(Array.isArray(res.data)){
-    var savedLogos={};
-    contacts.forEach(function(c){if(c.id&&c.company_logo)savedLogos[String(c.id)]=c.company_logo;});
+    var savedLogos={},savedSortOrders={};
+    contacts.forEach(function(c){
+      if(c.id&&c.company_logo)savedLogos[String(c.id)]=c.company_logo;
+      if(c.id&&c.sortOrder!==undefined)savedSortOrders[String(c.id)]=c.sortOrder;
+    });
     contacts=res.data.map(function(c){
-      return {id:c.id,fname:c.fname||'',lname:c.lname||'',company:c.company||'',pos:c.pos||'',date:c.date||'',prox:c.prox||'Faible',mail_url:c.mail_url||'',phone:c.phone||'',linkedin:c.linkedin||'',photo:c.photo||'',notes:c.notes||'',company_logo:c.company_logo||savedLogos[String(c.id)]||''};
+      return {id:c.id,fname:c.fname||'',lname:c.lname||'',company:c.company||'',pos:c.pos||'',date:c.date||'',prox:c.prox||'Faible',mail_url:c.mail_url||'',phone:c.phone||'',linkedin:c.linkedin||'',photo:c.photo||'',notes:c.notes||'',company_logo:c.company_logo||savedLogos[String(c.id)]||'',sortOrder:savedSortOrders[String(c.id)]!==undefined?savedSortOrders[String(c.id)]:undefined};
     });
     buildCompanyLogos();
     saveTasks();
@@ -1974,6 +1971,50 @@ async function deleteRemoteContact(id){
   var res=await supabaseClient.from(SUPABASE_TABLE_CONTACTS).delete().eq('id',id);
   if(res.error){console.warn('Supabase contact delete failed',res.error);setSyncState('error');}
   else{setSyncState();}
+}
+
+var contactDrag={active:false,startX:0,startY:0,moved:false,pointerId:null,contactId:null,el:null};
+var contactDropTarget=null;
+function contactPointerDown(e,contactId){
+  if(!e.target.classList.contains('net-drag-handle')&&!e.target.closest('.net-drag-handle'))return;
+  e.preventDefault();
+  contactDrag.active=true;contactDrag.startX=e.clientX;contactDrag.startY=e.clientY;
+  contactDrag.moved=false;contactDrag.pointerId=e.pointerId||null;contactDrag.contactId=contactId;
+  contactDrag.el=e.target.closest('.net-contact-row');
+  if(contactDrag.el&&contactDrag.el.setPointerCapture)contactDrag.el.setPointerCapture(e.pointerId);
+}
+function contactPointerMove(e){
+  if(!contactDrag.active)return;
+  var dx=Math.abs(e.clientX-contactDrag.startX),dy=Math.abs(e.clientY-contactDrag.startY);
+  if(dx<8&&dy<8)return;
+  if(!contactDrag.moved){contactDrag.moved=true;if(contactDrag.el)contactDrag.el.classList.add('net-contact-dragging');}
+  var target=document.elementFromPoint(e.clientX,e.clientY);
+  var row=target&&target.closest('.net-contact-row[data-contact-id]');
+  if(row&&row.getAttribute('data-contact-id')!==contactDrag.contactId){
+    if(contactDropTarget&&contactDropTarget!==row)contactDropTarget.classList.remove('net-contact-drag-over');
+    contactDropTarget=row;contactDropTarget.classList.add('net-contact-drag-over');
+  }else if(!row||row.getAttribute('data-contact-id')===contactDrag.contactId){
+    if(contactDropTarget){contactDropTarget.classList.remove('net-contact-drag-over');contactDropTarget=null;}
+  }
+}
+function contactPointerUp(e){
+  if(!contactDrag.active)return;
+  if(contactDrag.el)contactDrag.el.classList.remove('net-contact-dragging');
+  if(contactDrag.moved&&contactDrag.contactId&&contactDropTarget){
+    reorderContacts(contactDrag.contactId,contactDropTarget.getAttribute('data-contact-id'));
+  }
+  if(contactDropTarget){contactDropTarget.classList.remove('net-contact-drag-over');contactDropTarget=null;}
+  contactDrag.active=false;contactDrag.contactId=null;contactDrag.el=null;
+}
+function reorderContacts(fromId,toId){
+  contacts.forEach(function(c,i){if(c.sortOrder===undefined)c.sortOrder=i;});
+  contacts.sort(function(a,b){return (a.sortOrder||0)-(b.sortOrder||0);});
+  var fi=contacts.findIndex(function(c){return String(c.id)===String(fromId);});
+  var ti=contacts.findIndex(function(c){return String(c.id)===String(toId);});
+  if(fi===-1||ti===-1||fi===ti)return;
+  var item=contacts.splice(fi,1)[0];contacts.splice(ti,0,item);
+  contacts.forEach(function(c,i){c.sortOrder=i;});
+  saveTasks();rNetworking();
 }
 </script>
 
