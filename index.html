@@ -338,11 +338,13 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
 @media(max-width:1100px){.net-contacts-flat-grid{grid-template-columns:repeat(2,1fr);}}
 .net-co-tag{display:inline-flex;align-items:center;gap:3px;font-size:9px;font-weight:700;color:#C0BDB7;letter-spacing:0.08em;text-transform:uppercase;margin-top:3px;}
 .net-co-tag-logo{width:12px;height:12px;border-radius:2px;object-fit:contain;}
+.net-co-logo-blk{width:44px;height:auto;align-self:stretch;min-height:44px;border-radius:8px;background:#fff;border:1px solid rgba(0,0,0,0.09);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;font-size:15px;font-weight:700;color:#8A8680;text-transform:uppercase;}
+.net-co-logo-blk img{width:100%;height:100%;object-fit:contain;padding:6px;box-sizing:border-box;display:block;}
 /* Contact card */
-.net-contact-row{display:flex;align-items:flex-start;gap:9px;padding:10px 11px;border-radius:9px;background:#FAFAF8;border:1px solid rgba(0,0,0,0.07);cursor:pointer;transition:box-shadow .12s,border-color .12s,background .12s;}
+.net-contact-row{display:flex;align-items:stretch;gap:9px;padding:10px 11px;border-radius:9px;background:#FAFAF8;border:1px solid rgba(0,0,0,0.07);cursor:pointer;transition:box-shadow .12s,border-color .12s,background .12s;}
 .net-contact-row:last-child{border-bottom:1px solid rgba(0,0,0,0.07);}
 .net-contact-row:hover{background:#fff;box-shadow:0 2px 10px rgba(0,0,0,0.07);border-color:rgba(0,0,0,0.10);}
-.net-photo{width:36px;height:36px;border-radius:8px;overflow:hidden;background:#E8EDF5;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#4A90D9;flex-shrink:0;}
+.net-photo{width:40px;height:auto;align-self:stretch;min-height:40px;border-radius:8px;overflow:hidden;background:#E8EDF5;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#4A90D9;flex-shrink:0;}
 .net-photo img{width:100%;height:100%;object-fit:cover;display:block;}
 .net-contact-info{flex:1;min-width:0;}
 .net-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:5px;margin-bottom:1px;}
@@ -360,12 +362,12 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
 .net-date{font-size:10.5px;color:#C0BDB7;white-space:nowrap;}
 .net-contact-actions{display:flex;align-items:center;gap:2px;opacity:0;transition:opacity .12s;}
 .net-contact-row:hover .net-contact-actions{opacity:1;}
-.net-li-btn{background:none;border:none;cursor:pointer;color:#0A66C2;font-size:11px;font-weight:700;padding:2px 5px;border-radius:4px;transition:background .12s;text-decoration:none;display:inline-flex;align-items:center;font-family:Georgia,serif;}
-.net-li-btn:hover{background:rgba(10,102,194,0.10);}
-.net-wa-btn{background:none;border:none;cursor:pointer;color:#25D366;font-size:10px;font-weight:800;padding:2px 5px;border-radius:4px;transition:background .12s;text-decoration:none;display:inline-flex;align-items:center;line-height:1;}
-.net-wa-btn:hover{background:rgba(37,211,102,0.12);}
-.net-email-btn{background:none;border:none;cursor:pointer;color:#8A8680;font-size:12px;font-weight:700;padding:2px 5px;border-radius:4px;transition:background .12s;text-decoration:none;display:inline-flex;align-items:center;font-family:inherit;}
-.net-email-btn:hover{background:rgba(0,0,0,0.07);color:#3D3B38;}
+.net-li-btn{width:28px;height:28px;border-radius:7px;background:#0A66C2;display:inline-flex;align-items:center;justify-content:center;color:#fff;text-decoration:none;flex-shrink:0;font-size:13px;font-weight:800;font-family:Georgia,serif;padding:0;border:none;cursor:pointer;transition:filter .12s;}
+.net-li-btn:hover{filter:brightness(1.14);}
+.net-wa-btn{width:28px;height:28px;border-radius:7px;background:#25D366;display:inline-flex;align-items:center;justify-content:center;color:#fff;text-decoration:none;flex-shrink:0;padding:0;border:none;cursor:pointer;transition:filter .12s;}
+.net-wa-btn:hover{filter:brightness(1.10);}
+.net-email-btn{width:28px;height:28px;border-radius:7px;background:linear-gradient(180deg,#5DBBFF 0%,#1A8DFF 100%);display:inline-flex;align-items:center;justify-content:center;color:#fff;text-decoration:none;flex-shrink:0;padding:0;border:none;cursor:pointer;transition:filter .12s;}
+.net-email-btn:hover{filter:brightness(1.10);}
 .net-act-btn{background:none;border:none;cursor:pointer;color:#C8C5BF;font-size:12px;padding:2px 4px;border-radius:4px;transition:color .12s;line-height:1;}
 .net-act-btn:hover{color:#4A90D9;background:rgba(74,144,217,0.08);}
 .net-act-btn.del:hover{color:#FF3B30;background:rgba(255,59,48,0.07);}
@@ -528,7 +530,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
 </div>
 
 <!-- NETWORKING: modal contact -->
-<div class="backdrop" id="contact-bd" onclick="if(event.target===this)closeContactModal()">
+<div class="backdrop" id="contact-bd">
   <div class="modal">
     <div class="modal-title" id="contact-modal-title">Nouveau contact <button class="modal-close" onclick="closeContactModal()">&#10005;</button></div>
     <div class="modal-row">
@@ -538,6 +540,9 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
     <div class="modal-row">
       <input type="text" id="ct-company" placeholder="Entreprise / Banque" autocomplete="off" list="ct-company-list">
       <datalist id="ct-company-list"></datalist>
+    </div>
+    <div class="modal-row">
+      <input type="text" id="ct-company-logo" placeholder="Logo entreprise (URL image)" autocomplete="off">
     </div>
     <div class="modal-row">
       <input type="text" id="ct-pos" placeholder="Poste" autocomplete="off">
@@ -614,6 +619,7 @@ var SUPABASE_TABLE_CONTACTS='contacts';
 var PROX_ORDER={'Fort':0,'Moyen':1,'Faible':2};
 var netSearch='';
 var _editContactId=null;
+var companyLogos={};
 var BOOK_STATUS_LABELS={reading:'En lecture',to_read:'A lire',read:'Lu'};
 var BOOK_STATUS_ORDER=['reading','to_read','read'];
 var supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
@@ -715,6 +721,7 @@ function loadTasks(){
       }
       if(Array.isArray(data.books)) books=data.books;
       if(Array.isArray(data.contacts)) contacts=data.contacts;
+      buildCompanyLogos();
       if(typeof data.view==='string') currentView=data.view;
       if(Array.isArray(data.projRows)&&data.projRows.length) projRows=data.projRows;
       if(Array.isArray(data.projPeriods)&&data.projPeriods.length&&data.projDataVersion===PROJ_DATA_VERSION) projPeriods=data.projPeriods;
@@ -1649,7 +1656,7 @@ window.addEventListener('resize',function(){if(currentView==='Projection')rProje
   document.addEventListener('touchend',function(e){
     var dx=e.changedTouches[0].clientX-sx;
     var dy=Math.abs(e.changedTouches[0].clientY-sy);
-    if(dx>60&&dy<60&&document.querySelector('.app.mob-list'))mobBack();
+    if(dx>60&&dy<60&&document.querySelector('.app.mob-list')&&!document.getElementById('contact-bd').classList.contains('open'))mobBack();
   },{passive:true});
 })();
 document.getElementById('new-task').addEventListener('keydown',function(e){if(e.key==='Enter')addTask();});
@@ -1672,6 +1679,17 @@ document.getElementById('login-password').addEventListener('keydown',function(e)
 
 // ── Networking ──
 function newContactId(){return Date.now()+Math.floor(Math.random()*1000);}
+function buildCompanyLogos(){companyLogos={};contacts.forEach(function(c){if(c.company&&c.company_logo)companyLogos[c.company]=c.company_logo;});}
+function propagateCompanyLogo(company,logoUrl,excludeId){
+  if(!company||!logoUrl)return;
+  companyLogos[company]=logoUrl;
+  contacts.forEach(function(co){
+    if(co.company===company&&String(co.id)!==String(excludeId)&&co.company_logo!==logoUrl){
+      co.company_logo=logoUrl;
+      if(supabaseClient)updateRemoteContact(co.id,{company_logo:logoUrl});
+    }
+  });
+}
 
 function rNetworkingSidebar(){
   var el=document.getElementById('tabs');
@@ -1757,12 +1775,18 @@ function rNetworking(){
     var proxLabel=c.prox||'Faible';
     var liBtn=c.linkedin?'<a class="net-li-btn" href="'+e(c.linkedin)+'" target="_blank" rel="noopener" title="LinkedIn" onclick="event.stopPropagation()">in</a>':'';
     var waRaw=(c.phone||'').replace(/[^0-9]/g,'');
-    var waBtn=waRaw?'<a class="net-wa-btn" href="https://wa.me/'+waRaw+'" target="_blank" rel="noopener" title="WhatsApp" onclick="event.stopPropagation()">WA</a>':'';
-    var emailBtn=c.mail_url?'<a class="net-email-btn" href="'+e(c.mail_url)+'" target="_blank" rel="noopener" title="Email" onclick="event.stopPropagation()">@</a>':'';
+    var waBtn=waRaw?'<a class="net-wa-btn" href="https://wa.me/'+waRaw+'" target="_blank" rel="noopener" title="WhatsApp" onclick="event.stopPropagation()"><svg width="15" height="15" viewBox="0 0 32 32" fill="white"><path d="M16 3C8.83 3 3 8.83 3 16c0 2.32.63 4.49 1.72 6.37L3 29l6.83-1.7A12.98 12.98 0 0016 29c7.17 0 13-5.83 13-13S23.17 3 16 3zm5.73 17.1c-.27.76-1.59 1.45-2.18 1.54-.56.08-1.27.12-2.04-.13a18.5 18.5 0 01-1.85-.68C12.41 19.44 10.28 16.24 10.11 16c-.16-.22-1.3-1.72-1.3-3.28s.8-2.33 1.08-2.65c.29-.31.62-.39.83-.39h.6c.19 0 .44-.07.68.52l.97 2.35c.09.2.04.44-.06.62l-.38.55-.53.6c-.17.18-.37.38-.15.74.21.37.94 1.54 2.01 2.5 1.38 1.22 2.55 1.6 2.9 1.77.36.18.57.15.79-.09l.84-.98c.24-.3.47-.22.79-.08l2.36 1.1c.35.16.58.24.67.38.08.14.08.82-.22 1.63z"/></svg></a>':'';
+    var emailBtn=c.mail_url?'<a class="net-email-btn" href="'+e(c.mail_url)+'" target="_blank" rel="noopener" title="Email" onclick="event.stopPropagation()"><svg width="15" height="11" viewBox="0 0 20 15" fill="none"><rect x="0.75" y="0.75" width="18.5" height="13.5" rx="2.25" stroke="white" stroke-width="1.5"/><path d="M1 2.5L10 9.5L19 2.5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>':'';
     var cid=e(String(c.id));
-    var logoUrl=companyLogoUrl(c.company||'');
-    var coLogoTag=logoUrl?'<img class="net-co-tag-logo" src="'+e(logoUrl)+'" alt="" loading="lazy" onerror="this.style.display=\'none\'">':'';
+    var coLogo=companyLogos[c.company||'']||c.company_logo||'';
+    var coInitial=e((c.company||'?').charAt(0).toUpperCase());
+    var coLogoContent=coLogo
+      ?'<img src="'+e(coLogo)+'" alt="" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'\'">'
+       +'<span style="display:none">'+coInitial+'</span>'
+      :'<span>'+coInitial+'</span>';
+    var coLogoBlock=c.company?'<div class="net-co-logo-blk">'+coLogoContent+'</div>':'';
     gh+='<div class="net-contact-row" onclick="openContactModal(\''+cid+'\')">'
+      +coLogoBlock
       +'<div class="net-photo">'+photo+'</div>'
       +'<div class="net-contact-info">'
       +'<div class="net-card-top">'
@@ -1770,10 +1794,10 @@ function rNetworking(){
       +'<span class="net-prox '+proxCls+'">'+e(proxLabel)+'</span>'
       +'</div>'
       +(c.pos?'<div class="net-pos">'+e(c.pos)+'</div>':'')
-      +(c.company?'<div class="net-co-tag">'+coLogoTag+e(c.company)+'</div>':'')
+      +(c.company?'<div class="net-co-tag">'+e(c.company)+'</div>':'')
       +'<div class="net-card-footer">'
       +(c.date?'<span class="net-date">'+e(c.date)+'</span>':'<span></span>')
-      +'<div style="display:flex;align-items:center;gap:1px;">'
+      +'<div style="display:flex;align-items:center;gap:3px;">'
       +emailBtn+waBtn+liBtn
       +'<div class="net-contact-actions">'
       +'<button class="net-act-btn del" title="Supprimer" onclick="event.stopPropagation();deleteContactDirect(\''+cid+'\')">&#10005;</button>'
@@ -1807,6 +1831,7 @@ function openContactModal(id){
     document.getElementById('ct-phone').value=c.phone||'';
     document.getElementById('ct-linkedin').value=c.linkedin||'';
     document.getElementById('ct-photo').value=c.photo||'';
+    document.getElementById('ct-company-logo').value=c.company_logo||(c.company?companyLogos[c.company]||'':'');
     document.getElementById('ct-notes').value=c.notes||'';
     if(titleEl)titleEl.childNodes[0].textContent='Modifier le contact ';
     if(rowEdit)rowEdit.style.display='flex';
@@ -1822,6 +1847,7 @@ function openContactModal(id){
     document.getElementById('ct-phone').value='';
     document.getElementById('ct-linkedin').value='';
     document.getElementById('ct-photo').value='';
+    document.getElementById('ct-company-logo').value='';
     document.getElementById('ct-notes').value='';
     if(titleEl)titleEl.childNodes[0].textContent='Nouveau contact ';
     if(rowEdit)rowEdit.style.display='none';
@@ -1830,6 +1856,8 @@ function openContactModal(id){
   // Populate company datalist
   var dl=document.getElementById('ct-company-list');
   if(dl){var cos=[];contacts.forEach(function(c){if(c.company&&cos.indexOf(c.company)<0)cos.push(c.company);});dl.innerHTML=cos.map(function(c){return'<option value="'+e(c)+'">';}).join('');}
+  var _coEl=document.getElementById('ct-company');var _coLogoEl=document.getElementById('ct-company-logo');
+  _coEl.oninput=function(){var co=this.value.trim();if(co&&companyLogos[co]&&!_coLogoEl.value)_coLogoEl.value=companyLogos[co];};
   modal.classList.add('open');
   setTimeout(function(){document.getElementById('ct-fname').focus();},80);
 }
@@ -1851,6 +1879,7 @@ async function saveContact(){
   var phone=document.getElementById('ct-phone').value.trim();
   var linkedin=document.getElementById('ct-linkedin').value.trim();
   var photo=document.getElementById('ct-photo').value.trim();
+  var companyLogo=document.getElementById('ct-company-logo').value.trim();
   var notes=document.getElementById('ct-notes').value.trim();
   if(!fname&&!lname){
     var fi=document.getElementById('ct-fname');
@@ -1858,11 +1887,14 @@ async function saveContact(){
   }
   if(_editContactId){
     var c=contacts.find(function(x){return String(x.id)===_editContactId;});
-    if(c){c.fname=fname;c.lname=lname;c.company=company;c.pos=pos;c.date=date;c.prox=prox;c.mail_url=mailUrl;c.phone=phone;c.linkedin=linkedin;c.photo=photo;c.notes=notes;}
+    if(c){c.fname=fname;c.lname=lname;c.company=company;c.pos=pos;c.date=date;c.prox=prox;c.mail_url=mailUrl;c.phone=phone;c.linkedin=linkedin;c.photo=photo;c.notes=notes;c.company_logo=companyLogo||(company?companyLogos[company]||'':'');}
+    if(company&&companyLogo) propagateCompanyLogo(company,companyLogo,c?c.id:null);
     closeContactModal();saveTasks();render();
     if(supabaseClient&&c) await updateRemoteContact(c.id,contactToPayload(c));
   } else {
-    var nc={id:newContactId(),fname:fname,lname:lname,company:company,pos:pos,date:date,prox:prox,mail_url:mailUrl,phone:phone,linkedin:linkedin,photo:photo,notes:notes};
+    var resolvedLogo=companyLogo||(company?companyLogos[company]||'':'');
+    var nc={id:newContactId(),fname:fname,lname:lname,company:company,pos:pos,date:date,prox:prox,mail_url:mailUrl,phone:phone,linkedin:linkedin,photo:photo,notes:notes,company_logo:resolvedLogo};
+    if(company&&resolvedLogo) propagateCompanyLogo(company,resolvedLogo,nc.id);
     contacts.push(nc);
     closeContactModal();saveTasks();render();
     if(supabaseClient) await insertRemoteContact(nc);
@@ -1886,7 +1918,7 @@ async function deleteContactDirect(id){
 }
 
 function contactToPayload(c){
-  return {fname:c.fname||'',lname:c.lname||'',company:c.company||'',pos:c.pos||'',date:c.date||'',prox:c.prox||'Faible',mail_url:c.mail_url||'',phone:c.phone||'',linkedin:c.linkedin||'',photo:c.photo||'',notes:c.notes||''};
+  return {fname:c.fname||'',lname:c.lname||'',company:c.company||'',pos:c.pos||'',date:c.date||'',prox:c.prox||'Faible',mail_url:c.mail_url||'',phone:c.phone||'',linkedin:c.linkedin||'',photo:c.photo||'',notes:c.notes||'',company_logo:c.company_logo||''};
 }
 
 async function loadContactsRemote(){
@@ -1897,8 +1929,9 @@ async function loadContactsRemote(){
   if(res.error)throw res.error;
   if(Array.isArray(res.data)){
     contacts=res.data.map(function(c){
-      return {id:c.id,fname:c.fname||'',lname:c.lname||'',company:c.company||'',pos:c.pos||'',date:c.date||'',prox:c.prox||'Faible',mail_url:c.mail_url||'',phone:c.phone||'',linkedin:c.linkedin||'',photo:c.photo||'',notes:c.notes||''};
+      return {id:c.id,fname:c.fname||'',lname:c.lname||'',company:c.company||'',pos:c.pos||'',date:c.date||'',prox:c.prox||'Faible',mail_url:c.mail_url||'',phone:c.phone||'',linkedin:c.linkedin||'',photo:c.photo||'',notes:c.notes||'',company_logo:c.company_logo||''};
     });
+    buildCompanyLogos();
     saveTasks();
     if(currentView==='Networking')render();
   }
@@ -1912,7 +1945,7 @@ async function insertRemoteContact(c){
   var payload=Object.assign({user_id:user.id},contactToPayload(c));
   var res=await supabaseClient.from(SUPABASE_TABLE_CONTACTS).insert([payload]).select();
   if(res.error){
-    var p2=Object.assign({},payload);delete p2.mail_url;delete p2.phone;
+    var p2=Object.assign({},payload);delete p2.mail_url;delete p2.phone;delete p2.company_logo;
     res=await supabaseClient.from(SUPABASE_TABLE_CONTACTS).insert([p2]).select();
   }
   if(res.error){console.warn('Supabase contact insert failed',res.error);setSyncState('error');}
@@ -1924,7 +1957,7 @@ async function updateRemoteContact(id,changes){
   setSyncState('syncing');
   var res=await supabaseClient.from(SUPABASE_TABLE_CONTACTS).update(changes).eq('id',id);
   if(res.error){
-    var c2=Object.assign({},changes);delete c2.mail_url;delete c2.phone;
+    var c2=Object.assign({},changes);delete c2.mail_url;delete c2.phone;delete c2.company_logo;
     res=await supabaseClient.from(SUPABASE_TABLE_CONTACTS).update(c2).eq('id',id);
   }
   if(res.error){console.warn('Supabase contact update failed',res.error);setSyncState('error');}
