@@ -338,13 +338,13 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
 @media(max-width:1100px){.net-contacts-flat-grid{grid-template-columns:repeat(2,1fr);}}
 .net-co-tag{display:inline-flex;align-items:center;gap:3px;font-size:9px;font-weight:700;color:#C0BDB7;letter-spacing:0.08em;text-transform:uppercase;margin-top:3px;}
 .net-co-tag-logo{width:12px;height:12px;border-radius:2px;object-fit:contain;}
-.net-co-logo-blk{width:44px;height:auto;align-self:stretch;min-height:44px;border-radius:8px;background:#fff;border:1px solid rgba(0,0,0,0.09);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;font-size:15px;font-weight:700;color:#8A8680;text-transform:uppercase;}
+.net-co-logo-blk{width:44px;height:44px;align-self:center;border-radius:8px;background:#fff;border:1px solid rgba(0,0,0,0.09);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;font-size:15px;font-weight:700;color:#8A8680;text-transform:uppercase;}
 .net-co-logo-blk img{width:100%;height:100%;object-fit:contain;padding:6px;box-sizing:border-box;display:block;}
 /* Contact card */
 .net-contact-row{display:flex;align-items:stretch;gap:9px;padding:10px 11px;border-radius:9px;background:#FAFAF8;border:1px solid rgba(0,0,0,0.07);cursor:pointer;transition:box-shadow .12s,border-color .12s,background .12s;}
 .net-contact-row:last-child{border-bottom:1px solid rgba(0,0,0,0.07);}
 .net-contact-row:hover{background:#fff;box-shadow:0 2px 10px rgba(0,0,0,0.07);border-color:rgba(0,0,0,0.10);}
-.net-photo{width:40px;height:auto;align-self:stretch;min-height:40px;border-radius:8px;overflow:hidden;background:#E8EDF5;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#4A90D9;flex-shrink:0;}
+.net-photo{width:44px;height:44px;align-self:center;border-radius:8px;overflow:hidden;background:#E8EDF5;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#4A90D9;flex-shrink:0;}
 .net-photo img{width:100%;height:100%;object-fit:cover;display:block;}
 .net-contact-info{flex:1;min-width:0;}
 .net-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:5px;margin-bottom:1px;}
@@ -1889,6 +1889,7 @@ async function saveContact(){
     var c=contacts.find(function(x){return String(x.id)===_editContactId;});
     if(c){c.fname=fname;c.lname=lname;c.company=company;c.pos=pos;c.date=date;c.prox=prox;c.mail_url=mailUrl;c.phone=phone;c.linkedin=linkedin;c.photo=photo;c.notes=notes;c.company_logo=companyLogo||(company?companyLogos[company]||'':'');}
     if(company&&companyLogo) propagateCompanyLogo(company,companyLogo,c?c.id:null);
+    buildCompanyLogos();
     closeContactModal();saveTasks();render();
     if(supabaseClient&&c) await updateRemoteContact(c.id,contactToPayload(c));
   } else {
@@ -1896,6 +1897,7 @@ async function saveContact(){
     var nc={id:newContactId(),fname:fname,lname:lname,company:company,pos:pos,date:date,prox:prox,mail_url:mailUrl,phone:phone,linkedin:linkedin,photo:photo,notes:notes,company_logo:resolvedLogo};
     if(company&&resolvedLogo) propagateCompanyLogo(company,resolvedLogo,nc.id);
     contacts.push(nc);
+    buildCompanyLogos();
     closeContactModal();saveTasks();render();
     if(supabaseClient) await insertRemoteContact(nc);
   }
@@ -1928,8 +1930,10 @@ async function loadContactsRemote(){
   var res=await supabaseClient.from(SUPABASE_TABLE_CONTACTS).select().eq('user_id',user.id).order('id',{ascending:true});
   if(res.error)throw res.error;
   if(Array.isArray(res.data)){
+    var savedLogos={};
+    contacts.forEach(function(c){if(c.id&&c.company_logo)savedLogos[String(c.id)]=c.company_logo;});
     contacts=res.data.map(function(c){
-      return {id:c.id,fname:c.fname||'',lname:c.lname||'',company:c.company||'',pos:c.pos||'',date:c.date||'',prox:c.prox||'Faible',mail_url:c.mail_url||'',phone:c.phone||'',linkedin:c.linkedin||'',photo:c.photo||'',notes:c.notes||'',company_logo:c.company_logo||''};
+      return {id:c.id,fname:c.fname||'',lname:c.lname||'',company:c.company||'',pos:c.pos||'',date:c.date||'',prox:c.prox||'Faible',mail_url:c.mail_url||'',phone:c.phone||'',linkedin:c.linkedin||'',photo:c.photo||'',notes:c.notes||'',company_logo:c.company_logo||savedLogos[String(c.id)]||''};
     });
     buildCompanyLogos();
     saveTasks();
