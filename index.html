@@ -333,14 +333,11 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
 .net-toolbar{display:flex;align-items:center;gap:8px;padding:10px 16px;border-bottom:1px solid rgba(0,0,0,0.05);background:#fff;position:sticky;top:0;z-index:5;}
 .net-search{padding:7px 11px;border:1px solid #E0DDD8;border-radius:8px;font-size:13px;background:#FAFAF8;color:#1C1C1E;outline:none;flex:1;min-width:0;transition:border-color .15s,box-shadow .15s;}
 .net-search:focus{border-color:#4A90D9;box-shadow:0 0 0 3px rgba(74,144,217,0.10);}
-/* Company groups */
-.net-company-group{padding:0 16px 4px;}
-.net-company-hdr{display:flex;align-items:center;gap:8px;padding:14px 0 7px;}
-.net-company-name{font-size:10px;font-weight:700;color:#C0BDB7;letter-spacing:0.10em;text-transform:uppercase;}
-.net-company-count{font-size:10px;color:#D0CCC6;font-weight:500;}
-/* Contact cards grid */
-.net-contact-list{display:grid;grid-template-columns:repeat(2,1fr);gap:7px;}
-@media(min-width:1400px){.net-contact-list{grid-template-columns:repeat(3,1fr);}}
+/* Flat contacts grid */
+.net-contacts-flat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:12px 16px 24px;}
+@media(max-width:1100px){.net-contacts-flat-grid{grid-template-columns:repeat(2,1fr);}}
+.net-co-tag{display:inline-flex;align-items:center;gap:3px;font-size:9px;font-weight:700;color:#C0BDB7;letter-spacing:0.08em;text-transform:uppercase;margin-top:3px;}
+.net-co-tag-logo{width:12px;height:12px;border-radius:2px;object-fit:contain;}
 /* Contact card */
 .net-contact-row{display:flex;align-items:flex-start;gap:9px;padding:10px 11px;border-radius:9px;background:#FAFAF8;border:1px solid rgba(0,0,0,0.07);cursor:pointer;transition:box-shadow .12s,border-color .12s,background .12s;}
 .net-contact-row:last-child{border-bottom:1px solid rgba(0,0,0,0.07);}
@@ -402,8 +399,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
 /* ── Mobile overrides for projection & networking ── */
 @media(max-width:680px){
   .app.proj-view .sidebar{order:2;}
-  .net-company-group{padding:0 12px 4px;}
-  .net-contact-list{grid-template-columns:1fr;gap:6px;}
+  .net-contacts-flat-grid{grid-template-columns:1fr;gap:6px;padding:10px 12px 20px;}
   .net-contact-row{padding:10px 12px;}
   .net-contact-actions{opacity:1;}
 }
@@ -903,8 +899,11 @@ async function insertRemoteTask(task){
       var oldId=task.id;
       var newId=res.data[0].id;
       var t=tasks.find(function(x){return x.id===oldId;});
-      if(t){ t.id=newId; saveTasks(); }
+      if(t) t.id=newId;
     }
+    // Always clear _pendingAt — task is confirmed in Supabase, loadTasksRemote() must not re-add it
+    delete task._pendingAt;
+    saveTasks();
     // if the task changed while the insert was pending, reapply latest state and force a remote refresh
     var current = tasks.find(function(x){return x.id===task.id;});
     if(current){
@@ -1742,41 +1741,37 @@ function rNetworking(){
     return;
   }
 
-  var gh='';
-  groups.forEach(function(g){
-    var logoUrl=companyLogoUrl(g.company);
-    var logoTag=logoUrl?'<img class="net-company-logo" src="'+e(logoUrl)+'" alt="" loading="lazy" onerror="this.style.display=\'none\'">':'';
-    gh+='<div class="net-company-group">'
-      +'<div class="net-company-hdr">'+logoTag+'<span class="net-company-name">'+e(g.company)+'</span><span class="net-company-count">'+g.contacts.length+' contact'+(g.contacts.length>1?'s':'')+'</span></div>'
-      +'<div class="net-contact-list">';
-    g.contacts.forEach(function(c){
-      var initials=((c.fname||'').charAt(0)+(c.lname||'').charAt(0)).toUpperCase();
-      var photo=c.photo?'<img src="'+e(c.photo)+'" alt="">':'<span>'+e(initials)+'</span>';
-      var proxCls=(c.prox||'faible').toLowerCase();
-      var proxLabel=c.prox||'Faible';
-      var liBtn=c.linkedin?'<a class="net-li-btn" href="'+e(c.linkedin)+'" target="_blank" rel="noopener" title="LinkedIn">in</a>':'';
-      var cid=e(String(c.id));
-      gh+='<div class="net-contact-row" onclick="openContactModal(\''+cid+'\')">'
-        +'<div class="net-photo">'+photo+'</div>'
-        +'<div class="net-contact-info">'
-        +'<div class="net-card-top">'
-        +'<div class="net-name">'+e((c.fname+' '+c.lname).trim())+'</div>'
-        +'<span class="net-prox '+proxCls+'">'+e(proxLabel)+'</span>'
-        +'</div>'
-        +(c.pos?'<div class="net-pos">'+e(c.pos)+'</div>':'')
-        +(c.notes?'<div class="net-contact-notes-preview">'+e(c.notes)+'</div>':'')
-        +'<div class="net-card-footer">'
-        +(c.date?'<span class="net-date">'+e(c.date)+'</span>':'<span></span>')
-        +'<div class="net-contact-actions">'
-        +liBtn
-        +'<button class="net-act-btn del" title="Supprimer" onclick="event.stopPropagation();deleteContactDirect(\''+cid+'\')">&#10005;</button>'
-        +'</div>'
-        +'</div>'
-        +'</div>'
-        +'</div>';
-    });
-    gh+='</div></div>';
+  var gh='<div class="net-contacts-flat-grid">';
+  filtered.forEach(function(c){
+    var initials=((c.fname||'').charAt(0)+(c.lname||'').charAt(0)).toUpperCase();
+    var photo=c.photo?'<img src="'+e(c.photo)+'" alt="">':'<span>'+e(initials)+'</span>';
+    var proxCls=(c.prox||'faible').toLowerCase();
+    var proxLabel=c.prox||'Faible';
+    var liBtn=c.linkedin?'<a class="net-li-btn" href="'+e(c.linkedin)+'" target="_blank" rel="noopener" title="LinkedIn">in</a>':'';
+    var cid=e(String(c.id));
+    var logoUrl=companyLogoUrl(c.company||'');
+    var coLogoTag=logoUrl?'<img class="net-co-tag-logo" src="'+e(logoUrl)+'" alt="" loading="lazy" onerror="this.style.display=\'none\'">':'';
+    gh+='<div class="net-contact-row" onclick="openContactModal(\''+cid+'\')">'
+      +'<div class="net-photo">'+photo+'</div>'
+      +'<div class="net-contact-info">'
+      +'<div class="net-card-top">'
+      +'<div class="net-name">'+e((c.fname+' '+c.lname).trim())+'</div>'
+      +'<span class="net-prox '+proxCls+'">'+e(proxLabel)+'</span>'
+      +'</div>'
+      +(c.pos?'<div class="net-pos">'+e(c.pos)+'</div>':'')
+      +(c.company?'<div class="net-co-tag">'+coLogoTag+e(c.company)+'</div>':'')
+      +(c.notes?'<div class="net-contact-notes-preview">'+e(c.notes)+'</div>':'')
+      +'<div class="net-card-footer">'
+      +(c.date?'<span class="net-date">'+e(c.date)+'</span>':'<span></span>')
+      +'<div class="net-contact-actions">'
+      +liBtn
+      +'<button class="net-act-btn del" title="Supprimer" onclick="event.stopPropagation();deleteContactDirect(\''+cid+'\')">&#10005;</button>'
+      +'</div>'
+      +'</div>'
+      +'</div>'
+      +'</div>';
   });
+  gh+='</div>';
   overlay.innerHTML=gh;
 }
 
