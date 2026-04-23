@@ -362,6 +362,10 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
 .net-contact-row:hover .net-contact-actions{opacity:1;}
 .net-li-btn{background:none;border:none;cursor:pointer;color:#0A66C2;font-size:11px;font-weight:700;padding:2px 5px;border-radius:4px;transition:background .12s;text-decoration:none;display:inline-flex;align-items:center;font-family:Georgia,serif;}
 .net-li-btn:hover{background:rgba(10,102,194,0.10);}
+.net-wa-btn{background:none;border:none;cursor:pointer;color:#25D366;font-size:10px;font-weight:800;padding:2px 5px;border-radius:4px;transition:background .12s;text-decoration:none;display:inline-flex;align-items:center;line-height:1;}
+.net-wa-btn:hover{background:rgba(37,211,102,0.12);}
+.net-email-btn{background:none;border:none;cursor:pointer;color:#8A8680;font-size:12px;font-weight:700;padding:2px 5px;border-radius:4px;transition:background .12s;text-decoration:none;display:inline-flex;align-items:center;font-family:inherit;}
+.net-email-btn:hover{background:rgba(0,0,0,0.07);color:#3D3B38;}
 .net-act-btn{background:none;border:none;cursor:pointer;color:#C8C5BF;font-size:12px;padding:2px 4px;border-radius:4px;transition:color .12s;line-height:1;}
 .net-act-btn:hover{color:#4A90D9;background:rgba(74,144,217,0.08);}
 .net-act-btn.del:hover{color:#FF3B30;background:rgba(255,59,48,0.07);}
@@ -545,6 +549,10 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
         <option value="Moyen">Moyen</option>
         <option value="Faible">Faible</option>
       </select>
+    </div>
+    <div class="modal-row">
+      <input type="text" id="ct-email" placeholder="Lien conversation Mail (URL)" autocomplete="off">
+      <input type="text" id="ct-phone" placeholder="Numéro WhatsApp" autocomplete="off">
     </div>
     <div class="modal-row">
       <input type="text" id="ct-linkedin" placeholder="URL LinkedIn" autocomplete="off">
@@ -1747,7 +1755,10 @@ function rNetworking(){
     var photo=c.photo?'<img src="'+e(c.photo)+'" alt="">':'<span>'+e(initials)+'</span>';
     var proxCls=(c.prox||'faible').toLowerCase();
     var proxLabel=c.prox||'Faible';
-    var liBtn=c.linkedin?'<a class="net-li-btn" href="'+e(c.linkedin)+'" target="_blank" rel="noopener" title="LinkedIn">in</a>':'';
+    var liBtn=c.linkedin?'<a class="net-li-btn" href="'+e(c.linkedin)+'" target="_blank" rel="noopener" title="LinkedIn" onclick="event.stopPropagation()">in</a>':'';
+    var waRaw=(c.phone||'').replace(/[^0-9]/g,'');
+    var waBtn=waRaw?'<a class="net-wa-btn" href="https://wa.me/'+waRaw+'" target="_blank" rel="noopener" title="WhatsApp" onclick="event.stopPropagation()">WA</a>':'';
+    var emailBtn=c.mail_url?'<a class="net-email-btn" href="'+e(c.mail_url)+'" target="_blank" rel="noopener" title="Email" onclick="event.stopPropagation()">@</a>':'';
     var cid=e(String(c.id));
     var logoUrl=companyLogoUrl(c.company||'');
     var coLogoTag=logoUrl?'<img class="net-co-tag-logo" src="'+e(logoUrl)+'" alt="" loading="lazy" onerror="this.style.display=\'none\'">':'';
@@ -1760,14 +1771,16 @@ function rNetworking(){
       +'</div>'
       +(c.pos?'<div class="net-pos">'+e(c.pos)+'</div>':'')
       +(c.company?'<div class="net-co-tag">'+coLogoTag+e(c.company)+'</div>':'')
-      +(c.notes?'<div class="net-contact-notes-preview">'+e(c.notes)+'</div>':'')
       +'<div class="net-card-footer">'
       +(c.date?'<span class="net-date">'+e(c.date)+'</span>':'<span></span>')
+      +'<div style="display:flex;align-items:center;gap:1px;">'
+      +emailBtn+waBtn+liBtn
       +'<div class="net-contact-actions">'
-      +liBtn
       +'<button class="net-act-btn del" title="Supprimer" onclick="event.stopPropagation();deleteContactDirect(\''+cid+'\')">&#10005;</button>'
       +'</div>'
       +'</div>'
+      +'</div>'
+      +(c.notes?'<div class="net-contact-notes-preview">'+e(c.notes)+'</div>':'')
       +'</div>'
       +'</div>';
   });
@@ -1790,6 +1803,8 @@ function openContactModal(id){
     document.getElementById('ct-pos').value=c.pos||'';
     document.getElementById('ct-date').value=c.date||'';
     document.getElementById('ct-prox').value=c.prox||'Faible';
+    document.getElementById('ct-email').value=c.mail_url||'';
+    document.getElementById('ct-phone').value=c.phone||'';
     document.getElementById('ct-linkedin').value=c.linkedin||'';
     document.getElementById('ct-photo').value=c.photo||'';
     document.getElementById('ct-notes').value=c.notes||'';
@@ -1803,6 +1818,8 @@ function openContactModal(id){
     document.getElementById('ct-pos').value='';
     document.getElementById('ct-date').value='';
     document.getElementById('ct-prox').value='Faible';
+    document.getElementById('ct-email').value='';
+    document.getElementById('ct-phone').value='';
     document.getElementById('ct-linkedin').value='';
     document.getElementById('ct-photo').value='';
     document.getElementById('ct-notes').value='';
@@ -1830,6 +1847,8 @@ async function saveContact(){
   var pos=document.getElementById('ct-pos').value.trim();
   var date=document.getElementById('ct-date').value.trim();
   var prox=document.getElementById('ct-prox').value;
+  var mailUrl=document.getElementById('ct-email').value.trim();
+  var phone=document.getElementById('ct-phone').value.trim();
   var linkedin=document.getElementById('ct-linkedin').value.trim();
   var photo=document.getElementById('ct-photo').value.trim();
   var notes=document.getElementById('ct-notes').value.trim();
@@ -1839,11 +1858,11 @@ async function saveContact(){
   }
   if(_editContactId){
     var c=contacts.find(function(x){return String(x.id)===_editContactId;});
-    if(c){c.fname=fname;c.lname=lname;c.company=company;c.pos=pos;c.date=date;c.prox=prox;c.linkedin=linkedin;c.photo=photo;c.notes=notes;}
+    if(c){c.fname=fname;c.lname=lname;c.company=company;c.pos=pos;c.date=date;c.prox=prox;c.mail_url=mailUrl;c.phone=phone;c.linkedin=linkedin;c.photo=photo;c.notes=notes;}
     closeContactModal();saveTasks();render();
     if(supabaseClient&&c) await updateRemoteContact(c.id,contactToPayload(c));
   } else {
-    var nc={id:newContactId(),fname:fname,lname:lname,company:company,pos:pos,date:date,prox:prox,linkedin:linkedin,photo:photo,notes:notes};
+    var nc={id:newContactId(),fname:fname,lname:lname,company:company,pos:pos,date:date,prox:prox,mail_url:mailUrl,phone:phone,linkedin:linkedin,photo:photo,notes:notes};
     contacts.push(nc);
     closeContactModal();saveTasks();render();
     if(supabaseClient) await insertRemoteContact(nc);
@@ -1867,7 +1886,7 @@ async function deleteContactDirect(id){
 }
 
 function contactToPayload(c){
-  return {fname:c.fname||'',lname:c.lname||'',company:c.company||'',pos:c.pos||'',date:c.date||'',prox:c.prox||'Faible',linkedin:c.linkedin||'',photo:c.photo||'',notes:c.notes||''};
+  return {fname:c.fname||'',lname:c.lname||'',company:c.company||'',pos:c.pos||'',date:c.date||'',prox:c.prox||'Faible',mail_url:c.mail_url||'',phone:c.phone||'',linkedin:c.linkedin||'',photo:c.photo||'',notes:c.notes||''};
 }
 
 async function loadContactsRemote(){
@@ -1878,7 +1897,7 @@ async function loadContactsRemote(){
   if(res.error)throw res.error;
   if(Array.isArray(res.data)){
     contacts=res.data.map(function(c){
-      return {id:c.id,fname:c.fname||'',lname:c.lname||'',company:c.company||'',pos:c.pos||'',date:c.date||'',prox:c.prox||'Faible',linkedin:c.linkedin||'',photo:c.photo||'',notes:c.notes||''};
+      return {id:c.id,fname:c.fname||'',lname:c.lname||'',company:c.company||'',pos:c.pos||'',date:c.date||'',prox:c.prox||'Faible',mail_url:c.mail_url||'',phone:c.phone||'',linkedin:c.linkedin||'',photo:c.photo||'',notes:c.notes||''};
     });
     saveTasks();
     if(currentView==='Networking')render();
@@ -1892,6 +1911,10 @@ async function insertRemoteContact(c){
   if(!user)return;
   var payload=Object.assign({user_id:user.id},contactToPayload(c));
   var res=await supabaseClient.from(SUPABASE_TABLE_CONTACTS).insert([payload]).select();
+  if(res.error){
+    var p2=Object.assign({},payload);delete p2.mail_url;delete p2.phone;
+    res=await supabaseClient.from(SUPABASE_TABLE_CONTACTS).insert([p2]).select();
+  }
   if(res.error){console.warn('Supabase contact insert failed',res.error);setSyncState('error');}
   else{setSyncState();await loadContactsRemote();}
 }
@@ -1900,6 +1923,10 @@ async function updateRemoteContact(id,changes){
   if(!supabaseClient)return;
   setSyncState('syncing');
   var res=await supabaseClient.from(SUPABASE_TABLE_CONTACTS).update(changes).eq('id',id);
+  if(res.error){
+    var c2=Object.assign({},changes);delete c2.mail_url;delete c2.phone;
+    res=await supabaseClient.from(SUPABASE_TABLE_CONTACTS).update(c2).eq('id',id);
+  }
   if(res.error){console.warn('Supabase contact update failed',res.error);setSyncState('error');}
   else{setSyncState();}
 }
