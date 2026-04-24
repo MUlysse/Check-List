@@ -424,7 +424,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
 /* ── Exams View ── */
 .body-card.exams-mode{padding:0;}
 .app.exam-view .sidebar{position:relative;z-index:1;}
-#exam-full-overlay{position:fixed;left:0;right:0;bottom:0;z-index:20;overflow-y:auto;background:#F5F3EF;display:none;}
+#exam-full-overlay{position:fixed;left:0;right:0;bottom:0;z-index:20;overflow-y:auto;background:#fff;display:none;}
 #exam-full-overlay::-webkit-scrollbar{width:5px;}
 #exam-full-overlay::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.12);border-radius:3px;}
 .exam-toolbar{display:flex;align-items:center;gap:8px;padding:10px 16px;border-bottom:1px solid rgba(0,0,0,0.05);background:#fff;}
@@ -433,49 +433,54 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
 
 /* Revision tracker */
 .exam-cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;}
-.exam-card{background:#FAFAF8;border:1px solid #E8E5E0;border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:10px;position:relative;}
+.exam-card{background:#fff;border:1px solid #E8E5E0;border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:10px;position:relative;}
 .exam-card-header{display:flex;align-items:center;gap:8px;}
 .exam-card-name{font-size:14px;font-weight:600;color:#1C1C1E;flex:1;line-height:1.3;cursor:pointer;}
 .exam-card-name:hover{color:#4A90D9;}
-.exam-card-date{font-size:11.5px;color:#8A8680;white-space:nowrap;}
 .exam-del-btn{opacity:0;background:none;border:none;cursor:pointer;color:#FF3B30;font-size:19px;line-height:1;padding:0 2px;border-radius:4px;transition:opacity .15s;flex-shrink:0;}
 .exam-card:hover .exam-del-btn{opacity:1;}
-.exam-steps{display:flex;gap:6px;align-items:center;}
-.exam-step{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+/* Circles row */
+.exam-steps-circles{display:flex;align-items:center;gap:0;}
+.exam-step-circ{flex:0 0 28px;display:flex;align-items:center;justify-content:center;cursor:pointer;-webkit-tap-highlight-color:transparent;}
 .exam-step-circle{width:28px;height:28px;border-radius:50%;border:2px solid #D0CCC6;background:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#B0ADA8;transition:all .18s;flex-shrink:0;}
-.exam-step.done .exam-step-circle{background:#4A90D9;border-color:#4A90D9;color:#fff;}
-.exam-step-label{font-size:9px;font-weight:500;color:#B0ADA8;text-align:center;line-height:1.2;max-width:62px;}
-.exam-step.done .exam-step-label{color:#4A90D9;}
-.exam-step-connector{width:100%;height:2px;background:#E0DDD8;border-radius:1px;margin:0 -3px;position:relative;z-index:0;}
+.exam-step-circ.done .exam-step-circle{background:#4A90D9;border-color:#4A90D9;color:#fff;}
+/* Labels row */
+.exam-steps-labels{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:3px;}
+.exam-step-lbl{font-size:9px;font-weight:500;color:#B0ADA8;text-align:center;line-height:1.2;padding:0 2px;}
+.exam-step-lbl.done{color:#4A90D9;}
+.exam-step-connector{flex:1;height:2px;background:#E0DDD8;border-radius:1px;}
 .exam-step-connector.done{background:#4A90D9;}
-.exam-date-row{display:flex;align-items:center;gap:8px;}
+.exam-date-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
 .exam-date-label{font-size:11px;color:#8A8680;flex-shrink:0;}
-.exam-date-input{flex:1;border:1px solid #E0DDD8;border-radius:6px;padding:4px 8px;font-size:12px;color:#1C1C1E;background:#FAFAF8;outline:none;font-family:inherit;}
+.exam-date-input{flex:1;min-width:90px;border:1px solid #E0DDD8;border-radius:6px;padding:4px 8px;font-size:12px;color:#1C1C1E;background:#FAFAF8;outline:none;font-family:inherit;}
 .exam-date-input:focus{border-color:#4A90D9;}
 
 /* Grades tables */
 .grades-section{margin-bottom:32px;}
 .grades-semester-title{font-size:15px;font-weight:700;color:#1C1C1E;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
 .grades-badge{font-size:11px;font-weight:600;background:#4A90D9;color:#fff;padding:2px 8px;border-radius:10px;}
-.grades-table-wrap{border:1px solid #E8E5E0;border-radius:12px;overflow:hidden;}
-.grades-table{width:100%;border-collapse:collapse;table-layout:fixed;}
+.grades-table-wrap{border:1px solid #E8E5E0;border-radius:12px;overflow:hidden;background:#fff;}
+.grades-table{width:100%;border-collapse:collapse;table-layout:fixed;background:#fff;}
 .grades-table th{background:#F5F3EF;font-size:10.5px;font-weight:700;color:#8A8680;text-transform:uppercase;letter-spacing:0.06em;padding:8px 10px;text-align:center;border-bottom:1px solid #E8E5E0;}
 .grades-table th.subject-col{text-align:left;}
-.grades-table td{padding:8px 10px;border-bottom:1px solid #F0EDE8;text-align:center;vertical-align:middle;}
+.grades-table td{padding:8px 8px;border-bottom:1px solid #F0EDE8;text-align:center;vertical-align:middle;background:#fff;}
 .grades-table tr:last-child td{border-bottom:none;}
-.grades-table tr:hover td{background:#FAFAF8;}
-.grades-table td.subject-name{text-align:left;font-size:13px;font-weight:500;color:#1C1C1E;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.grades-table tr:hover td{background:#F8F7F5;}
+.grades-table td.subject-name{text-align:left;font-size:13px;font-weight:500;color:#1C1C1E;white-space:normal;word-break:break-word;}
 .grades-table td.ects-cell{font-size:12px;color:#5A5755;font-weight:600;}
 .grade-cell{display:flex;flex-direction:column;align-items:center;gap:2px;}
-.grade-coeff{font-size:9.5px;color:#B0ADA8;font-weight:500;}
-.grade-input{width:52px;border:1px solid #E0DDD8;border-radius:6px;padding:3px 5px;font-size:13px;color:#1C1C1E;background:#FAFAF8;outline:none;text-align:center;font-family:inherit;transition:border-color .15s;}
+.grade-label-input{width:100%;border:none;background:transparent;font-size:10px;color:#5A5755;text-align:center;outline:none;font-family:inherit;font-weight:600;padding:1px 0;}
+.grade-label-input::placeholder{color:#C0BDB7;font-weight:400;}
+.grade-coeff{font-size:10px;color:#8A8680;font-weight:600;}
+.grade-input{width:48px;border:1px solid #E0DDD8;border-radius:6px;padding:3px 4px;font-size:13px;color:#1C1C1E;background:#FAFAF8;outline:none;text-align:center;font-family:inherit;transition:border-color .15s;}
 .grade-input:focus{border-color:#4A90D9;background:#fff;}
 .grade-input.has-value{font-weight:600;color:#1C1C1E;}
+.grade-input.min-needed::placeholder{color:#4A90D9;font-weight:600;}
 .grade-mean{font-size:13px;font-weight:700;color:#4A90D9;}
 .grade-mean-empty{font-size:12px;color:#D0CCC6;}
 .ects-input{width:36px;border:1px solid #E0DDD8;border-radius:6px;padding:3px 5px;font-size:12px;color:#5A5755;background:#FAFAF8;outline:none;text-align:center;font-family:inherit;}
 .ects-input:focus{border-color:#4A90D9;}
-.grades-total-row td{background:#F5F3EF;font-weight:700;border-top:2px solid #E0DDD8;}
+.grades-total-row td{background:#F5F3EF !important;font-weight:700;border-top:2px solid #E0DDD8;}
 
 @media(max-width:680px){
   #exam-full-overlay{bottom:0!important;}
@@ -537,7 +542,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
   <button class="mobile-nav-btn" data-view="Books" onclick="setView('Books')"><span class="mobile-nav-icon">☷</span><span>Books</span></button>
   <button class="mobile-nav-btn" data-view="Projection" onclick="setView('Projection')"><span class="mobile-nav-icon">◫</span><span>Plan</span></button>
   <button class="mobile-nav-btn" data-view="Networking" onclick="setView('Networking')"><span class="mobile-nav-icon">◎</span><span>Réseau</span></button>
-  <button class="mobile-nav-btn" data-view="Exams" onclick="setView('Exams')"><span class="mobile-nav-icon">🎓</span><span>Exams</span></button>
+  <button class="mobile-nav-btn" data-view="Exams" onclick="setView('Exams')"><span class="mobile-nav-icon">E</span><span>Exams</span></button>
 </nav>
 
 <div class="backdrop" id="bd" onclick="bdClick(event)">
@@ -1134,7 +1139,7 @@ function render(){
     if(bc){bc.classList.remove('proj-mode');bc.classList.remove('net-mode');bc.classList.add('exams-mode');}
     var mti=document.getElementById('main-title-icon');
     var mtt=document.getElementById('main-title-text');
-    if(mti){mti.textContent='🎓';mti.style.background='#5856D6';mti.style.color='#fff';}
+    if(mti){mti.textContent='E';mti.style.background='#5856D6';mti.style.color='#fff';mti.style.fontWeight='700';mti.style.fontSize='20px';}
     if(mtt)mtt.textContent='Exams';
     rExams();
   } else {
@@ -1834,21 +1839,25 @@ function companyLogoUrl(name){
 function rNetworking(){
   var el=document.getElementById('list');
   if(!el)return;
-  var q=netSearch.toLowerCase().trim();
-  var filtered=contacts.filter(function(c){
-    if(!q)return true;
-    return (c.fname+' '+c.lname+' '+c.company+' '+c.pos+' '+c.notes).toLowerCase().indexOf(q)>=0;
-  });
+
+  // Rebuild toolbar only if needed (first render or view switch)
+  if(!document.getElementById('net-toolbar-el')){
+    el.innerHTML='<div class="net-toolbar" id="net-toolbar-el">'
+      +'<input class="net-search" id="net-search-input" type="text" placeholder="Rechercher…" value="'+e(netSearch)+'" autocomplete="off">'
+      +'<span id="net-count-label" style="font-size:12px;color:#8A8680;white-space:nowrap;flex-shrink:0;padding:0 8px;">'+contacts.length+' contact'+(contacts.length!==1?'s':'')+'</span>'
+      +'<button class="add-btn" style="margin:0;padding:7px 14px;font-size:13px" onclick="openContactModal(null)">+ Ajouter</button>'
+      +'</div>';
+    var si=document.getElementById('net-search-input');
+    if(si){si.addEventListener('input',function(){netSearch=this.value;rNetworkingContacts();});}
+  } else {
+    var si2=document.getElementById('net-search-input');
+    if(si2&&si2!==document.activeElement)si2.value=netSearch;
+    var cl=document.getElementById('net-count-label');
+    if(cl)cl.textContent=contacts.length+' contact'+(contacts.length!==1?'s':'');
+  }
+
   var needsInit=contacts.some(function(c){return c.sortOrder===undefined;});
   if(needsInit){contacts.forEach(function(c,i){if(c.sortOrder===undefined)c.sortOrder=i;});saveTasks();}
-  filtered.sort(function(a,b){return (a.sortOrder||0)-(b.sortOrder||0);});
-
-  // Toolbar stays in the normal flow (inside .main, respects sidebar width)
-  el.innerHTML='<div class="net-toolbar" id="net-toolbar-el">'
-    +'<input class="net-search" type="text" placeholder="Rechercher…" value="'+e(netSearch)+'" oninput="netSearch=this.value;rNetworking()" autocomplete="off">'
-    +'<span style="font-size:12px;color:#8A8680;white-space:nowrap;flex-shrink:0;padding:0 8px;">'+contacts.length+' contact'+(contacts.length!==1?'s':'')+'</span>'
-    +'<button class="add-btn" style="margin:0;padding:7px 14px;font-size:13px" onclick="openContactModal(null)">+ Ajouter</button>'
-    +'</div>';
 
   // Get or create full-width overlay
   var overlay=document.getElementById('net-full-overlay');
@@ -1863,6 +1872,18 @@ function rNetworking(){
   var overlayTop=toolbar?Math.round(toolbar.getBoundingClientRect().bottom):66;
   overlay.style.top=overlayTop+'px';
   overlay.style.display='block';
+  rNetworkingContacts();
+}
+
+function rNetworkingContacts(){
+  var overlay=document.getElementById('net-full-overlay');
+  if(!overlay)return;
+  var q=netSearch.toLowerCase().trim();
+  var filtered=contacts.filter(function(c){
+    if(!q)return true;
+    return (c.fname+' '+c.lname+' '+c.company+' '+c.pos+' '+c.notes).toLowerCase().indexOf(q)>=0;
+  });
+  filtered.sort(function(a,b){return (a.sortOrder||0)-(b.sortOrder||0);});
 
   if(!filtered.length){
     overlay.innerHTML='<div class="empty"><div class="empty-icon">&#128100;</div><div class="empty-txt">'+(contacts.length?'Aucun contact trouvé.':'Aucun contact enregistré.')+'</div></div>';
@@ -2170,24 +2191,24 @@ var examData={
     {id:'mgmt',     name:'Managerial Skills',                color:'#34C759',step:0,examDate:''}
   ],
   s1Grades:[
-    {name:'Spanish',                        ects:'',exams:[{date:'',coeff:'1',note:''},{date:'',coeff:'1',note:''},{date:'',coeff:'1',note:''}]},
-    {name:'Climate Finance',                ects:'',exams:[{date:'',coeff:'1',note:''},{date:'',coeff:'1',note:''},{date:'',coeff:'1',note:''}]},
-    {name:'Principles of Finance',          ects:'',exams:[{date:'',coeff:'1',note:''},{date:'',coeff:'1',note:''},{date:'',coeff:'1',note:''}]},
-    {name:'Financial Analysis & Valuation', ects:'',exams:[{date:'',coeff:'1',note:''},{date:'',coeff:'1',note:''},{date:'',coeff:'1',note:''}]},
-    {name:'Portfolio Construction Theory',  ects:'',exams:[{date:'',coeff:'1',note:''},{date:'',coeff:'1',note:''},{date:'',coeff:'1',note:''}]},
-    {name:'Financial Modelling (Excel)',     ects:'',exams:[{date:'',coeff:'1',note:''},{date:'',coeff:'1',note:''},{date:'',coeff:'1',note:''}]},
-    {name:'Financial Econometrics (Python)',ects:'',exams:[{date:'',coeff:'1',note:''},{date:'',coeff:'1',note:''},{date:'',coeff:'1',note:''}]},
-    {name:'Managerial Skills',              ects:'',exams:[{date:'',coeff:'1',note:''},{date:'',coeff:'1',note:''},{date:'',coeff:'1',note:''}]}
+    {name:'Spanish',                        ects:'',exams:[{label:'',date:'',coeff:'1',note:''},{label:'',date:'',coeff:'1',note:''},{label:'',date:'',coeff:'1',note:''}]},
+    {name:'Climate Finance',                ects:'',exams:[{label:'',date:'',coeff:'1',note:''},{label:'',date:'',coeff:'1',note:''},{label:'',date:'',coeff:'1',note:''}]},
+    {name:'Principles of Finance',          ects:'',exams:[{label:'',date:'',coeff:'1',note:''},{label:'',date:'',coeff:'1',note:''},{label:'',date:'',coeff:'1',note:''}]},
+    {name:'Financial Analysis & Valuation', ects:'',exams:[{label:'',date:'',coeff:'1',note:''},{label:'',date:'',coeff:'1',note:''},{label:'',date:'',coeff:'1',note:''}]},
+    {name:'Portfolio Construction Theory',  ects:'',exams:[{label:'',date:'',coeff:'1',note:''},{label:'',date:'',coeff:'1',note:''},{label:'',date:'',coeff:'1',note:''}]},
+    {name:'Financial Modelling (Excel)',     ects:'',exams:[{label:'',date:'',coeff:'1',note:''},{label:'',date:'',coeff:'1',note:''},{label:'',date:'',coeff:'1',note:''}]},
+    {name:'Financial Econometrics (Python)',ects:'',exams:[{label:'',date:'',coeff:'1',note:''},{label:'',date:'',coeff:'1',note:''},{label:'',date:'',coeff:'1',note:''}]},
+    {name:'Managerial Skills',              ects:'',exams:[{label:'',date:'',coeff:'1',note:''},{label:'',date:'',coeff:'1',note:''},{label:'',date:'',coeff:'1',note:''}]}
   ],
   s2Grades:[
-    {name:'',ects:'',exams:[{date:'',coeff:'1',note:''},{date:'',coeff:'1',note:''},{date:'',coeff:'1',note:''}]},
-    {name:'',ects:'',exams:[{date:'',coeff:'1',note:''},{date:'',coeff:'1',note:''},{date:'',coeff:'1',note:''}]},
-    {name:'',ects:'',exams:[{date:'',coeff:'1',note:''},{date:'',coeff:'1',note:''},{date:'',coeff:'1',note:''}]},
-    {name:'',ects:'',exams:[{date:'',coeff:'1',note:''},{date:'',coeff:'1',note:''},{date:'',coeff:'1',note:''}]},
-    {name:'',ects:'',exams:[{date:'',coeff:'1',note:''},{date:'',coeff:'1',note:''},{date:'',coeff:'1',note:''}]},
-    {name:'',ects:'',exams:[{date:'',coeff:'1',note:''},{date:'',coeff:'1',note:''},{date:'',coeff:'1',note:''}]},
-    {name:'',ects:'',exams:[{date:'',coeff:'1',note:''},{date:'',coeff:'1',note:''},{date:'',coeff:'1',note:''}]},
-    {name:'',ects:'',exams:[{date:'',coeff:'1',note:''},{date:'',coeff:'1',note:''},{date:'',coeff:'1',note:''}]}
+    {name:'',ects:'',exams:[{label:'',date:'',coeff:'1',note:''},{label:'',date:'',coeff:'1',note:''},{label:'',date:'',coeff:'1',note:''}]},
+    {name:'',ects:'',exams:[{label:'',date:'',coeff:'1',note:''},{label:'',date:'',coeff:'1',note:''},{label:'',date:'',coeff:'1',note:''}]},
+    {name:'',ects:'',exams:[{label:'',date:'',coeff:'1',note:''},{label:'',date:'',coeff:'1',note:''},{label:'',date:'',coeff:'1',note:''}]},
+    {name:'',ects:'',exams:[{label:'',date:'',coeff:'1',note:''},{label:'',date:'',coeff:'1',note:''},{label:'',date:'',coeff:'1',note:''}]},
+    {name:'',ects:'',exams:[{label:'',date:'',coeff:'1',note:''},{label:'',date:'',coeff:'1',note:''},{label:'',date:'',coeff:'1',note:''}]},
+    {name:'',ects:'',exams:[{label:'',date:'',coeff:'1',note:''},{label:'',date:'',coeff:'1',note:''},{label:'',date:'',coeff:'1',note:''}]},
+    {name:'',ects:'',exams:[{label:'',date:'',coeff:'1',note:''},{label:'',date:'',coeff:'1',note:''},{label:'',date:'',coeff:'1',note:''}]},
+    {name:'',ects:'',exams:[{label:'',date:'',coeff:'1',note:''},{label:'',date:'',coeff:'1',note:''},{label:'',date:'',coeff:'1',note:''}]}
   ]
 };
 
@@ -2202,13 +2223,20 @@ function loadExamData(){
         return {id:s.id||('sub'+i),name:s.name||'',color:s.color||_ec[i%_ec.length],step:typeof s.step==='number'?s.step:0,examDate:s.examDate||''};
       });
     }
+    function migrateGrade(g){
+      if(!g.exams)g.exams=[];
+      g.exams=g.exams.map(function(ex){return {label:ex.label||'',date:ex.date||'',coeff:ex.coeff||'1',note:ex.note||''};});
+      return g;
+    }
     if(Array.isArray(d.s1Grades)){
       d.s1Grades.forEach(function(g,i){
+        migrateGrade(g);
         if(i<examData.s1Grades.length)Object.assign(examData.s1Grades[i],g);
       });
     }
     if(Array.isArray(d.s2Grades)){
       d.s2Grades.forEach(function(g,i){
+        migrateGrade(g);
         if(i<examData.s2Grades.length)Object.assign(examData.s2Grades[i],g);
         else examData.s2Grades.push(g);
       });
@@ -2242,6 +2270,21 @@ function updateGrade(sem,rowIdx,examIdx,field,val){
     if(meanEl)meanEl.innerHTML=calcExamMean(grades[rowIdx]);
     var semMeanEl=document.getElementById('sem-mean-'+sem);
     if(semMeanEl)semMeanEl.innerHTML=calcSemMean(grades);
+    if(field==='note'||field==='coeff'){
+      var row=grades[rowIdx];
+      for(var i=0;i<row.exams.length;i++){
+        var ex=row.exams[i];
+        if(!ex.note){
+          var inp=document.querySelector('[data-grade-key="'+sem+'-'+rowIdx+'-'+i+'"]');
+          if(inp){
+            var mn=calcMinNeeded(row,i);
+            if(mn===null){inp.placeholder='—';inp.classList.remove('min-needed');}
+            else if(mn==='>20'){inp.placeholder='impossible';inp.classList.remove('min-needed');}
+            else{inp.placeholder=String(mn);inp.classList.add('min-needed');}
+          }
+        }
+      }
+    }
   }
 }
 
@@ -2260,7 +2303,7 @@ function updateSubjectName(sem,rowIdx,val){
 
 function addExamGradeRow(sem){
   var grades=sem==='s1'?examData.s1Grades:examData.s2Grades;
-  grades.push({name:'',ects:'',exams:[{date:'',coeff:'1',note:''},{date:'',coeff:'1',note:''},{date:'',coeff:'1',note:''}]});
+  grades.push({name:'',ects:'',exams:[{label:'',date:'',coeff:'1',note:''},{label:'',date:'',coeff:'1',note:''},{label:'',date:'',coeff:'1',note:''}]});
   saveExamData();rExams();
 }
 
@@ -2336,25 +2379,42 @@ function rExams(){
   gh+='<div class="exam-cards-grid">';
   examData.subjects.forEach(function(s){
     var stepsDone=s.step;
+    var daysHtml='';
+    if(s.examDate){
+      var parts=s.examDate.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+      if(parts){
+        var examDt=new Date(parseInt(parts[3]),parseInt(parts[2])-1,parseInt(parts[1]));
+        var today2=new Date();today2.setHours(0,0,0,0);
+        var diff=Math.ceil((examDt-today2)/(1000*60*60*24));
+        if(diff>0)daysHtml='<span style="font-size:11px;font-weight:600;color:#FF9500;margin-left:6px;">J-'+diff+'</span>';
+        else if(diff===0)daysHtml='<span style="font-size:11px;font-weight:600;color:#FF3B30;margin-left:6px;">Aujourd\'hui</span>';
+        else daysHtml='<span style="font-size:11px;color:#B0ADA8;margin-left:6px;">Passé</span>';
+      }
+    }
     gh+='<div class="exam-card" data-id="'+e(s.id)+'">';
     gh+='<div class="exam-card-header">';
     gh+='<div class="exam-card-name" onclick="startEditExamName(\''+s.id+'\')">'+e(s.name)+'</div>';
-    if(s.examDate)gh+='<div class="exam-card-date">'+e(s.examDate)+'</div>';
     gh+='<button class="exam-del-btn" onclick="deleteExamSubject(\''+s.id+'\')" title="Supprimer">&#10005;</button>';
     gh+='</div>';
-    gh+='<div class="exam-steps">';
+    gh+='<div class="exam-steps-circles">';
     EXAM_STEPS.forEach(function(step,idx){
       var done=stepsDone>idx;
       if(idx>0)gh+='<div class="exam-step-connector'+(stepsDone>idx?' done':'')+'"></div>';
-      gh+='<div class="exam-step'+(done?' done':'')+'" onclick="setExamStep(\''+s.id+'\','+idx+')" title="'+step.label+'">';
+      gh+='<div class="exam-step-circ'+(done?' done':'')+'" onclick="setExamStep(\''+s.id+'\','+idx+')" title="'+step.label+'">';
       gh+='<div class="exam-step-circle">'+(done?'&#10003;':step.icon)+'</div>';
-      gh+='<div class="exam-step-label">'+step.label+'</div>';
       gh+='</div>';
+    });
+    gh+='</div>';
+    gh+='<div class="exam-steps-labels">';
+    EXAM_STEPS.forEach(function(step,idx){
+      var done=stepsDone>idx;
+      gh+='<div class="exam-step-lbl'+(done?' done':'')+'">'+step.label+'</div>';
     });
     gh+='</div>';
     gh+='<div class="exam-date-row">';
     gh+='<span class="exam-date-label">Date exam :</span>';
-    gh+='<input class="exam-date-input" type="text" placeholder="jj/mm/aaaa" value="'+e(s.examDate||'')+'" oninput="saveExamDate(\''+s.id+'\',this.value)">';
+    gh+='<input class="exam-date-input" type="text" placeholder="jj/mm/aaaa" value="'+e(s.examDate||'')+'" onchange="saveExamDate(\''+s.id+'\',this.value)">';
+    gh+=daysHtml;
     gh+='</div>';
     gh+='</div>';
   });
@@ -2408,11 +2468,38 @@ function addExamSubject(){
   setTimeout(function(){startEditExamName(id);},30);
 }
 
+function calcMinNeeded(row,examIdx){
+  // Calculate minimum grade needed in exam[examIdx] to achieve 10/20 average
+  // considering other empty evals will also need to contribute at their minimum
+  var totalCoeff=0,earnedWeighted=0;
+  row.exams.forEach(function(ex){
+    var c=parseFloat(ex.coeff)||1;
+    totalCoeff+=c;
+    var n=parseFloat(ex.note);
+    if(!isNaN(n))earnedWeighted+=n*c;
+  });
+  // Only calculate if this exam is empty
+  var thisCoeff=parseFloat(row.exams[examIdx]&&row.exams[examIdx].coeff)||1;
+  // Needed weighted score from this exam alone (assuming other empty evals get 10)
+  var otherEmptyWeighted=0;
+  row.exams.forEach(function(ex,i){
+    if(i===examIdx)return;
+    var c=parseFloat(ex.coeff)||1;
+    var n=parseFloat(ex.note);
+    if(isNaN(n))otherEmptyWeighted+=10*c;
+    else otherEmptyWeighted+=n*c;
+  });
+  var needed=(10*totalCoeff-otherEmptyWeighted)/thisCoeff;
+  if(needed<=0)return null;
+  if(needed>20)return '>20';
+  return Math.round(needed*100)/100;
+}
+
 function buildGradesTable(sem){
   var grades=sem==='s1'?examData.s1Grades:examData.s2Grades;
   var html='<div class="grades-section"><div class="grades-table-wrap">';
   html+='<table class="grades-table">';
-  html+='<colgroup><col style="width:auto"><col style="width:50px"><col style="width:92px"><col style="width:92px"><col style="width:92px"><col style="width:72px"></colgroup>';
+  html+='<colgroup><col style="width:160px"><col style="width:46px"><col style="width:110px"><col style="width:110px"><col style="width:110px"><col style="width:68px"></colgroup>';
   html+='<thead><tr>';
   html+='<th class="subject-col">Matière</th><th>ECTS</th><th>Éval. 1</th><th>Éval. 2</th><th>Éval. 3</th><th>Moy.</th>';
   html+='</tr></thead><tbody>';
@@ -2420,20 +2507,20 @@ function buildGradesTable(sem){
   var totalEcts=0;
   grades.forEach(function(row,rowIdx){
     html+='<tr>';
-    if(sem==='s2'){
-      html+='<td class="subject-name"><input style="width:100%;border:none;background:transparent;font-size:13px;font-weight:500;color:#1C1C1E;outline:none;font-family:inherit;" value="'+e(row.name)+'" placeholder="Matière..." oninput="updateSubjectName(\''+sem+'\','+rowIdx+',this.value)"></td>';
-    }else{
-      html+='<td class="subject-name">'+e(row.name)+'</td>';
-    }
+    html+='<td class="subject-name"><input style="width:100%;border:none;background:transparent;font-size:13px;font-weight:500;color:#1C1C1E;outline:none;font-family:inherit;" value="'+e(row.name)+'" placeholder="Matière..." oninput="updateSubjectName(\''+sem+'\','+rowIdx+',this.value)"></td>';
     html+='<td class="ects-cell"><input class="ects-input" type="number" min="0" max="30" value="'+e(row.ects)+'" placeholder="—" oninput="updateExamEcts(\''+sem+'\','+rowIdx+',this.value)"></td>';
     for(var i=0;i<3;i++){
-      var ex=row.exams[i]||{date:'',coeff:'1',note:''};
+      var ex=row.exams[i]||{label:'',date:'',coeff:'1',note:''};
+      var minNeed=(!ex.note)?calcMinNeeded(row,i):null;
+      var minPlaceholder=(minNeed===null)?'—':(minNeed==='>20'?'impossible':String(minNeed));
+      var minIsBlue=(minNeed!==null&&minNeed!=='>20');
       html+='<td><div class="grade-cell">';
-      html+='<input style="width:100%;border:none;background:transparent;font-size:9.5px;color:#B0ADA8;text-align:center;outline:none;font-family:inherit;padding:1px 0;" type="text" placeholder="date" value="'+e(ex.date||'')+'" oninput="updateGrade(\''+sem+'\','+rowIdx+','+i+',\'date\',this.value)">';
+      html+='<input class="grade-label-input" type="text" placeholder="Épreuve…" value="'+e(ex.label||'')+'" oninput="updateGrade(\''+sem+'\','+rowIdx+','+i+',\'label\',this.value)">';
+      html+='<input style="width:100%;border:none;background:transparent;font-size:9px;color:#B0ADA8;text-align:center;outline:none;font-family:inherit;padding:1px 0;" type="text" placeholder="date" value="'+e(ex.date||'')+'" oninput="updateGrade(\''+sem+'\','+rowIdx+','+i+',\'date\',this.value)">';
       html+='<div style="display:flex;align-items:center;gap:3px;justify-content:center;margin-top:2px;">';
       html+='<span class="grade-coeff">×</span>';
-      html+='<input style="width:26px;border:1px solid #E0DDD8;border-radius:4px;padding:2px 2px;font-size:10px;text-align:center;outline:none;font-family:inherit;background:#FAFAF8;" type="number" min="0" max="10" step="0.5" value="'+e(ex.coeff||'1')+'" oninput="updateGrade(\''+sem+'\','+rowIdx+','+i+',\'coeff\',this.value)">';
-      html+='<input class="grade-input'+(ex.note?' has-value':'')+'" type="number" min="0" max="20" step="0.25" value="'+e(ex.note||'')+'" placeholder="—" oninput="updateGrade(\''+sem+'\','+rowIdx+','+i+',\'note\',this.value)">';
+      html+='<input style="width:28px;border:1px solid #E0DDD8;border-radius:4px;padding:2px 2px;font-size:11px;font-weight:600;text-align:center;outline:none;font-family:inherit;background:#FAFAF8;" type="number" min="0" max="10" step="0.5" value="'+e(ex.coeff||'1')+'" oninput="updateGrade(\''+sem+'\','+rowIdx+','+i+',\'coeff\',this.value)">';
+      html+='<input class="grade-input'+(ex.note?' has-value':'')+(minIsBlue?' min-needed':'')+'" data-grade-key="'+sem+'-'+rowIdx+'-'+i+'" type="number" min="0" max="20" step="0.25" value="'+e(ex.note||'')+'" placeholder="'+minPlaceholder+'" oninput="updateGrade(\''+sem+'\','+rowIdx+','+i+',\'note\',this.value)">';
       html+='</div></div></td>';
     }
     html+='<td id="mean-'+sem+'-'+rowIdx+'">'+calcExamMean(row)+'</td>';
@@ -2451,7 +2538,7 @@ function buildGradesTable(sem){
   html+='</tr>';
 
   html+='</tbody></table>';
-  html+='<div style="padding:10px 14px;border-top:1px solid #F0EDE8;">';
+  html+='<div style="padding:10px 14px;border-top:1px solid #F0EDE8;background:#fff;">';
   html+='<button onclick="addExamGradeRow(\''+sem+'\')" style="font-size:12px;color:#4A90D9;background:none;border:none;cursor:pointer;padding:2px 0;font-family:inherit;">+ Ajouter une matière</button>';
   html+='</div>';
   html+='</div></div>';
@@ -2876,7 +2963,7 @@ function deleteProjGoal(id){
     <button class="nav-drawer-item" data-view="Books" onclick="navDrawerGo('Books')"><span class="nav-drawer-item-icon">☷</span><span class="nav-drawer-item-label">Books</span></button>
     <button class="nav-drawer-item" data-view="Projection" onclick="navDrawerGo('Projection')"><span class="nav-drawer-item-icon">◫</span><span class="nav-drawer-item-label">Projection</span></button>
     <button class="nav-drawer-item" data-view="Networking" onclick="navDrawerGo('Networking')"><span class="nav-drawer-item-icon">◎</span><span class="nav-drawer-item-label">Réseau</span></button>
-    <button class="nav-drawer-item" data-view="Exams" onclick="navDrawerGo('Exams')"><span class="nav-drawer-item-icon">🎓</span><span class="nav-drawer-item-label">Exams</span></button>
+    <button class="nav-drawer-item" data-view="Exams" onclick="navDrawerGo('Exams')"><span class="nav-drawer-item-icon" style="font-weight:700;">E</span><span class="nav-drawer-item-label">Exams</span></button>
   </div>
 </div>
 </body>
