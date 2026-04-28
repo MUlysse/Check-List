@@ -937,6 +937,8 @@ async function loadTasksRemote(){
         if(Array.isArray(s.projRows)&&s.projRows.length) projRows=s.projRows;
         if(Array.isArray(s.projPeriods)&&s.projPeriods.length&&s.projDataVersion===PROJ_DATA_VERSION) projPeriods=s.projPeriods;
         if(Array.isArray(s.projGoals)) projGoals=s.projGoals;
+        if(s.examData&&typeof s.examData==='object'){loadExamData(s.examData);examData._loaded=true;}
+        if(s.companyLogos&&typeof s.companyLogos==='object'){Object.assign(companyLogos,s.companyLogos);}
       }catch(e){}
     }
     var merged = rows.map(function(rt){
@@ -1270,11 +1272,17 @@ function dragStart(e) { draggedTab = e.target.closest('.tab'); if(draggedTab){ e
 function dragOver(e) { e.preventDefault(); e.dataTransfer && (e.dataTransfer.dropEffect = 'move'); var t = e.target.closest('.tab'); if(t && t !== draggedTab){ dropTarget = t; }}
 function dragEnter(e){ var t = e.target.closest('.tab'); if(t && t !== draggedTab){ dropTarget = t; t.classList.add('drag-over'); }}
 function dragLeave(e){ var t = e.target.closest('.tab'); if(t && t !== draggedTab){ t.classList.remove('drag-over'); if(dropTarget===t) dropTarget=null; }}
+var _settingsSyncTimer=null;
+function scheduleSettingsSync(){
+  if(!supabaseClient)return;
+  if(_settingsSyncTimer)clearTimeout(_settingsSyncTimer);
+  _settingsSyncTimer=setTimeout(function(){saveSettingsRemote();},1500);
+}
 async function saveSettingsRemote(){
   if(!supabaseClient) return;
   const { data: { user } } = await supabaseClient.auth.getUser();
   if (!user) return;
-  var settingsData = JSON.stringify({tabs: TABS, tab: tab, projRows: projRows, projPeriods: projPeriods, projDataVersion: PROJ_DATA_VERSION, projGoals: projGoals});
+  var settingsData = JSON.stringify({tabs: TABS, tab: tab, projRows: projRows, projPeriods: projPeriods, projDataVersion: PROJ_DATA_VERSION, projGoals: projGoals, examData:{subjects:examData.subjects,s1Grades:examData.s1Grades,s2Grades:examData.s2Grades}, companyLogos:companyLogos});
   var payload={cat:SETTINGS_CAT,text:settingsData,prio:'L',done:true,user_id:user.id};
   if(settingsId){
     await updateRemoteTask(settingsId,{text:settingsData});
@@ -1811,6 +1819,7 @@ function propagateCompanyLogo(company,logoUrl,excludeId){
       if(supabaseClient)updateRemoteContact(co.id,{company_logo:logoUrl});
     }
   });
+  scheduleSettingsSync();
 }
 
 function rNetworkingSidebar(){
@@ -2017,7 +2026,7 @@ async function saveContact(){
     var c=contacts.find(function(x){return String(x.id)===_editContactId;});
     if(c){c.fname=fname;c.lname=lname;c.company=company;c.pos=pos;c.date=date;c.prox=prox;c.mail_url=mailUrl;c.phone=phone;c.linkedin=linkedin;c.photo=photo;c.notes=notes;c.company_logo=companyLogo||(company?companyLogos[company]||'':'');}
     if(company&&companyLogo) propagateCompanyLogo(company,companyLogo,c?c.id:null);
-    buildCompanyLogos();
+    buildCompanyLogos();scheduleSettingsSync();
     closeContactModal();saveTasks();render();
     if(supabaseClient&&c) await updateRemoteContact(c.id,contactToPayload(c));
   } else {
@@ -2025,7 +2034,7 @@ async function saveContact(){
     var nc={id:newContactId(),fname:fname,lname:lname,company:company,pos:pos,date:date,prox:prox,mail_url:mailUrl,phone:phone,linkedin:linkedin,photo:photo,notes:notes,company_logo:resolvedLogo};
     if(company&&resolvedLogo) propagateCompanyLogo(company,resolvedLogo,nc.id);
     contacts.push(nc);
-    buildCompanyLogos();
+    buildCompanyLogos();scheduleSettingsSync();
     closeContactModal();saveTasks();render();
     if(supabaseClient) await insertRemoteContact(nc);
   }
@@ -2065,7 +2074,7 @@ async function loadContactsRemote(){
     });
     var logoPushPromises=[];
     contacts=res.data.map(function(c){
-      var resolvedLogo=c.company_logo||savedLogos[String(c.id)]||'';
+      var resolvedLogo=c.company_logo||savedLogos[String(c.id)]||companyLogos[c.company||'']||'';
       var resolvedOrder=typeof c.sort_order==='number'?c.sort_order:(savedSortOrders[String(c.id)]!==undefined?savedSortOrders[String(c.id)]:undefined);
       // Migrate local logo to Supabase if Supabase has none
       if(!c.company_logo&&savedLogos[String(c.id)]){
@@ -2216,11 +2225,10 @@ var examData={
   ]
 };
 
-function loadExamData(){
+function loadExamData(remoteData){
   try{
-    var stored=localStorage.getItem(EXAM_DATA_KEY);
-    if(!stored)return;
-    var d=JSON.parse(stored);
+    var d=remoteData||(function(){var s=localStorage.getItem(EXAM_DATA_KEY);return s?JSON.parse(s):null;})();
+    if(!d)return;
     if(Array.isArray(d.subjects)&&d.subjects.length){
       var _ec=['#4A90D9','#34C759','#FF9500','#FF2D55','#AF52DE','#5AC8FA','#5856D6','#FF6B35'];
       examData.subjects=d.subjects.map(function(s,i){
@@ -2250,6 +2258,7 @@ function loadExamData(){
 
 function saveExamData(){
   try{localStorage.setItem(EXAM_DATA_KEY,JSON.stringify(examData));}catch(e){}
+  scheduleSettingsSync();
 }
 
 function setExamStep(subjectId,stepIdx){
