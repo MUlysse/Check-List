@@ -454,8 +454,19 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
 .exam-date-label{font-size:11px;color:#5A5755;font-weight:500;flex-shrink:0;}
 .exam-date-input{flex:1;min-width:90px;border:1px solid #D0CBC3;border-radius:6px;padding:4px 8px;font-size:12px;color:#1C1C1E;background:#FAFAF8;outline:none;font-family:inherit;}
 .exam-date-input:focus{border-color:#4A90D9;}
-.exam-comment-input{width:100%;border:none;border-top:1px solid #EAE7E2;background:transparent;font-size:12px;color:#3D3B38;font-family:inherit;resize:none;outline:none;padding:8px 0 2px;min-height:48px;line-height:1.5;box-sizing:border-box;}
-.exam-comment-input::placeholder{color:#C0BDB7;}
+.exam-comment-preview{width:100%;border-top:1px solid #EAE7E2;padding:8px 0 2px;font-size:12px;color:#3D3B38;font-family:inherit;line-height:1.5;cursor:pointer;min-height:36px;white-space:pre-wrap;word-break:break-word;}
+.exam-comment-preview.empty{color:#C0BDB7;font-style:italic;}
+.exam-comment-preview:hover{color:#1C1C1E;}
+/* Comment full-screen editor */
+#exam-comment-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);backdrop-filter:blur(6px);z-index:300;align-items:center;justify-content:center;}
+#exam-comment-overlay.open{display:flex;}
+.exam-comment-modal{background:#fff;border-radius:16px;padding:24px;width:min(580px,94vw);max-height:80vh;display:flex;flex-direction:column;gap:14px;box-shadow:0 32px 80px rgba(0,0,0,0.22);}
+.exam-comment-modal-title{font-size:15px;font-weight:700;color:#1C1C1E;display:flex;align-items:center;justify-content:space-between;}
+.exam-comment-modal-title button{background:none;border:none;cursor:pointer;color:#B0ADA8;font-size:16px;padding:2px 6px;border-radius:5px;line-height:1;}
+.exam-comment-modal-title button:hover{background:#F0EDE8;color:#5A5755;}
+.exam-comment-textarea{flex:1;min-height:260px;max-height:52vh;border:1px solid #E0DDD8;border-radius:10px;padding:12px 14px;font-size:13.5px;color:#1C1C1E;font-family:inherit;line-height:1.6;resize:none;outline:none;transition:border-color .15s;}
+.exam-comment-textarea:focus{border-color:#4A90D9;box-shadow:0 0 0 3px rgba(74,144,217,0.10);}
+.exam-comment-textarea::placeholder{color:#C0BDB7;}
 
 /* Grades tables */
 .grades-section{margin-bottom:32px;}
@@ -1740,7 +1751,7 @@ function editBook(id){
 
 function pfc(){var sp=['All','Urgent','Completed'];document.getElementById('new-cat').value=(sp.indexOf(tab)<0&&!isTodayTab(tab))?tab:'';}
 
-document.addEventListener('keydown',function(e){if(e.ctrlKey&&e.key==='r'){e.preventDefault();location.reload();}if(e.key==='Escape'){closeModal();closeBookModal();closeProjPeriodModal();closeProjRowModal();closeContactModal();closeNavDrawer();}});
+document.addEventListener('keydown',function(e){if(e.ctrlKey&&e.key==='r'){e.preventDefault();location.reload();}if(e.key==='Escape'){closeModal();closeBookModal();closeProjPeriodModal();closeProjRowModal();closeContactModal();closeNavDrawer();closeCommentEditor();}});
 window.addEventListener('resize',function(){if(currentView==='Projection')rProjection();if(currentView==='Networking')rNetworking();});
 
 // ── Pull-to-refresh (iPhone) ──
@@ -2273,6 +2284,30 @@ function saveExamComment(id,val){
   var s=examData.subjects.find(function(x){return x.id===id;});
   if(s){s.comment=val;saveExamData();}
 }
+var _commentEditorId=null;
+function openCommentEditor(id){
+  var s=examData.subjects.find(function(x){return x.id===id;});
+  if(!s)return;
+  _commentEditorId=id;
+  document.getElementById('exam-comment-modal-subject').textContent=s.name||'Notes';
+  document.getElementById('exam-comment-textarea').value=s.comment||'';
+  document.getElementById('exam-comment-overlay').classList.add('open');
+  setTimeout(function(){
+    var ta=document.getElementById('exam-comment-textarea');
+    if(ta){ta.focus();ta.setSelectionRange(ta.value.length,ta.value.length);}
+  },80);
+}
+function saveCommentEditor(){
+  if(!_commentEditorId)return;
+  var val=document.getElementById('exam-comment-textarea').value;
+  saveExamComment(_commentEditorId,val);
+  closeCommentEditor();
+  rExams();
+}
+function closeCommentEditor(){
+  document.getElementById('exam-comment-overlay').classList.remove('open');
+  _commentEditorId=null;
+}
 function saveExamDate(subjectId,val){
   var s=examData.subjects.find(function(x){return x.id===subjectId;});
   if(s){s.examDate=val;saveExamData();}
@@ -2433,7 +2468,10 @@ function rExams(){
     gh+='<input class="exam-date-input" type="text" placeholder="jj/mm/aaaa" value="'+e(s.examDate||'')+'" onchange="saveExamDate(\''+s.id+'\',this.value)">';
     gh+=daysHtml;
     gh+='</div>';
-    gh+='<textarea class="exam-comment-input" placeholder="Notes, conseils, stratégie…" onchange="saveExamComment(\''+s.id+'\',this.value)">'+e(s.comment||'')+'</textarea>';
+    var _commentPreview=s.comment?e(s.comment.length>120?s.comment.slice(0,120)+'…':s.comment):'';
+    gh+='<div class="exam-comment-preview'+(s.comment?'':' empty')+'" onclick="openCommentEditor(\''+s.id+'\')">'
+      +(_commentPreview||'Notes, conseils, stratégie…')
+      +'</div>';
     gh+='</div>';
   });
   gh+='</div>'; // exam-cards-grid
@@ -2963,6 +3001,18 @@ function deleteProjGoal(id){
   saveTasks();saveSettingsRemote();rProjectionGoals();
 }
 </script>
+
+<!-- EXAM COMMENT EDITOR -->
+<div id="exam-comment-overlay" onclick="if(event.target===this)closeCommentEditor()">
+  <div class="exam-comment-modal">
+    <div class="exam-comment-modal-title">
+      <span id="exam-comment-modal-subject">Notes</span>
+      <button onclick="closeCommentEditor()">&#10005;</button>
+    </div>
+    <textarea class="exam-comment-textarea" id="exam-comment-textarea" placeholder="Notes, conseils, stratégie, chapitres à revoir…"></textarea>
+    <button class="add-btn" onclick="saveCommentEditor()">Enregistrer</button>
+  </div>
+</div>
 
 <!-- BOTTOM BAR -->
 <div class="bottom-bar">
