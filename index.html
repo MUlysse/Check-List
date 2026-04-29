@@ -476,16 +476,20 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
 .grades-table{width:100%;border-collapse:collapse;table-layout:fixed;background:#fff;}
 .grades-table th{background:#F5F3EF;font-size:10.5px;font-weight:700;color:#5A5755;text-transform:uppercase;letter-spacing:0.06em;padding:8px 10px;text-align:center;border-bottom:1px solid #D8D4CE;}
 .grades-table th.subject-col{text-align:left;}
-.grades-table td{padding:8px 8px;border-bottom:1px solid #F0EDE8;text-align:center;vertical-align:middle;background:#fff;}
+.grades-table td{padding:8px 8px;border-bottom:1px solid #F0EDE8;text-align:center;vertical-align:middle;background:#FAFAF8;}
 .grades-table tr:last-child td{border-bottom:none;}
-.grades-table tr:hover td{background:#F8F7F5;}
+.grades-table tbody tr:nth-child(odd) td{background:#FAFAF8;}
+.grades-table tbody tr:nth-child(even) td{background:#F2EFE9;}
+.grades-table tbody tr:hover td{background:#E8E4DC;}
+.grades-table tr.grades-total-row td{background:#EDE9E2!important;font-weight:600;}
 .grades-table td.subject-name{text-align:left;font-size:13px;font-weight:500;color:#1C1C1E;white-space:normal;word-break:break-word;}
 .grades-table td.ects-cell{font-size:12px;color:#5A5755;font-weight:600;}
 .grade-cell{display:flex;flex-direction:column;align-items:center;gap:2px;}
 .grade-label-input{width:100%;border:none;background:transparent;font-size:10px;color:#5A5755;text-align:center;outline:none;font-family:inherit;font-weight:600;padding:1px 0;}
 .grade-label-input::placeholder{color:#C0BDB7;font-weight:400;}
 .grade-coeff{font-size:10px;color:#8A8680;font-weight:600;}
-.grade-input{width:48px;border:1px solid #E0DDD8;border-radius:6px;padding:3px 4px;font-size:13px;color:#1C1C1E;background:#FAFAF8;outline:none;text-align:center;font-family:inherit;transition:border-color .15s;}
+.grade-input{width:52px;border:1px solid #E0DDD8;border-radius:6px;padding:3px 4px;font-size:13px;color:#1C1C1E;background:#FAFAF8;outline:none;text-align:center;font-family:inherit;transition:border-color .15s;-webkit-appearance:none;-moz-appearance:textfield;appearance:textfield;}
+.grade-input::-webkit-inner-spin-button,.grade-input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0;}
 .grade-coeff-input{-webkit-appearance:none;-moz-appearance:textfield;appearance:textfield;}
 .grade-coeff-input::-webkit-inner-spin-button,.grade-coeff-input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0;}
 .grade-input:focus{border-color:#4A90D9;background:#fff;}
@@ -502,7 +506,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
   .exams-layout{grid-template-columns:1fr;padding:16px 14px 80px;}
   .exam-cards-grid{grid-template-columns:1fr;}
   .grades-table th,.grades-table td{padding:7px 7px;}
-  .grade-input{width:44px;font-size:12px;}
+  .grade-input{width:46px;font-size:12px;}
 }
 </style>
 </head>
@@ -1293,7 +1297,7 @@ async function saveSettingsRemote(){
   if(!supabaseClient) return;
   const { data: { user } } = await supabaseClient.auth.getUser();
   if (!user) return;
-  var settingsData = JSON.stringify({tabs: TABS, tab: tab, projRows: projRows, projPeriods: projPeriods, projDataVersion: PROJ_DATA_VERSION, projGoals: projGoals, examData:{subjects:examData.subjects,s1Grades:examData.s1Grades,s2Grades:examData.s2Grades}, companyLogos:companyLogos});
+  var settingsData = JSON.stringify({tabs: TABS, tab: tab, projRows: projRows, projPeriods: projPeriods, projDataVersion: PROJ_DATA_VERSION, projGoals: projGoals, examData:{subjects:examData.subjects,s1NumExams:examData.s1NumExams,s2NumExams:examData.s2NumExams,s1Grades:examData.s1Grades,s2Grades:examData.s2Grades}, companyLogos:companyLogos});
   var payload={cat:SETTINGS_CAT,text:settingsData,prio:'L',done:true,user_id:user.id};
   if(settingsId){
     await updateRemoteTask(settingsId,{text:settingsData});
@@ -2214,6 +2218,8 @@ var examData={
     {id:'python',   name:'Financial Econometrics (Python)',  color:'#5856D6',step:0,examDate:''},
     {id:'mgmt',     name:'Managerial Skills',                color:'#34C759',step:0,examDate:''}
   ],
+  s1NumExams:2,
+  s2NumExams:2,
   s1Grades:[
     {name:'Spanish',                        ects:'',exams:[{label:'',date:'',coeff:'1',note:''},{label:'',date:'',coeff:'1',note:''},{label:'',date:'',coeff:'1',note:''}]},
     {name:'Climate Finance',                ects:'',exams:[{label:'',date:'',coeff:'1',note:''},{label:'',date:'',coeff:'1',note:''},{label:'',date:'',coeff:'1',note:''}]},
@@ -2251,6 +2257,8 @@ function loadExamData(remoteData){
       g.exams=g.exams.map(function(ex){return {label:ex.label||'',date:ex.date||'',coeff:ex.coeff||'1',note:ex.note||''};});
       return g;
     }
+    if(typeof d.s1NumExams==='number')examData.s1NumExams=d.s1NumExams;
+    if(typeof d.s2NumExams==='number')examData.s2NumExams=d.s2NumExams;
     if(Array.isArray(d.s1Grades)){
       d.s1Grades.forEach(function(g,i){
         migrateGrade(g);
@@ -2315,21 +2323,22 @@ function saveExamDate(subjectId,val){
 
 function updateGrade(sem,rowIdx,examIdx,field,val){
   var grades=sem==='s1'?examData.s1Grades:examData.s2Grades;
+  var numExams=examData[sem+'NumExams']||2;
   if(grades[rowIdx]&&grades[rowIdx].exams[examIdx]){
     grades[rowIdx].exams[examIdx][field]=val;
     saveExamData();
     var meanEl=document.getElementById('mean-'+sem+'-'+rowIdx);
-    if(meanEl)meanEl.innerHTML=calcExamMean(grades[rowIdx]);
+    if(meanEl)meanEl.innerHTML=calcExamMean(grades[rowIdx],numExams);
     var semMeanEl=document.getElementById('sem-mean-'+sem);
-    if(semMeanEl)semMeanEl.innerHTML=calcSemMean(grades);
+    if(semMeanEl)semMeanEl.innerHTML=calcSemMean(grades,numExams);
     if(field==='note'||field==='coeff'){
       var row=grades[rowIdx];
-      for(var i=0;i<row.exams.length;i++){
+      for(var i=0;i<numExams;i++){
         var ex=row.exams[i];
-        if(!ex.note){
+        if(ex&&!ex.note){
           var inp=document.querySelector('[data-grade-key="'+sem+'-'+rowIdx+'-'+i+'"]');
           if(inp){
-            var mn=calcMinNeeded(row,i);
+            var mn=calcMinNeeded(row,i,numExams);
             if(mn===null){inp.placeholder='—';inp.classList.remove('min-needed');}
             else if(mn==='>20'){inp.placeholder='impossible';inp.classList.remove('min-needed');}
             else{inp.placeholder=String(mn);inp.classList.add('min-needed');}
@@ -2342,9 +2351,10 @@ function updateGrade(sem,rowIdx,examIdx,field,val){
 
 function updateExamEcts(sem,rowIdx,val){
   var grades=sem==='s1'?examData.s1Grades:examData.s2Grades;
+  var numExams=examData[sem+'NumExams']||2;
   if(grades[rowIdx]){grades[rowIdx].ects=val;saveExamData();
     var semMeanEl=document.getElementById('sem-mean-'+sem);
-    if(semMeanEl)semMeanEl.innerHTML=calcSemMean(grades);
+    if(semMeanEl)semMeanEl.innerHTML=calcSemMean(grades,numExams);
   }
 }
 
@@ -2355,13 +2365,30 @@ function updateSubjectName(sem,rowIdx,val){
 
 function addExamGradeRow(sem){
   var grades=sem==='s1'?examData.s1Grades:examData.s2Grades;
-  grades.push({name:'',ects:'',exams:[{label:'',date:'',coeff:'1',note:''},{label:'',date:'',coeff:'1',note:''},{label:'',date:'',coeff:'1',note:''}]});
+  var n=examData[sem+'NumExams']||2;
+  var exams=[];
+  for(var i=0;i<n;i++)exams.push({label:'',date:'',coeff:'1',note:''});
+  grades.push({name:'',ects:'',exams:exams});
   saveExamData();rExams();
 }
 
-function calcExamMean(row){
+function addExamColumn(sem){
+  var key=sem+'NumExams';
+  if(typeof examData[key]!=='number')examData[key]=2;
+  examData[key]++;
+  var grades=sem==='s1'?examData.s1Grades:examData.s2Grades;
+  var n=examData[key];
+  grades.forEach(function(row){
+    while(row.exams.length<n)row.exams.push({label:'',date:'',coeff:'1',note:''});
+  });
+  saveExamData();
+  rExams();
+}
+
+function calcExamMean(row,numExams){
+  var exams=(numExams&&numExams<row.exams.length)?row.exams.slice(0,numExams):row.exams;
   var total=0,totalCoeff=0;
-  row.exams.forEach(function(ex){
+  exams.forEach(function(ex){
     var n=parseFloat(ex.note),c=parseFloat(ex.coeff)||1;
     if(!isNaN(n)){total+=n*c;totalCoeff+=c;}
   });
@@ -2371,13 +2398,14 @@ function calcExamMean(row){
   return '<span class="grade-mean" style="color:'+color+'">'+mean.toFixed(2)+'</span>';
 }
 
-function calcSemMean(grades){
+function calcSemMean(grades,numExams){
   var weightedSum=0,totalEcts=0;
   grades.forEach(function(row){
     var ects=parseFloat(row.ects)||0;
     if(ects===0)return;
+    var exams=(numExams&&numExams<row.exams.length)?row.exams.slice(0,numExams):row.exams;
     var total=0,totalCoeff=0;
-    row.exams.forEach(function(ex){
+    exams.forEach(function(ex){
       var n=parseFloat(ex.note),c=parseFloat(ex.coeff)||1;
       if(!isNaN(n)){total+=n*c;totalCoeff+=c;}
     });
@@ -2524,21 +2552,13 @@ function addExamSubject(){
   setTimeout(function(){startEditExamName(id);},30);
 }
 
-function calcMinNeeded(row,examIdx){
-  // Calculate minimum grade needed in exam[examIdx] to achieve 10/20 average
-  // considering other empty evals will also need to contribute at their minimum
-  var totalCoeff=0,earnedWeighted=0;
-  row.exams.forEach(function(ex){
-    var c=parseFloat(ex.coeff)||1;
-    totalCoeff+=c;
-    var n=parseFloat(ex.note);
-    if(!isNaN(n))earnedWeighted+=n*c;
-  });
-  // Only calculate if this exam is empty
-  var thisCoeff=parseFloat(row.exams[examIdx]&&row.exams[examIdx].coeff)||1;
-  // Needed weighted score from this exam alone (assuming other empty evals get 10)
+function calcMinNeeded(row,examIdx,numExams){
+  var exams=(numExams&&numExams<row.exams.length)?row.exams.slice(0,numExams):row.exams;
+  var totalCoeff=0;
+  exams.forEach(function(ex){totalCoeff+=parseFloat(ex.coeff)||1;});
+  var thisCoeff=parseFloat(exams[examIdx]&&exams[examIdx].coeff)||1;
   var otherEmptyWeighted=0;
-  row.exams.forEach(function(ex,i){
+  exams.forEach(function(ex,i){
     if(i===examIdx)return;
     var c=parseFloat(ex.coeff)||1;
     var n=parseFloat(ex.note);
@@ -2553,11 +2573,22 @@ function calcMinNeeded(row,examIdx){
 
 function buildGradesTable(sem){
   var grades=sem==='s1'?examData.s1Grades:examData.s2Grades;
+  var numExams=examData[sem+'NumExams']||2;
   var html='<div class="grades-section"><div class="grades-table-wrap">';
   html+='<table class="grades-table">';
-  html+='<colgroup><col style="width:160px"><col style="width:46px"><col style="width:110px"><col style="width:110px"><col style="width:110px"><col style="width:68px"></colgroup>';
+  html+='<colgroup><col style="width:160px"><col style="width:46px">';
+  for(var ci=0;ci<numExams;ci++)html+='<col style="width:110px">';
+  html+='<col style="width:68px"></colgroup>';
   html+='<thead><tr>';
-  html+='<th class="subject-col">Matière</th><th>ECTS</th><th>Éval. 1</th><th>Éval. 2</th><th>Éval. 3</th><th>Moy.</th>';
+  html+='<th class="subject-col">Matière</th><th>ECTS</th>';
+  for(var ci=0;ci<numExams;ci++){
+    if(ci===numExams-1){
+      html+='<th>Éval. '+(ci+1)+' <button onclick="addExamColumn(\''+sem+'\')" title="Ajouter une épreuve" style="font-size:10px;background:#4A90D9;color:#fff;border:none;border-radius:4px;padding:1px 6px;cursor:pointer;margin-left:4px;font-family:inherit;line-height:1.4;">+</button></th>';
+    }else{
+      html+='<th>Éval. '+(ci+1)+'</th>';
+    }
+  }
+  html+='<th>Moy.</th>';
   html+='</tr></thead><tbody>';
 
   var totalEcts=0;
@@ -2565,9 +2596,9 @@ function buildGradesTable(sem){
     html+='<tr>';
     html+='<td class="subject-name"><input style="width:100%;border:none;background:transparent;font-size:13px;font-weight:500;color:#1C1C1E;outline:none;font-family:inherit;" value="'+e(row.name)+'" placeholder="Matière..." oninput="updateSubjectName(\''+sem+'\','+rowIdx+',this.value)"></td>';
     html+='<td class="ects-cell"><input class="ects-input" type="number" min="0" max="30" value="'+e(row.ects)+'" placeholder="—" oninput="updateExamEcts(\''+sem+'\','+rowIdx+',this.value)"></td>';
-    for(var i=0;i<3;i++){
+    for(var i=0;i<numExams;i++){
       var ex=row.exams[i]||{label:'',date:'',coeff:'1',note:''};
-      var minNeed=(!ex.note)?calcMinNeeded(row,i):null;
+      var minNeed=(!ex.note)?calcMinNeeded(row,i,numExams):null;
       var minPlaceholder=(minNeed===null)?'—':(minNeed==='>20'?'impossible':String(minNeed));
       var minIsBlue=(minNeed!==null&&minNeed!=='>20');
       html+='<td><div class="grade-cell">';
@@ -2579,18 +2610,17 @@ function buildGradesTable(sem){
       html+='<input class="grade-input'+(ex.note?' has-value':'')+(minIsBlue?' min-needed':'')+'" data-grade-key="'+sem+'-'+rowIdx+'-'+i+'" type="number" min="0" max="20" step="0.25" value="'+e(ex.note||'')+'" placeholder="'+minPlaceholder+'" oninput="updateGrade(\''+sem+'\','+rowIdx+','+i+',\'note\',this.value)">';
       html+='</div></div></td>';
     }
-    html+='<td id="mean-'+sem+'-'+rowIdx+'">'+calcExamMean(row)+'</td>';
+    html+='<td id="mean-'+sem+'-'+rowIdx+'">'+calcExamMean(row,numExams)+'</td>';
     html+='</tr>';
     var ects=parseFloat(row.ects)||0;totalEcts+=ects;
   });
 
-  // Total row
   var totalEctsDisp=totalEcts>0?totalEcts:'—';
   html+='<tr class="grades-total-row">';
   html+='<td class="subject-name">Total / Moyenne pondérée</td>';
   html+='<td class="ects-cell" style="font-weight:700;">'+totalEctsDisp+'</td>';
-  html+='<td colspan="3"></td>';
-  html+='<td id="sem-mean-'+sem+'">'+calcSemMean(grades)+'</td>';
+  html+='<td colspan="'+numExams+'"></td>';
+  html+='<td id="sem-mean-'+sem+'">'+calcSemMean(grades,numExams)+'</td>';
   html+='</tr>';
 
   html+='</tbody></table>';
