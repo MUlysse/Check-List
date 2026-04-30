@@ -2273,11 +2273,12 @@ function loadExamData(remoteData){
     }
     function migrateGrade(g){
       if(!g.exams)g.exams=[];
-      g.exams=g.exams.map(function(ex){return {label:ex.label||'',date:ex.date||'',coeff:ex.coeff||'1',note:ex.note||''};});
+      g.exams=g.exams.map(function(ex){return Object.assign({label:'',date:'',coeff:'1',note:''},ex);});
       if(typeof g.numExams!=='number'){
         var has3=g.exams[2]&&(g.exams[2].note||g.exams[2].label||g.exams[2].date);
         g.numExams=has3?3:2;
       }
+      while(g.exams.length<(g.numExams||2))g.exams.push({label:'',date:'',coeff:'1',note:''});
       return g;
     }
     if(typeof d.s1NumExams==='number')examData.s1NumExams=d.s1NumExams;
@@ -2361,6 +2362,8 @@ function updateGrade(sem,rowIdx,examIdx,field,val){
         dateInp.style.color=_dfut?'#FF3B30':'#B0ADA8';
         dateInp.style.fontWeight=_dfut?'700':'400';
       }
+      var _ap3=rowAllDatesPast(row);var _rn3=row.numExams||2;
+      for(var _k=0;_k<_rn3;_k++){var _cw3=document.querySelector('[data-confirm-wrap="'+sem+'-'+rowIdx+'-'+_k+'"]');if(_cw3&&row.exams[_k])_cw3.style.display=(!_ap3&&row.exams[_k].note)?'inline':'none';}
     }
     if(field==='note'){
       updateExamGradeColor(sem,rowIdx,examIdx);
@@ -2607,6 +2610,17 @@ function calcMinNeeded(row,examIdx){
   return Math.round(needed*100)/100;
 }
 
+function rowAllDatesPast(row){
+  var rowN=row.numExams||2;
+  for(var i=0;i<rowN;i++){
+    var ex=row.exams[i];
+    if(!ex||!ex.date)return false;
+    var dp=ex.date.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+    if(dp){var d=new Date(parseInt(dp[3]),parseInt(dp[2])-1,parseInt(dp[1]));var td=new Date();td.setHours(0,0,0,0);if(d>td)return false;}
+  }
+  return true;
+}
+
 function getGradeStyle(ex){
   if(!ex.note)return{color:'',fontWeight:''};
   if(ex.confirmed===true)return{color:'#34C759',fontWeight:'600'};
@@ -2623,7 +2637,8 @@ function updateExamGradeColor(sem,rowIdx,examIdx){
     if(ex.note){var gs=getGradeStyle(ex);gi.style.color=gs.color;gi.style.fontWeight=gs.fontWeight;gi.style.fontStyle='';}
     else{gi.style.color='';gi.style.fontWeight='';gi.style.fontStyle='';}
   }
-  if(cw){cw.style.display=ex.note?'inline':'none';cw.textContent=(ex.confirmed===true)?'V':'B';}
+  var _ap=rowAllDatesPast(row);
+  if(cw){cw.style.display=(!_ap&&ex.note)?'inline':'none';cw.textContent=(ex.confirmed===true)?'B':'V';}
 }
 
 function toggleGradeConfirmed(sem,rowIdx,examIdx){
@@ -2651,6 +2666,7 @@ function buildGradesTable(sem){
   var totalEcts=0;
   grades.forEach(function(row,rowIdx){
     var rowN=row.numExams||2;
+    var _allPast=rowAllDatesPast(row);
     html+='<tr>';
     html+='<td class="subject-name"><textarea rows="1" style="width:100%;border:none;background:transparent;font-size:13px;font-weight:500;color:#1C1C1E;outline:none;font-family:inherit;resize:none;overflow:hidden;padding:0;margin:0;display:block;line-height:1.4;box-sizing:border-box;" placeholder="Matière..." oninput="this.style.height=\'auto\';this.style.height=this.scrollHeight+\'px\';updateSubjectName(\''+sem+'\','+rowIdx+',this.value)">'+e(row.name)+'</textarea></td>';
     html+='<td class="ects-cell"><input class="ects-input" type="number" min="0" max="30" value="'+e(row.ects)+'" placeholder="—" oninput="updateExamEcts(\''+sem+'\','+rowIdx+',this.value)"></td>';
@@ -2666,13 +2682,13 @@ function buildGradesTable(sem){
         var dateColor=dateFuture?'#FF3B30':'#B0ADA8';var dateFW=dateFuture?'700':'400';
         html+='<input data-date-key="'+sem+'-'+rowIdx+'-'+i+'" style="width:100%;border:none;background:transparent;font-size:9px;color:'+dateColor+';font-weight:'+dateFW+';text-align:center;outline:none;font-family:inherit;padding:1px 0;" type="text" placeholder="date" value="'+e(ex.date||'')+'" oninput="updateGrade(\''+sem+'\','+rowIdx+','+i+',\'date\',this.value)">';
         html+='<div style="display:flex;align-items:center;gap:2px;justify-content:center;margin-top:2px;">';
-        html+='<span style="font-size:9px;color:#8A8680;font-weight:600;flex-shrink:0;">×</span>';
-        html+='<input class="grade-coeff-input" style="width:28px;box-sizing:border-box;border:1px solid #E0DDD8;border-radius:4px;padding:2px;font-size:10px;font-weight:600;text-align:center;outline:none;font-family:inherit;background:#FAFAF8;" type="number" min="0" max="10" step="0.5" value="'+e(ex.coeff||'1')+'" oninput="updateGrade(\''+sem+'\','+rowIdx+','+i+',\'coeff\',this.value)">';
+        html+='<input class="grade-coeff-input" style="width:30px;border:1px solid #E0DDD8;border-radius:5px;padding:2px 3px;font-size:11px;font-weight:600;text-align:center;outline:none;font-family:inherit;background:#FAFAF8;" type="number" min="0" max="100" step="0.5" value="'+e(ex.coeff||'1')+'" oninput="updateGrade(\''+sem+'\','+rowIdx+','+i+',\'coeff\',this.value)">';
         var _gradeStyle=getGradeStyle(ex);
         var _gradeStyleStr=ex.note?'color:'+_gradeStyle.color+';font-weight:'+_gradeStyle.fontWeight+';':'';
-        var _bvLabel=(ex.confirmed===true)?'V':'B';
-        html+='<input class="grade-input'+(ex.note?' has-value':'')+(minIsBlue?' min-needed':'')+'" style="width:40px;box-sizing:border-box;'+_gradeStyleStr+'" data-grade-key="'+sem+'-'+rowIdx+'-'+i+'" type="number" min="0" max="20" step="0.25" value="'+e(ex.note||'')+'" placeholder="'+minPlaceholder+'" oninput="updateGrade(\''+sem+'\','+rowIdx+','+i+',\'note\',this.value)">';
-        html+='<span data-confirm-wrap="'+sem+'-'+rowIdx+'-'+i+'" onclick="toggleGradeConfirmed(\''+sem+'\','+rowIdx+','+i+')" style="display:'+(ex.note?'inline':'none')+';font-size:9px;color:#C8C4BF;cursor:pointer;font-weight:700;user-select:none;flex-shrink:0;line-height:1;">'+_bvLabel+'</span>';
+        var _showBV=!_allPast&&!!ex.note;
+        var _bvLabel=(ex.confirmed===true)?'B':'V';
+        html+='<input class="grade-input'+(ex.note?' has-value':'')+(minIsBlue?' min-needed':'')+'" style="'+_gradeStyleStr+'" data-grade-key="'+sem+'-'+rowIdx+'-'+i+'" type="number" min="0" max="20" step="0.25" value="'+e(ex.note||'')+'" placeholder="'+minPlaceholder+'" oninput="updateGrade(\''+sem+'\','+rowIdx+','+i+',\'note\',this.value)">';
+        html+='<span data-confirm-wrap="'+sem+'-'+rowIdx+'-'+i+'" onclick="toggleGradeConfirmed(\''+sem+'\','+rowIdx+','+i+')" style="display:'+(_showBV?'inline':'none')+';font-size:9px;color:#C8C4BF;cursor:pointer;font-weight:700;user-select:none;flex-shrink:0;line-height:1;">'+_bvLabel+'</span>';
         html+='</div></div></td>';
       } else {
         html+='<td class="grade-add-col-cell"><button class="grade-add-col-btn" onclick="activateRowExam(\''+sem+'\','+rowIdx+','+i+')" title="Ajouter cette épreuve">+</button></td>';
