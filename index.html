@@ -2362,8 +2362,8 @@ function updateGrade(sem,rowIdx,examIdx,field,val){
         dateInp.style.color=_dfut?'#FF3B30':'#B0ADA8';
         dateInp.style.fontWeight=_dfut?'700':'400';
       }
-      var _ap3=rowAllDatesPast(row);var _rn3=row.numExams||2;
-      for(var _k=0;_k<_rn3;_k++){var _cw3=document.querySelector('[data-confirm-wrap="'+sem+'-'+rowIdx+'-'+_k+'"]');if(_cw3&&row.exams[_k])_cw3.style.display=(!_ap3&&row.exams[_k].note)?'inline':'none';}
+      var _rn3=row.numExams||2;
+      for(var _k=0;_k<_rn3;_k++){var _cw3=document.querySelector('[data-confirm-wrap="'+sem+'-'+rowIdx+'-'+_k+'"]');if(_cw3&&row.exams[_k])_cw3.style.display=row.exams[_k].note?'inline':'none';}
     }
     if(field==='note'){
       updateExamGradeColor(sem,rowIdx,examIdx);
@@ -2616,7 +2616,8 @@ function rowAllDatesPast(row){
     var ex=row.exams[i];
     if(!ex||!ex.date)return false;
     var dp=ex.date.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
-    if(dp){var d=new Date(parseInt(dp[3]),parseInt(dp[2])-1,parseInt(dp[1]));var td=new Date();td.setHours(0,0,0,0);if(d>td)return false;}
+    if(!dp)return false;
+    var d=new Date(parseInt(dp[3]),parseInt(dp[2])-1,parseInt(dp[1]));var td=new Date();td.setHours(0,0,0,0);if(d>td)return false;
   }
   return true;
 }
@@ -2637,8 +2638,7 @@ function updateExamGradeColor(sem,rowIdx,examIdx){
     if(ex.note){var gs=getGradeStyle(ex);gi.style.color=gs.color;gi.style.fontWeight=gs.fontWeight;gi.style.fontStyle='';}
     else{gi.style.color='';gi.style.fontWeight='';gi.style.fontStyle='';}
   }
-  var _ap=rowAllDatesPast(row);
-  if(cw){cw.style.display=(!_ap&&ex.note)?'inline':'none';cw.textContent=(ex.confirmed===true)?'B':'V';}
+  if(cw){cw.style.display=ex.note?'inline':'none';cw.textContent=(ex.confirmed===true)?'B':'V';}
 }
 
 function toggleGradeConfirmed(sem,rowIdx,examIdx){
@@ -2685,7 +2685,7 @@ function buildGradesTable(sem){
         html+='<input class="grade-coeff-input" style="width:30px;border:1px solid #E0DDD8;border-radius:5px;padding:2px 3px;font-size:11px;font-weight:600;text-align:center;outline:none;font-family:inherit;background:#FAFAF8;" type="number" min="0" max="100" step="0.5" value="'+e(ex.coeff||'1')+'" oninput="updateGrade(\''+sem+'\','+rowIdx+','+i+',\'coeff\',this.value)">';
         var _gradeStyle=getGradeStyle(ex);
         var _gradeStyleStr=ex.note?'color:'+_gradeStyle.color+';font-weight:'+_gradeStyle.fontWeight+';':'';
-        var _showBV=!_allPast&&!!ex.note;
+        var _showBV=!!ex.note;
         var _bvLabel=(ex.confirmed===true)?'B':'V';
         html+='<input class="grade-input'+(ex.note?' has-value':'')+(minIsBlue?' min-needed':'')+'" style="'+_gradeStyleStr+'" data-grade-key="'+sem+'-'+rowIdx+'-'+i+'" type="number" min="0" max="20" step="0.25" value="'+e(ex.note||'')+'" placeholder="'+minPlaceholder+'" oninput="updateGrade(\''+sem+'\','+rowIdx+','+i+',\'note\',this.value)">';
         html+='<span data-confirm-wrap="'+sem+'-'+rowIdx+'-'+i+'" onclick="toggleGradeConfirmed(\''+sem+'\','+rowIdx+','+i+')" style="display:'+(_showBV?'inline':'none')+';font-size:9px;color:#C8C4BF;cursor:pointer;font-weight:700;user-select:none;flex-shrink:0;line-height:1;">'+_bvLabel+'</span>';
