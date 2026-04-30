@@ -2613,7 +2613,7 @@ function getRowColorMode(row){
   for(var i=0;i<rowN;i++){
     var ex=row.exams[i];
     if(!ex){hasFutureOrNone=true;continue;}
-    if(ex.date){var dp=ex.date.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);if(dp){var d=new Date(parseInt(dp[3]),parseInt(dp[2])-1,parseInt(dp[1]));var td=new Date();td.setHours(0,0,0,0);if(d<=td)hasPast=true;else hasFutureOrNone=true;}else hasFutureOrNone=true;}else hasFutureOrNone=true;
+    if(ex.date){var dp=ex.date.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);if(dp){var d=new Date(parseInt(dp[3]),parseInt(dp[2])-1,parseInt(dp[1]));var td=new Date();td.setHours(0,0,0,0);if(d<=td)hasPast=true;else hasFutureOrNone=true;}else hasPast=true;}else hasFutureOrNone=true;
   }
   if(hasPast&&!hasFutureOrNone)return 'all-past';
   if(!hasPast)return 'all-future';
@@ -2626,7 +2626,7 @@ function getGradeStyle(ex,colorMode){
   if(colorMode==='all-future')return{color:'#1C1C1E',fontWeight:'600',fontStyle:'italic'};
   if(ex.confirmed===true)return{color:'#34C759',fontWeight:'600',fontStyle:'normal'};
   if(ex.confirmed===false)return{color:'#1C1C1E',fontWeight:'600',fontStyle:'italic'};
-  if(ex.date){var dp=ex.date.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);if(dp){var d=new Date(parseInt(dp[3]),parseInt(dp[2])-1,parseInt(dp[1]));var td=new Date();td.setHours(0,0,0,0);if(d<=td)return{color:'#34C759',fontWeight:'600',fontStyle:'normal'};}}
+  if(ex.date){var dp=ex.date.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);if(dp){var d=new Date(parseInt(dp[3]),parseInt(dp[2])-1,parseInt(dp[1]));var td=new Date();td.setHours(0,0,0,0);if(d<=td)return{color:'#34C759',fontWeight:'600',fontStyle:'normal'};}else return{color:'#34C759',fontWeight:'600',fontStyle:'normal'};}
   return{color:'#1C1C1E',fontWeight:'600',fontStyle:'italic'};
 }
 
@@ -2695,8 +2695,8 @@ function buildGradesTable(sem){
         var _showCB=(colorMode==='mixed'&&!!ex.note);
         html+='<input class="grade-input'+(ex.note?' has-value':'')+(minIsBlue?' min-needed':'')+'" style="'+_gradeStyleStr+'" data-grade-key="'+sem+'-'+rowIdx+'-'+i+'" type="number" min="0" max="20" step="0.25" value="'+e(ex.note||'')+'" placeholder="'+minPlaceholder+'" oninput="updateGrade(\''+sem+'\','+rowIdx+','+i+',\'note\',this.value)">';
         html+='<div data-confirm-wrap="'+sem+'-'+rowIdx+'-'+i+'" style="display:'+(_showCB?'flex':'none')+';flex-direction:column;gap:2px;margin-left:2px;">';
-        html+='<button style="width:12px;height:12px;border-radius:50%;background:#34C759;border:1.5px solid rgba(0,0,0,0.15);cursor:pointer;padding:0;" onclick="setGradeConfirmed(\''+sem+'\','+rowIdx+','+i+',true)" title="Note officielle"></button>';
-        html+='<button style="width:12px;height:12px;border-radius:50%;background:#3D3B38;border:1.5px solid rgba(0,0,0,0.15);cursor:pointer;padding:0;" onclick="setGradeConfirmed(\''+sem+'\','+rowIdx+','+i+',false)" title="Note provisoire"></button>';
+        html+='<button style="width:9px;height:9px;border-radius:2px;background:#34C759;border:1px solid rgba(0,0,0,0.15);cursor:pointer;padding:0;" onclick="setGradeConfirmed(\''+sem+'\','+rowIdx+','+i+',true)" title="Note officielle"></button>';
+        html+='<button style="width:9px;height:9px;border-radius:2px;background:#3D3B38;border:1px solid rgba(0,0,0,0.15);cursor:pointer;padding:0;" onclick="setGradeConfirmed(\''+sem+'\','+rowIdx+','+i+',false)" title="Note provisoire"></button>';
         html+='</div>';
         html+='</div></div></td>';
       } else {
