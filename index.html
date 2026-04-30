@@ -2338,6 +2338,14 @@ function updateGrade(sem,rowIdx,examIdx,field,val){
     if(meanEl)meanEl.innerHTML=calcExamMean(row);
     var semMeanEl=document.getElementById('sem-mean-'+sem);
     if(semMeanEl)semMeanEl.innerHTML=calcSemMean(grades);
+    if(field==='date'){
+      var dateInp=document.querySelector('[data-date-key="'+sem+'-'+rowIdx+'-'+examIdx+'"]');
+      if(dateInp){
+        var _dfut=false;if(val){var _ddp=val.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);if(_ddp){var _ddd=new Date(parseInt(_ddp[3]),parseInt(_ddp[2])-1,parseInt(_ddp[1]));var _dtd=new Date();_dtd.setHours(0,0,0,0);_dfut=_ddd>_dtd;}}
+        dateInp.style.color=_dfut?'#FF3B30':'#B0ADA8';
+        dateInp.style.fontWeight=_dfut?'700':'400';
+      }
+    }
     if(field==='note'||field==='coeff'){
       var n=row.numExams||2;
       for(var i=0;i<n;i++){
@@ -2390,10 +2398,12 @@ function activateRowExam(sem,rowIdx,examIdx){
 
 function calcExamMean(row){
   var exams=row.exams.slice(0,row.numExams||2);
+  var allFilled=exams.every(function(ex){return ex.note!==''&&!isNaN(parseFloat(ex.note));});
+  if(!allFilled)return '<span class="grade-mean-empty">—</span>';
   var total=0,totalCoeff=0;
   exams.forEach(function(ex){
     var n=parseFloat(ex.note),c=parseFloat(ex.coeff)||1;
-    if(!isNaN(n)){total+=n*c;totalCoeff+=c;}
+    total+=n*c;totalCoeff+=c;
   });
   if(totalCoeff===0)return '<span class="grade-mean-empty">—</span>';
   var mean=Math.round(total/totalCoeff*100)/100;
@@ -2407,10 +2417,12 @@ function calcSemMean(grades){
     var ects=parseFloat(row.ects)||0;
     if(ects===0)return;
     var exams=row.exams.slice(0,row.numExams||2);
+    var allFilled=exams.every(function(ex){return ex.note!==''&&!isNaN(parseFloat(ex.note));});
+    if(!allFilled)return;
     var total=0,totalCoeff=0;
     exams.forEach(function(ex){
       var n=parseFloat(ex.note),c=parseFloat(ex.coeff)||1;
-      if(!isNaN(n)){total+=n*c;totalCoeff+=c;}
+      total+=n*c;totalCoeff+=c;
     });
     if(totalCoeff>0){weightedSum+=(total/totalCoeff)*ects;totalEcts+=ects;}
   });
@@ -2510,6 +2522,7 @@ function rExams(){
 
   gh+='</div>'; // exams-layout
   overlay.innerHTML=gh;
+  overlay.querySelectorAll('td.subject-name textarea').forEach(function(ta){ta.style.height='auto';ta.style.height=ta.scrollHeight+'px';});
 }
 
 function deleteExamSubject(id){
@@ -2593,7 +2606,7 @@ function buildGradesTable(sem){
   grades.forEach(function(row,rowIdx){
     var rowN=row.numExams||2;
     html+='<tr>';
-    html+='<td class="subject-name"><input style="width:100%;border:none;background:transparent;font-size:13px;font-weight:500;color:#1C1C1E;outline:none;font-family:inherit;" value="'+e(row.name)+'" placeholder="Matière..." oninput="updateSubjectName(\''+sem+'\','+rowIdx+',this.value)"></td>';
+    html+='<td class="subject-name"><textarea rows="1" style="width:100%;border:none;background:transparent;font-size:13px;font-weight:500;color:#1C1C1E;outline:none;font-family:inherit;resize:none;overflow:hidden;padding:0;margin:0;display:block;line-height:1.4;box-sizing:border-box;" placeholder="Matière..." oninput="this.style.height=\'auto\';this.style.height=this.scrollHeight+\'px\';updateSubjectName(\''+sem+'\','+rowIdx+',this.value)">'+e(row.name)+'</textarea></td>';
     html+='<td class="ects-cell"><input class="ects-input" type="number" min="0" max="30" value="'+e(row.ects)+'" placeholder="—" oninput="updateExamEcts(\''+sem+'\','+rowIdx+',this.value)"></td>';
     for(var i=0;i<tableN;i++){
       if(i<rowN){
@@ -2603,7 +2616,9 @@ function buildGradesTable(sem){
         var minIsBlue=(minNeed!==null&&minNeed!=='>20');
         html+='<td><div class="grade-cell">';
         html+='<input class="grade-label-input" type="text" placeholder="Épreuve…" value="'+e(ex.label||'')+'" oninput="updateGrade(\''+sem+'\','+rowIdx+','+i+',\'label\',this.value)">';
-        html+='<input style="width:100%;border:none;background:transparent;font-size:9px;color:#B0ADA8;text-align:center;outline:none;font-family:inherit;padding:1px 0;" type="text" placeholder="date" value="'+e(ex.date||'')+'" oninput="updateGrade(\''+sem+'\','+rowIdx+','+i+',\'date\',this.value)">';
+        var dateFuture=false;if(ex.date){var _dp=ex.date.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);if(_dp){var _dd=new Date(parseInt(_dp[3]),parseInt(_dp[2])-1,parseInt(_dp[1]));var _td=new Date();_td.setHours(0,0,0,0);dateFuture=_dd>_td;}}
+        var dateColor=dateFuture?'#FF3B30':'#B0ADA8';var dateFW=dateFuture?'700':'400';
+        html+='<input data-date-key="'+sem+'-'+rowIdx+'-'+i+'" style="width:100%;border:none;background:transparent;font-size:9px;color:'+dateColor+';font-weight:'+dateFW+';text-align:center;outline:none;font-family:inherit;padding:1px 0;" type="text" placeholder="date" value="'+e(ex.date||'')+'" oninput="updateGrade(\''+sem+'\','+rowIdx+','+i+',\'date\',this.value)">';
         html+='<div style="display:flex;align-items:center;gap:3px;justify-content:center;margin-top:2px;">';
         html+='<span class="grade-coeff">×</span>';
         html+='<input class="grade-coeff-input" style="width:36px;border:1px solid #E0DDD8;border-radius:4px;padding:2px 2px;font-size:11px;font-weight:600;text-align:center;outline:none;font-family:inherit;background:#FAFAF8;" type="number" min="0" max="10" step="0.5" value="'+e(ex.coeff||'1')+'" oninput="updateGrade(\''+sem+'\','+rowIdx+','+i+',\'coeff\',this.value)">';
