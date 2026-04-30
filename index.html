@@ -2363,8 +2363,7 @@ function updateGrade(sem,rowIdx,examIdx,field,val){
       }
     }
     if(field==='note'||field==='date'){
-      var _gi=document.querySelector('[data-grade-key="'+sem+'-'+rowIdx+'-'+examIdx+'"]');
-      if(_gi){var _gex=row.exams[examIdx];if(_gex&&_gex.note){var _gpast=false;if(_gex.date){var _gdp2=_gex.date.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);if(_gdp2){var _gd2=new Date(parseInt(_gdp2[3]),parseInt(_gdp2[2])-1,parseInt(_gdp2[1]));var _gt2=new Date();_gt2.setHours(0,0,0,0);_gpast=_gd2<=_gt2;}}_gi.style.color=_gpast?'#34C759':'#1C1C1E';}else{_gi.style.color='';}}
+      updateRowGradeColors(sem,rowIdx);
     }
     if(field==='note'||field==='coeff'){
       var n=row.numExams||2;
@@ -2608,6 +2607,54 @@ function calcMinNeeded(row,examIdx){
   return Math.round(needed*100)/100;
 }
 
+function getRowColorMode(row){
+  var rowN=row.numExams||2;
+  var hasPast=false,hasFutureOrNone=false;
+  for(var i=0;i<rowN;i++){
+    var ex=row.exams[i];
+    if(!ex){hasFutureOrNone=true;continue;}
+    if(ex.date){var dp=ex.date.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);if(dp){var d=new Date(parseInt(dp[3]),parseInt(dp[2])-1,parseInt(dp[1]));var td=new Date();td.setHours(0,0,0,0);if(d<=td)hasPast=true;else hasFutureOrNone=true;}else hasFutureOrNone=true;}else hasFutureOrNone=true;
+  }
+  if(hasPast&&!hasFutureOrNone)return 'all-past';
+  if(!hasPast)return 'all-future';
+  return 'mixed';
+}
+
+function getGradeStyle(ex,colorMode){
+  if(!ex.note)return{color:'',fontWeight:'',fontStyle:''};
+  if(colorMode==='all-past')return{color:'#34C759',fontWeight:'600',fontStyle:'normal'};
+  if(colorMode==='all-future')return{color:'#1C1C1E',fontWeight:'600',fontStyle:'italic'};
+  if(ex.confirmed===true)return{color:'#34C759',fontWeight:'600',fontStyle:'normal'};
+  if(ex.confirmed===false)return{color:'#1C1C1E',fontWeight:'600',fontStyle:'italic'};
+  if(ex.date){var dp=ex.date.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);if(dp){var d=new Date(parseInt(dp[3]),parseInt(dp[2])-1,parseInt(dp[1]));var td=new Date();td.setHours(0,0,0,0);if(d<=td)return{color:'#34C759',fontWeight:'600',fontStyle:'normal'};}}
+  return{color:'#1C1C1E',fontWeight:'600',fontStyle:'italic'};
+}
+
+function updateRowGradeColors(sem,rowIdx){
+  var grades=sem==='s1'?examData.s1Grades:examData.s2Grades;
+  var row=grades[rowIdx];if(!row)return;
+  var colorMode=getRowColorMode(row);
+  var rowN=row.numExams||2;
+  for(var i=0;i<rowN;i++){
+    var ex=row.exams[i];if(!ex)continue;
+    var gi=document.querySelector('[data-grade-key="'+sem+'-'+rowIdx+'-'+i+'"]');
+    var cw=document.querySelector('[data-confirm-wrap="'+sem+'-'+rowIdx+'-'+i+'"]');
+    if(gi){
+      if(ex.note){var gs=getGradeStyle(ex,colorMode);gi.style.color=gs.color;gi.style.fontWeight=gs.fontWeight;gi.style.fontStyle=gs.fontStyle;}
+      else{gi.style.color='';gi.style.fontWeight='';gi.style.fontStyle='';}
+    }
+    if(cw)cw.style.display=(colorMode==='mixed'&&!!ex.note)?'flex':'none';
+  }
+}
+
+function setGradeConfirmed(sem,rowIdx,examIdx,val){
+  var grades=sem==='s1'?examData.s1Grades:examData.s2Grades;
+  var row=grades[rowIdx];if(!row||!row.exams[examIdx])return;
+  row.exams[examIdx].confirmed=val;
+  saveExamData();
+  updateRowGradeColors(sem,rowIdx);
+}
+
 function buildGradesTable(sem){
   var grades=sem==='s1'?examData.s1Grades:examData.s2Grades;
   var tableN=examData[sem+'NumExams']||3;
@@ -2625,6 +2672,7 @@ function buildGradesTable(sem){
   var totalEcts=0;
   grades.forEach(function(row,rowIdx){
     var rowN=row.numExams||2;
+    var colorMode=getRowColorMode(row);
     html+='<tr>';
     html+='<td class="subject-name"><textarea rows="1" style="width:100%;border:none;background:transparent;font-size:13px;font-weight:500;color:#1C1C1E;outline:none;font-family:inherit;resize:none;overflow:hidden;padding:0;margin:0;display:block;line-height:1.4;box-sizing:border-box;" placeholder="Matière..." oninput="this.style.height=\'auto\';this.style.height=this.scrollHeight+\'px\';updateSubjectName(\''+sem+'\','+rowIdx+',this.value)">'+e(row.name)+'</textarea></td>';
     html+='<td class="ects-cell"><input class="ects-input" type="number" min="0" max="30" value="'+e(row.ects)+'" placeholder="—" oninput="updateExamEcts(\''+sem+'\','+rowIdx+',this.value)"></td>';
@@ -2642,8 +2690,14 @@ function buildGradesTable(sem){
         html+='<div style="display:flex;align-items:center;gap:3px;justify-content:center;margin-top:2px;">';
         html+='<span class="grade-coeff">×</span>';
         html+='<input class="grade-coeff-input" style="width:36px;border:1px solid #E0DDD8;border-radius:4px;padding:2px 2px;font-size:11px;font-weight:600;text-align:center;outline:none;font-family:inherit;background:#FAFAF8;" type="number" min="0" max="10" step="0.5" value="'+e(ex.coeff||'1')+'" oninput="updateGrade(\''+sem+'\','+rowIdx+','+i+',\'coeff\',this.value)">';
-        var _gnColor='#1C1C1E';if(ex.note&&ex.date){var _gnDp=ex.date.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);if(_gnDp){var _gnD=new Date(parseInt(_gnDp[3]),parseInt(_gnDp[2])-1,parseInt(_gnDp[1]));var _gnT=new Date();_gnT.setHours(0,0,0,0);if(_gnD<=_gnT)_gnColor='#34C759';}}
-        html+='<input class="grade-input'+(ex.note?' has-value':'')+(minIsBlue?' min-needed':'')+'" style="'+(ex.note?'color:'+_gnColor+';font-weight:600;':'')+'" data-grade-key="'+sem+'-'+rowIdx+'-'+i+'" type="number" min="0" max="20" step="0.25" value="'+e(ex.note||'')+'" placeholder="'+minPlaceholder+'" oninput="updateGrade(\''+sem+'\','+rowIdx+','+i+',\'note\',this.value)">';
+        var _gradeStyle=getGradeStyle(ex,colorMode);
+        var _gradeStyleStr=ex.note?'color:'+_gradeStyle.color+';font-weight:'+_gradeStyle.fontWeight+';font-style:'+_gradeStyle.fontStyle+';':'';
+        var _showCB=(colorMode==='mixed'&&!!ex.note);
+        html+='<input class="grade-input'+(ex.note?' has-value':'')+(minIsBlue?' min-needed':'')+'" style="'+_gradeStyleStr+'" data-grade-key="'+sem+'-'+rowIdx+'-'+i+'" type="number" min="0" max="20" step="0.25" value="'+e(ex.note||'')+'" placeholder="'+minPlaceholder+'" oninput="updateGrade(\''+sem+'\','+rowIdx+','+i+',\'note\',this.value)">';
+        html+='<div data-confirm-wrap="'+sem+'-'+rowIdx+'-'+i+'" style="display:'+(_showCB?'flex':'none')+';flex-direction:column;gap:2px;margin-left:2px;">';
+        html+='<button style="width:12px;height:12px;border-radius:50%;background:#34C759;border:1.5px solid rgba(0,0,0,0.15);cursor:pointer;padding:0;" onclick="setGradeConfirmed(\''+sem+'\','+rowIdx+','+i+',true)" title="Note officielle"></button>';
+        html+='<button style="width:12px;height:12px;border-radius:50%;background:#3D3B38;border:1.5px solid rgba(0,0,0,0.15);cursor:pointer;padding:0;" onclick="setGradeConfirmed(\''+sem+'\','+rowIdx+','+i+',false)" title="Note provisoire"></button>';
+        html+='</div>';
         html+='</div></div></td>';
       } else {
         html+='<td class="grade-add-col-cell"><button class="grade-add-col-btn" onclick="activateRowExam(\''+sem+'\','+rowIdx+','+i+')" title="Ajouter cette épreuve">+</button></td>';
