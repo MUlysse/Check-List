@@ -2085,22 +2085,36 @@ async function loadContactsRemote(){
   var res=await supabaseClient.from(SUPABASE_TABLE_CONTACTS).select().eq('user_id',user.id).order('id',{ascending:true});
   if(res.error)throw res.error;
   if(Array.isArray(res.data)){
-    var savedLogos={},savedSortOrders={};
-    contacts.forEach(function(c){
-      if(c.id&&c.company_logo)savedLogos[String(c.id)]=c.company_logo;
-      if(c.id&&c.sortOrder!==undefined)savedSortOrders[String(c.id)]=c.sortOrder;
-    });
-    var logoPushPromises=[];
+    // Snapshot ALL local fields before overwriting
+    var localById={};
+    contacts.forEach(function(c){localById[String(c.id)]=c;});
+    // best(): prefer non-empty Supabase value, fall back to local
+    function best(rv,lv){return(rv!=null&&rv!=='')?rv:(lv||'');}
+    var syncBack=[];
     contacts=res.data.map(function(c){
-      var resolvedLogo=c.company_logo||savedLogos[String(c.id)]||companyLogos[c.company||'']||'';
-      var resolvedOrder=typeof c.sort_order==='number'?c.sort_order:(savedSortOrders[String(c.id)]!==undefined?savedSortOrders[String(c.id)]:undefined);
-      // Migrate local logo to Supabase if Supabase has none
-      if(!c.company_logo&&savedLogos[String(c.id)]){
-        logoPushPromises.push(supabaseClient.from(SUPABASE_TABLE_CONTACTS).update({company_logo:resolvedLogo}).eq('id',c.id));
-      }
-      return {id:c.id,fname:c.fname||'',lname:c.lname||'',company:c.company||'',pos:c.pos||'',date:c.date||'',prox:c.prox||'Faible',mail_url:c.mail_url||'',phone:c.phone||'',linkedin:c.linkedin||'',photo:c.photo||'',notes:c.notes||'',company_logo:resolvedLogo,sortOrder:resolvedOrder};
+      var loc=localById[String(c.id)]||{};
+      var resolvedPhone=best(c.phone,loc.phone);
+      var resolvedPhoto=best(c.photo,loc.photo);
+      var resolvedMail=best(c.mail_url,loc.mail_url);
+      var resolvedLinkedin=best(c.linkedin,loc.linkedin);
+      var resolvedNotes=best(c.notes,loc.notes);
+      var resolvedLogo=best(c.company_logo,loc.company_logo||companyLogos[c.company||'']||'');
+      var resolvedOrder=typeof c.sort_order==='number'?c.sort_order:(loc.sortOrder!==undefined?loc.sortOrder:undefined);
+      // Push back to Supabase any field that local had but remote was missing
+      var patch={};
+      if(!c.phone&&resolvedPhone)patch.phone=resolvedPhone;
+      if(!c.photo&&resolvedPhoto)patch.photo=resolvedPhoto;
+      if(!c.mail_url&&resolvedMail)patch.mail_url=resolvedMail;
+      if(!c.linkedin&&resolvedLinkedin)patch.linkedin=resolvedLinkedin;
+      if(!c.company_logo&&resolvedLogo)patch.company_logo=resolvedLogo;
+      if(Object.keys(patch).length)syncBack.push({id:c.id,patch:patch});
+      return {id:c.id,fname:c.fname||'',lname:c.lname||'',company:c.company||'',pos:c.pos||'',date:c.date||'',prox:c.prox||'Faible',mail_url:resolvedMail,phone:resolvedPhone,linkedin:resolvedLinkedin,photo:resolvedPhoto,notes:resolvedNotes,company_logo:resolvedLogo,sortOrder:resolvedOrder};
     });
-    if(logoPushPromises.length)Promise.all(logoPushPromises).catch(function(){});
+    if(syncBack.length){
+      syncBack.forEach(function(item){
+        supabaseClient.from(SUPABASE_TABLE_CONTACTS).update(item.patch).eq('id',item.id).eq('user_id',user.id).then(function(){}).catch(function(){});
+      });
+    }
     buildCompanyLogos();
     saveTasks();
     if(currentView==='Networking')render();
@@ -2115,11 +2129,12 @@ async function insertRemoteContact(c){
   var payload=Object.assign({user_id:user.id},contactToPayload(c));
   var res=await supabaseClient.from(SUPABASE_TABLE_CONTACTS).insert([payload]).select();
   if(res.error){
-    // Retry without sort_order (column might not exist yet), keep company_logo
+    // Retry without sort_order (column might not exist yet)
     var p2=Object.assign({},payload);delete p2.sort_order;
     res=await supabaseClient.from(SUPABASE_TABLE_CONTACTS).insert([p2]).select();
     if(res.error){
-      var p3=Object.assign({},p2);delete p3.mail_url;delete p3.phone;
+      // Last resort: drop company_logo only — NEVER drop phone/mail_url/photo/linkedin
+      var p3=Object.assign({},p2);delete p3.company_logo;
       res=await supabaseClient.from(SUPABASE_TABLE_CONTACTS).insert([p3]).select();
     }
   }
@@ -2132,11 +2147,12 @@ async function updateRemoteContact(id,changes){
   setSyncState('syncing');
   var res=await supabaseClient.from(SUPABASE_TABLE_CONTACTS).update(changes).eq('id',id);
   if(res.error){
-    // Retry without sort_order (might not exist yet), keep company_logo
+    // Retry without sort_order (might not exist yet)
     var c2=Object.assign({},changes);delete c2.sort_order;
     res=await supabaseClient.from(SUPABASE_TABLE_CONTACTS).update(c2).eq('id',id);
     if(res.error){
-      var c3=Object.assign({},c2);delete c3.mail_url;delete c3.phone;
+      // Last resort: drop company_logo only — NEVER drop phone/mail_url/photo/linkedin
+      var c3=Object.assign({},c2);delete c3.company_logo;
       res=await supabaseClient.from(SUPABASE_TABLE_CONTACTS).update(c3).eq('id',id);
     }
   }
@@ -3084,4 +3100,3 @@ function deleteProjGoal(id){
 </div>
 </body>
 </html>
-
