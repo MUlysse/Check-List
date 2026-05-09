@@ -549,6 +549,13 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
 .chess-pgn-textarea{width:100%;min-height:110px;border:1px solid #E0DDD8;border-radius:8px;padding:9px 11px;font-size:12px;color:#1C1C1E;background:#FAFAF8;outline:none;resize:vertical;font-family:'SF Mono','Consolas','Courier New',monospace;line-height:1.6;transition:border-color .15s,box-shadow .15s;box-sizing:border-box;}
 .chess-pgn-textarea:focus{border-color:#4A90D9;box-shadow:0 0 0 3px rgba(74,144,217,0.10);}
 .chess-pgn-textarea::placeholder{color:#C0BDB7;}
+.chess-card-flip{background:none;border:none;cursor:pointer;color:#C8C5BF;font-size:15px;padding:2px 5px;border-radius:4px;transition:color .12s;line-height:1;flex-shrink:0;}
+.chess-card-flip:hover{color:#5856D6;}
+.chess-single{display:flex;justify-content:center;padding:24px 20px;}
+.chess-single .chess-card{max-width:380px;width:100%;}
+.chess-side-btn{flex:1;padding:6px 8px;border-radius:7px;border:1.5px solid #E0DDD8;font-size:12px;font-weight:600;cursor:pointer;background:#FAFAF8;color:#8A8680;transition:all .15s;}
+.chess-side-btn.active-w{background:#F0EDE8;border-color:#C8C5BF;color:#1C1C1E;}
+.chess-side-btn.active-b{background:#302E2C;border-color:#302E2C;color:#F0D9B5;}
 </style>
 </head>
 <body>
@@ -660,6 +667,10 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
     <div class="modal-title">Nouvel échiquier <button class="modal-close" onclick="closeChessModal()">&#10005;</button></div>
     <div class="modal-row">
       <input type="text" id="chess-new-title" placeholder="Titre (ex: Piège de la Caro-Kann)" autocomplete="off">
+    </div>
+    <div class="modal-row" style="gap:6px;">
+      <button class="chess-side-btn active-w" id="chess-side-w" onclick="selectChessSide('w')">♔ Blancs</button>
+      <button class="chess-side-btn" id="chess-side-b" onclick="selectChessSide('b')">♚ Noirs</button>
     </div>
     <div class="modal-row" style="flex-direction:column;gap:4px;">
       <textarea id="chess-new-pgn" class="chess-pgn-textarea" placeholder="Coller les coups PGN ici…&#10;Ex: 1. e4 c6 2. d4 d5 3. Nc3 dxe4 4. Nxe4"></textarea>
@@ -1226,12 +1237,13 @@ function render(){
   } else if(currentView==='Chess'){
     if(appEl){appEl.classList.remove('proj-view');appEl.classList.remove('net-view');appEl.classList.remove('exam-view');}
     var twch=document.getElementById('tabs-wrap');
-    if(twch){twch.style.display='none';}
+    if(twch){twch.style.display='block';twch.style.flexDirection='';twch.style.padding='';}
     if(bc){bc.classList.remove('proj-mode');bc.classList.remove('net-mode');}
     var mti=document.getElementById('main-title-icon');
     var mtt=document.getElementById('main-title-text');
     if(mti){mti.textContent='♟';mti.style.background='#5856D6';mti.style.color='#fff';mti.style.fontWeight='700';mti.style.fontSize='20px';}
     if(mtt)mtt.textContent='Chess';
+    rChessNav();
     rChess();
   } else {
     if(appEl)appEl.classList.remove('proj-view');
@@ -2331,6 +2343,7 @@ var examData={
 // ── Chess Data ──
 var chessData={boards:[]};
 var _chessInst={};
+var currentChessBoard=null;
 var CHESS_UNI={w:{k:'♔',q:'♕',r:'♖',b:'♗',n:'♘',p:'♙'},b:{k:'♚',q:'♛',r:'♜',b:'♝',n:'♞',p:'♟'}};
 
 function loadChessData(d){if(d&&Array.isArray(d.boards))chessData.boards=d.boards;}
@@ -2340,10 +2353,16 @@ function openChessModal(){
   document.getElementById('chess-bd').classList.add('open');
   document.getElementById('chess-new-title').value='';
   document.getElementById('chess-new-pgn').value='';
+  selectChessSide('w');
   setTimeout(function(){document.getElementById('chess-new-title').focus();},80);
 }
 function closeChessModal(){document.getElementById('chess-bd').classList.remove('open');}
 function chessBdClick(ev){if(ev.target===document.getElementById('chess-bd'))closeChessModal();}
+
+function selectChessSide(s){
+  document.getElementById('chess-side-w').classList.toggle('active-w',s==='w');
+  document.getElementById('chess-side-b').classList.toggle('active-b',s==='b');
+}
 
 function addChessBoard(){
   var titleEl=document.getElementById('chess-new-title');
@@ -2352,7 +2371,8 @@ function addChessBoard(){
   var pgn=pgnEl.value.trim();
   if(!title){titleEl.style.borderColor='#C0392B';setTimeout(function(){titleEl.style.borderColor='';},1200);return;}
   var id='cb'+Date.now();
-  chessData.boards.push({id:id,title:title,pgn:pgn,currentMove:-1});
+  var side=document.getElementById('chess-side-b').classList.contains('active-b')?'b':'w';
+  chessData.boards.push({id:id,title:title,pgn:pgn,currentMove:-1,side:side});
   closeChessModal();
   saveChessData();
   rChess();
@@ -2361,7 +2381,41 @@ function addChessBoard(){
 function deleteChessBoard(id){
   chessData.boards=chessData.boards.filter(function(b){return b.id!==id;});
   delete _chessInst[id];
+  if(currentChessBoard===id)currentChessBoard=null;
   saveChessData();
+  rChessNav();
+  rChess();
+}
+
+function flipChessBoard(id){
+  var board=chessData.boards.find(function(b){return b.id===id;});
+  if(!board) return;
+  board.side=(board.side==='b'?'w':'b');
+  saveChessData();
+  rChessNav();
+  _renderChessBoard(id);
+}
+
+function rChessNav(){
+  var wrap=document.getElementById('tabs-wrap');
+  if(!wrap) return;
+  var h='<div class="tab'+(currentChessBoard===null?' active':'')+'" onclick="selectChessBoard(null)">';
+  h+='<span class="tab-icon" style="background:#F0EDE8;font-size:15px;">♟</span>';
+  h+='<span class="tab-label">Tous les pièges</span>';
+  h+='<span class="tab-badge">'+chessData.boards.length+'</span></div>';
+  chessData.boards.forEach(function(board){
+    var icon=board.side==='b'?'♚':'♔';
+    var active=currentChessBoard===board.id;
+    h+='<div class="tab'+(active?' active':'')+'" onclick="selectChessBoard(\''+board.id+'\''+')">';
+    h+='<span class="tab-icon" style="background:'+(active?'#5856D6':'#F0EDE8')+';color:'+(active?'#fff':'#1C1C1E')+';font-size:15px;">'+icon+'</span>';
+    h+='<span class="tab-label">'+e(board.title||'Sans titre')+'</span></div>';
+  });
+  wrap.innerHTML=h;
+}
+
+function selectChessBoard(id){
+  currentChessBoard=id;
+  rChessNav();
   rChess();
 }
 
@@ -2371,6 +2425,15 @@ function rChess(){
   if(!chessData.boards.length){
     el.innerHTML='<div class="empty"><div class="empty-icon">♟</div><div class="empty-txt">Aucun échiquier. Cliquez sur + pour en ajouter un.</div></div>';
     return;
+  }
+  if(currentChessBoard){
+    var board=chessData.boards.find(function(b){return b.id===currentChessBoard;});
+    if(board){
+      el.innerHTML='<div class="chess-single">'+_chessCardHTML(board)+'</div>';
+      _initChessInst(board);
+      _renderChessBoard(board.id);
+      return;
+    }
   }
   var html='<div class="chess-grid">';
   chessData.boards.forEach(function(board){html+=_chessCardHTML(board);});
@@ -2383,7 +2446,10 @@ function _chessCardHTML(board){
   var bid=board.id;
   var h='<div class="chess-card" id="chess-card-'+bid+'">';
   h+='<div class="chess-card-header"><span class="chess-card-title">'+e(board.title||'Sans titre')+'</span>';
-  h+='<button class="chess-card-del" onclick="deleteChessBoard(\''+bid+'\')">&#10005;</button></div>';
+  h+='<div style="display:flex;align-items:center;gap:4px;">';
+  h+='<button class="chess-card-flip" onclick="flipChessBoard(\''+bid+'\')" title="Rotation">⇅</button>';
+  h+='<button class="chess-card-del" onclick="deleteChessBoard(\''+bid+'\')">&#10005;</button>';
+  h+='</div></div>';
   h+='<div class="chess-board-wrap"><div class="chess-frame"><div class="chess-board" id="chess-board-'+bid+'"></div></div></div>';
   h+='<div class="chess-move-label" id="chess-mlabel-'+bid+'"></div>';
   h+='<div class="chess-controls">';
@@ -2449,19 +2515,39 @@ function _renderChessBoard(boardId){
     outer:for(var rr=0;rr<8;rr++){for(var ff=0;ff<8;ff++){var pp=bd2[rr][ff];if(pp&&pp.type==='k'&&pp.color===turn){checkSq=String.fromCharCode(97+ff)+(8-rr);break outer;}}}
   }
   var bd=chess.board();var html='';
-  for(var rank=7;rank>=0;rank--){
-    for(var file=0;file<8;file++){
-      var sqName=String.fromCharCode(97+file)+(rank+1);
-      var isLight=(rank+file)%2!==0;
-      var isHL=(sqName===fromSq||sqName===toSq);
-      var isChk=(sqName===checkSq);
-      var sqBg=isHL?(isLight?'hl-light':'hl-dark'):isChk?'sq-check':(isLight?'sq-light':'sq-dark');
-      var coordCls=isLight?'coord-on-light':'coord-on-dark';
-      var piece=bd[7-rank][file];var pHtml='';
-      if(piece){pHtml='<img class="chess-piece-img" src="'+_pieceUrl(piece.color,piece.type)+'" alt="">';}
-      var coordR=(file===0)?'<span class="chess-coord chess-coord-rank '+coordCls+'">'+(rank+1)+'</span>':'';
-      var coordF=(rank===0)?'<span class="chess-coord chess-coord-file '+coordCls+'">'+String.fromCharCode(97+file)+'</span>':'';
-      html+='<div class="chess-sq '+sqBg+'">'+pHtml+coordR+coordF+'</div>';
+  var boardObj=chessData.boards.find(function(b){return b.id===boardId;});
+  var flipped=boardObj&&boardObj.side==='b';
+  if(flipped){
+    for(var rank=0;rank<8;rank++){
+      for(var file=7;file>=0;file--){
+        var sqName=String.fromCharCode(97+file)+(rank+1);
+        var isLight=(rank+file)%2!==0;
+        var isHL=(sqName===fromSq||sqName===toSq);
+        var isChk=(sqName===checkSq);
+        var sqBg=isHL?(isLight?'hl-light':'hl-dark'):isChk?'sq-check':(isLight?'sq-light':'sq-dark');
+        var coordCls=isLight?'coord-on-light':'coord-on-dark';
+        var piece=bd[7-rank][file];var pHtml='';
+        if(piece){pHtml='<img class="chess-piece-img" src="'+_pieceUrl(piece.color,piece.type)+'" alt="">';}
+        var coordR=(file===7)?'<span class="chess-coord chess-coord-rank '+coordCls+'">'+(rank+1)+'</span>':'';
+        var coordF=(rank===7)?'<span class="chess-coord chess-coord-file '+coordCls+'">'+String.fromCharCode(97+file)+'</span>':'';
+        html+='<div class="chess-sq '+sqBg+'">'+pHtml+coordR+coordF+'</div>';
+      }
+    }
+  } else {
+    for(var rank=7;rank>=0;rank--){
+      for(var file=0;file<8;file++){
+        var sqName=String.fromCharCode(97+file)+(rank+1);
+        var isLight=(rank+file)%2!==0;
+        var isHL=(sqName===fromSq||sqName===toSq);
+        var isChk=(sqName===checkSq);
+        var sqBg=isHL?(isLight?'hl-light':'hl-dark'):isChk?'sq-check':(isLight?'sq-light':'sq-dark');
+        var coordCls=isLight?'coord-on-light':'coord-on-dark';
+        var piece=bd[7-rank][file];var pHtml='';
+        if(piece){pHtml='<img class="chess-piece-img" src="'+_pieceUrl(piece.color,piece.type)+'" alt="">';}
+        var coordR=(file===0)?'<span class="chess-coord chess-coord-rank '+coordCls+'">'+(rank+1)+'</span>':'';
+        var coordF=(rank===0)?'<span class="chess-coord chess-coord-file '+coordCls+'">'+String.fromCharCode(97+file)+'</span>':'';
+        html+='<div class="chess-sq '+sqBg+'">'+pHtml+coordR+coordF+'</div>';
+      }
     }
   }
   boardEl.innerHTML=html;
