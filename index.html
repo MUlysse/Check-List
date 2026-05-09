@@ -514,7 +514,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
 }
 
 /* ── Chess View ── */
-.chess-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:20px;padding-bottom:24px;}
+.chess-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;padding-bottom:24px;}
 .chess-card{background:#fff;border:1px solid rgba(0,0,0,0.08);border-radius:14px;overflow:hidden;transition:box-shadow .15s;}
 .chess-card:hover{box-shadow:0 4px 18px rgba(0,0,0,0.11);}
 .chess-card-header{display:flex;align-items:center;justify-content:space-between;padding:12px 14px 10px;}
@@ -525,8 +525,8 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
 .chess-board-wrap{display:flex;justify-content:center;padding:0 10px 8px;}
 /* Outer frame: dark wood border */
 .chess-frame{background:#302E2C;padding:4px;border-radius:3px;box-shadow:0 6px 20px rgba(0,0,0,0.28),0 2px 6px rgba(0,0,0,0.18);}
-.chess-board{display:grid;grid-template-columns:repeat(8,44px);grid-template-rows:repeat(8,44px);}
-.chess-sq{width:44px;height:44px;display:flex;align-items:center;justify-content:center;position:relative;overflow:visible;}
+.chess-board{display:grid;grid-template-columns:repeat(8,34px);grid-template-rows:repeat(8,34px);}
+.chess-sq{width:34px;height:34px;display:flex;align-items:center;justify-content:center;position:relative;overflow:visible;}
 .sq-light{background:#F0D9B5;}
 .sq-dark{background:#B58863;}
 .hl-light{background:#CDD26A;}
@@ -534,7 +534,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
 /* Check: red radial glow on the king square */
 .sq-check{background:radial-gradient(ellipse at center,rgba(255,0,0,0.92) 0%,rgba(231,0,0,0.68) 30%,rgba(169,0,0,0) 85%)!important;}
 /* Piece images from Lichess cburnett set */
-.chess-piece-img{width:40px;height:40px;object-fit:contain;user-select:none;pointer-events:none;position:relative;z-index:2;display:block;}
+.chess-piece-img{width:30px;height:30px;object-fit:contain;user-select:none;pointer-events:none;position:relative;z-index:2;display:block;}
 /* Board coordinates */
 .chess-coord{position:absolute;font-size:9.5px;font-weight:700;line-height:1;pointer-events:none;z-index:3;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;}
 .chess-coord-rank{top:2px;left:3px;}
@@ -2395,12 +2395,21 @@ function _chessCardHTML(board){
   return h;
 }
 
+function _frenchToEnglishPgn(pgn){
+  /* Translate French SAN piece letters to English before passing to chess.js
+     C=Cavalier→N, F=Fou→B, D=Dame→Q, T=Tour→R, R=Roi→K */
+  return pgn.replace(/([CFDTR])(?=[a-h1-8x@])/g,function(m,p){
+    return{C:'N',F:'B',D:'Q',T:'R',R:'K'}[p]||p;
+  });
+}
+
 function _initChessInst(board){
   var history=[];
   try{
     if(board.pgn&&typeof Chess!=='undefined'){
       var full=new Chess();
-      if(full.load_pgn(board.pgn))history=full.history({verbose:true});
+      var pgn=_frenchToEnglishPgn(board.pgn);
+      if(full.load_pgn(pgn))history=full.history({verbose:true});
     }
   }catch(ex){}
   var mi=typeof board.currentMove==='number'?board.currentMove:history.length-1;
