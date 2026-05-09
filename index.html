@@ -2398,9 +2398,12 @@ function _chessCardHTML(board){
 function _frenchToEnglishPgn(pgn){
   /* Translate French SAN piece letters to English before passing to chess.js
      C=Cavalier→N, F=Fou→B, D=Dame→Q, T=Tour→R, R=Roi→K */
-  return pgn.replace(/([CFDTR])(?=[a-h1-8x@])/g,function(m,p){
-    return{C:'N',F:'B',D:'Q',T:'R',R:'K'}[p]||p;
-  });
+  var map={C:'N',F:'B',D:'Q',T:'R',R:'K'};
+  // Promotions: =C, =F, =D, =T (followed by +, !, end of token)
+  pgn=pgn.replace(/=([CFDT])/g,function(m,p){return'='+(map[p]||p);});
+  // Regular piece moves: piece letter before file/rank/capture
+  pgn=pgn.replace(/([CFDTR])(?=[a-h1-8x])/g,function(m,p){return map[p]||p;});
+  return pgn;
 }
 
 function _initChessInst(board){
