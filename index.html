@@ -425,12 +425,12 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
 /* ── Exams View ── */
 .body-card.exams-mode{padding:0;}
 .app.exam-view .sidebar{position:relative;z-index:1;}
-#exam-full-overlay{position:fixed;left:0;right:0;bottom:0;z-index:20;overflow-y:auto;background:#fff;display:none;}
+#exam-full-overlay{position:fixed;left:0;right:0;bottom:0;z-index:20;overflow-y:auto;overflow-x:hidden;background:#fff;display:none;}
 #exam-full-overlay::-webkit-scrollbar{width:5px;}
 #exam-full-overlay::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.12);border-radius:3px;}
 .exam-toolbar{display:flex;align-items:center;gap:8px;padding:10px 16px;border-bottom:1px solid rgba(0,0,0,0.10);background:#fff;}
-.exams-layout{display:flex;flex-direction:column;gap:28px;padding:24px 28px 60px;}
-.exams-grades-row{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start;}
+.exams-layout{display:flex;flex-direction:column;gap:16px;padding:12px 12px 48px;}
+.exams-grades-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:start;}
 .exams-col-title{font-size:12px;font-weight:700;color:#5A5755;letter-spacing:0.09em;text-transform:uppercase;margin-bottom:12px;}
 
 /* Revision tracker */
@@ -476,21 +476,21 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
 .grades-badge{font-size:11px;font-weight:600;background:#4A90D9;color:#fff;padding:2px 8px;border-radius:10px;}
 .grades-table-wrap{border:1px solid #E8E5E0;border-radius:12px;overflow:hidden;background:#fff;}
 .grades-table{width:100%;border-collapse:collapse;table-layout:fixed;background:#fff;}
-.grades-table th{background:#F5F3EF;font-size:10.5px;font-weight:700;color:#5A5755;text-transform:uppercase;letter-spacing:0.06em;padding:8px 10px;text-align:center;border-bottom:1px solid #D8D4CE;}
+.grades-table th{background:#F5F3EF;font-size:10px;font-weight:700;color:#5A5755;text-transform:uppercase;letter-spacing:0.04em;padding:6px 5px;text-align:center;border-bottom:1px solid #D8D4CE;}
 .grades-table th.subject-col{text-align:left;}
-.grades-table td{padding:8px 8px;border-bottom:1px solid #F0EDE8;text-align:center;vertical-align:middle;background:#FAFAF8;}
+.grades-table td{padding:6px 5px;border-bottom:1px solid #F0EDE8;text-align:center;vertical-align:middle;background:#FAFAF8;}
 .grades-table tr:last-child td{border-bottom:none;}
 .grades-table tbody tr:nth-child(odd) td{background:#FAFAF8;}
 .grades-table tbody tr:nth-child(even) td{background:#F2EFE9;}
 .grades-table tbody tr:hover td{background:#E8E4DC;}
 .grades-table tr.grades-total-row td{background:#EDE9E2!important;font-weight:600;}
-.grades-table td.subject-name{text-align:left;font-size:13px;font-weight:500;color:#1C1C1E;white-space:normal;word-break:break-word;}
+.grades-table td.subject-name{text-align:left;font-size:12px;font-weight:500;color:#1C1C1E;white-space:normal;word-break:break-word;}
 .grades-table td.ects-cell{font-size:12px;color:#5A5755;font-weight:600;}
 .grade-cell{display:flex;flex-direction:column;align-items:center;gap:2px;}
 .grade-label-input{width:100%;border:none;background:transparent;font-size:10px;color:#5A5755;text-align:center;outline:none;font-family:inherit;font-weight:600;padding:1px 0;}
 .grade-label-input::placeholder{color:#C0BDB7;font-weight:400;}
 .grade-coeff{font-size:10px;color:#8A8680;font-weight:600;}
-.grade-input{width:52px;border:1px solid #E0DDD8;border-radius:6px;padding:3px 4px;font-size:13px;color:#1C1C1E;background:#FAFAF8;outline:none;text-align:center;font-family:inherit;transition:border-color .15s;-webkit-appearance:none;-moz-appearance:textfield;appearance:textfield;}
+.grade-input{width:40px;border:1px solid #E0DDD8;border-radius:6px;padding:3px 2px;font-size:12px;color:#1C1C1E;background:#FAFAF8;outline:none;text-align:center;font-family:inherit;transition:border-color .15s;-webkit-appearance:none;-moz-appearance:textfield;appearance:textfield;}
 .grade-input::-webkit-inner-spin-button,.grade-input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0;}
 .grade-coeff-input{-webkit-appearance:none;-moz-appearance:textfield;appearance:textfield;}
 .grade-coeff-input::-webkit-inner-spin-button,.grade-coeff-input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0;}
@@ -508,7 +508,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
 
 @media(max-width:680px){
   #exam-full-overlay{bottom:0!important;}
-  .exams-layout{padding:16px 14px 80px;}
+  .exams-layout{padding:10px 8px 80px;}
   .exams-grades-row{grid-template-columns:1fr;}
   .exam-cards-grid{grid-template-columns:1fr;}
   .grades-table th,.grades-table td{padding:7px 7px;}
@@ -3767,9 +3767,9 @@ function buildGradesTable(sem){
   var tableN=examData[sem+'NumExams']||3;
   var html='<div class="grades-section"><div class="grades-table-wrap">';
   html+='<table class="grades-table">';
-  html+='<colgroup><col style="width:160px"><col style="width:46px">';
-  for(var ci=0;ci<tableN;ci++)html+='<col style="width:110px">';
-  html+='<col style="width:68px"></colgroup>';
+  html+='<colgroup><col style="width:105px"><col style="width:34px">';
+  for(var ci=0;ci<tableN;ci++)html+='<col style="width:74px">';
+  html+='<col style="width:48px"></colgroup>';
   html+='<thead><tr>';
   html+='<th class="subject-col">Matière</th><th>ECTS</th>';
   for(var ci=0;ci<tableN;ci++)html+='<th>Éval. '+(ci+1)+'</th>';
