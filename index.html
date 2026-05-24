@@ -885,6 +885,7 @@ html,body{background:#F4F4F4;color:#111;}
       <button class="mob-back-btn" onclick="mobBack()">&#8592;</button>
       <div class="main-title" id="main-title"><span class="main-title-icon" id="main-title-icon"></span><span id="main-title-text">All</span></div>
       <button class="home-btn" id="main-home-btn" onclick="setView('Home')" title="Home" style="display:none;">Home</button>
+      <button class="home-btn" id="culture-add-btn" onclick="openBookModal()" title="Ajouter un livre" style="display:none;font-size:22px;font-weight:300;line-height:1;padding:0 6px;">+</button>
     </div>
     <div class="body-card">
       <div id="list"></div>
@@ -1086,7 +1087,7 @@ var netSearch='';
 var _editContactId=null;
 var companyLogos={};
 var BOOK_STATUS_LABELS={reading:'En lecture',to_read:'A lire',read:'Lu'};
-var CULTURE_CAT_ORDER=['Philosophie','Société','Economie','Littérature','Finance','Politique','Arts','Sports','Management'];
+var CULTURE_CAT_ORDER=['Littérature','Philosophie','Société','Economie','Finance','Politique','Arts','Sports','Management'];
 var BOOK_STATUS_ORDER=['reading','to_read','read'];
 var supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 var deleteTimers={};
@@ -1729,6 +1730,9 @@ function render(){
   // FAB: only show on Checklist view
   var fabEl=document.querySelector('.fab');
   if(fabEl)fabEl.style.display=currentView==='Checklist'?'':'none';
+  // Culture "+" button
+  var cultAddBtn=document.getElementById('culture-add-btn');
+  if(cultAddBtn)cultAddBtn.style.display=currentView==='Culture'?'':'none';
   if(currentView==='Home'){
     if(bc){bc.classList.remove('proj-mode');bc.classList.remove('net-mode');}
     var mti=document.getElementById('main-title-icon');var mtt=document.getElementById('main-title-text');
@@ -2328,7 +2332,9 @@ function rhBook(b){
     ?'<img class="book-cover" src="'+e(b.coverUrl)+'" alt="" onclick="openBookReader(\''+e(bid)+'\')" title="Ouvrir le livre">'
     :'<div class="book-cover-placeholder" onclick="openBookReader(\''+e(bid)+'\')" title="Ouvrir le livre">&#9632;</div>';
   var statusBadge='<span class="book-status-badge '+status+'">'+e(BOOK_STATUS_LABELS[status]||status)+'</span>';
-  return '<div class="book-drag-handle" title="Déplacer">⠿</div>'
+  var hasNotes=bookNotes[bid]&&bookNotes[bid].some(function(p){return p&&p.trim();});
+  var dragDots='⠿'+(hasNotes?'<span style="color:#E53935;">⠿</span>':'');
+  return '<div class="book-drag-handle" title="Déplacer">'+dragDots+'</div>'
     +cover
     +'<div class="book-card">'
     +'<div class="book-title">'+e(b.title)+'</div>'
