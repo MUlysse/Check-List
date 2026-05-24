@@ -2155,12 +2155,12 @@ function rBookReader(){
       +'<div style="font-size:18px;font-weight:700;color:#1C1C1E;font-family:\'Libre Baskerville\',serif;text-align:center;">'+e(book.title)+'</div>'
       +(book.author?'<div style="font-size:12px;color:#8A8680;margin-top:6px;font-family:\'Libre Baskerville\',serif;">'+e(book.author)+'</div>':'')
       +'</div>')
-    :('<div class="br-page-content" id="br-left-content" contenteditable="true" data-placeholder="Écrire ici…" onblur="saveBookPage('+leftIdx+',this.innerHTML)" oninput="brHandleInput(this,'+leftIdx+')">'+(_brPageContent(leftIdx))+'</div>'
+    :('<div class="br-page-content" id="br-left-content" contenteditable="true" data-placeholder="Écrire ici…" onblur="saveBookPage('+leftIdx+',this.innerHTML)" oninput="brHandleInput(this,'+leftIdx+')" onpaste="brHandlePaste(event,'+leftIdx+')">'+(_brPageContent(leftIdx))+'</div>'
       +'<div class="br-pgnum">'+(leftIdx+1)+'</div>');
   var pgLabel=isFirst?'Couverture':'Pages '+(leftIdx+1)+'-'+(rightIdx+1);
   var rightPageHTML=isFirst
     ?'<div class="br-cover-face" style="color:#C0BDB7;font-style:italic;font-family:\'Libre Baskerville\',serif;font-size:13px;">Tournez la page →</div>'
-    :'<div class="br-page-content" id="br-right-content" contenteditable="true" data-placeholder="Écrire ici…" onblur="saveBookPage('+rightIdx+',this.innerHTML)" oninput="brHandleInput(this,'+rightIdx+')">'+(_brPageContent(rightIdx))+'</div>'
+    :'<div class="br-page-content" id="br-right-content" contenteditable="true" data-placeholder="Écrire ici…" onblur="saveBookPage('+rightIdx+',this.innerHTML)" oninput="brHandleInput(this,'+rightIdx+')" onpaste="brHandlePaste(event,'+rightIdx+')">'+(_brPageContent(rightIdx))+'</div>'
       +'<div class="br-pgnum" id="br-right-pgnum">'+(rightIdx+1)+'</div>';
   ov.innerHTML=
     '<div class="br-shell">'
@@ -2169,6 +2169,7 @@ function rBookReader(){
     +'<div class="br-tools">'
     +'<button class="br-tool-btn" onclick="brToolBold()" title="Gras"><b style="font-family:sans-serif;">B</b></button>'
     +'<label class="br-tool-btn" title="Insérer image" style="cursor:pointer;">Image<input type="file" accept="image/*" style="display:none" onchange="brInsertImage(this)"></label>'
+    +'<button class="br-tool-btn" onclick="brClearAllContent()" title="Effacer tout le contenu" style="color:#FF6B6B;border-color:rgba(255,107,107,0.4);">Effacer</button>'
     +'<button class="br-x-btn" onclick="closeBookReader()">&#10005;</button>'
     +'</div>'
     +'</div>'
@@ -2206,7 +2207,7 @@ function updateBrSpread(){
         +(book.author?'<div style="font-size:12px;color:#8A8680;margin-top:6px;font-family:\'Libre Baskerville\',serif;">'+e(book.author)+'</div>':'')
         +'</div>';
     } else {
-      leftPg.innerHTML='<div class="br-page-content" id="br-left-content" contenteditable="true" data-placeholder="Écrire ici…" onblur="saveBookPage('+leftIdx+',this.innerHTML)" oninput="brHandleInput(this,'+leftIdx+')">'+(_brPageContent(leftIdx))+'</div>'
+      leftPg.innerHTML='<div class="br-page-content" id="br-left-content" contenteditable="true" data-placeholder="Écrire ici…" onblur="saveBookPage('+leftIdx+',this.innerHTML)" oninput="brHandleInput(this,'+leftIdx+')" onpaste="brHandlePaste(event,'+leftIdx+')">'+(_brPageContent(leftIdx))+'</div>'
         +'<div class="br-pgnum">'+(leftIdx+1)+'</div>';
     }
   }
@@ -2214,7 +2215,7 @@ function updateBrSpread(){
     if(isFirst){
       rightPg.innerHTML='<div class="br-cover-face" style="color:#C0BDB7;font-style:italic;font-family:\'Libre Baskerville\',serif;font-size:13px;">Tournez la page →</div>';
     } else {
-      rightPg.innerHTML='<div class="br-page-content" id="br-right-content" contenteditable="true" data-placeholder="Écrire ici…" onblur="saveBookPage('+rightIdx+',this.innerHTML)" oninput="brHandleInput(this,'+rightIdx+')">'+(_brPageContent(rightIdx))+'</div>'
+      rightPg.innerHTML='<div class="br-page-content" id="br-right-content" contenteditable="true" data-placeholder="Écrire ici…" onblur="saveBookPage('+rightIdx+',this.innerHTML)" oninput="brHandleInput(this,'+rightIdx+')" onpaste="brHandlePaste(event,'+rightIdx+')">'+(_brPageContent(rightIdx))+'</div>'
         +'<div class="br-pgnum" id="br-right-pgnum">'+(rightIdx+1)+'</div>';
     }
   }
@@ -2245,6 +2246,7 @@ function brExtractOverflow(el){
 }
 function brCheckOverflow(el,pageIdx){
   if(!el||el.scrollHeight<=el.clientHeight)return;
+  if(bookNotes[_bookReaderOpen]&&bookNotes[_bookReaderOpen].length>150)return;
   var overflow=brExtractOverflow(el);
   if(!overflow)return;
   saveBookPage(pageIdx,el.innerHTML);
@@ -2279,6 +2281,20 @@ function brHandleInput(el,pageIdx){
   if(el.scrollHeight<=el.clientHeight)return;
   var _el=el,_pg=pageIdx;
   setTimeout(function(){if(document.contains(_el))brCheckOverflow(_el,_pg);},0);
+}
+function brHandlePaste(e,pageIdx){
+  e.preventDefault();
+  var text=e.clipboardData?e.clipboardData.getData('text/plain'):'';
+  if(!text)return;
+  document.execCommand('insertText',false,text);
+}
+function brClearAllContent(){
+  if(!_bookReaderOpen)return;
+  if(!confirm('Effacer tout le contenu de ce livre-simulation ?'))return;
+  bookNotes[_bookReaderOpen]=[''];
+  _bookReaderPage=0;
+  saveTasks();scheduleSettingsSync();
+  rBookReader();
 }
 function saveBookPage(pageIdx,html){
   if(!_bookReaderOpen||pageIdx<0)return;
