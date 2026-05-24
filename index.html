@@ -556,6 +556,116 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
 .chess-side-btn{flex:1;padding:6px 8px;border-radius:7px;border:1.5px solid #E0DDD8;font-size:12px;font-weight:600;cursor:pointer;background:#FAFAF8;color:#8A8680;transition:all .15s;}
 .chess-side-btn.active-w{background:#F0EDE8;border-color:#C8C5BF;color:#1C1C1E;}
 .chess-side-btn.active-b{background:#302E2C;border-color:#302E2C;color:#F0D9B5;}
+
+/* ── Category vertical list (replaces treemap) ── */
+.cat-list{display:flex;flex-direction:column;gap:2px;padding:4px 0 8px;}
+.cat-list-item{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:8px;cursor:pointer;transition:background .1s;}
+.cat-list-item:hover{background:rgba(0,0,0,0.04);}
+.cat-list-item.active{background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.10);}
+.cat-list-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.cat-list-name{flex:1;font-size:13px;color:#3D3B38;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cat-list-badge{min-width:20px;height:20px;border-radius:10px;background:#FF3B30;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 5px;flex-shrink:0;}
+
+/* ── Today ordered tasks ── */
+.today-ordered-list{display:flex;flex-direction:column;gap:0;}
+.today-row{display:flex;align-items:center;gap:6px;padding:4px 6px;border-radius:8px;cursor:grab;transition:background .1s;}
+.today-row:hover{background:rgba(0,0,0,0.02);}
+.today-row.today-row-dragging{opacity:.5;box-shadow:0 4px 16px rgba(0,0,0,0.14);cursor:grabbing;}
+.today-row.today-row-over{background:rgba(74,144,217,0.10);outline:2px dashed rgba(74,144,217,0.45);border-radius:8px;}
+.today-num{font-size:13px;font-weight:700;color:#8A8680;min-width:24px;text-align:right;flex-shrink:0;}
+.today-row .row{flex:1;padding:4px 0;border:none;border-radius:0;background:transparent;}
+.today-row .row:hover{background:transparent;}
+.today-row .row+.row{border-top:none;}
+
+/* ── Home page ── */
+.home-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;padding:20px 24px 60px;}
+@media(max-width:900px){.home-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:500px){.home-grid{grid-template-columns:1fr 1fr;padding:12px;gap:10px;}}
+.home-card{background:#fff;border:1px solid rgba(0,0,0,0.07);border-radius:14px;padding:20px 16px 16px;cursor:pointer;transition:box-shadow .15s,transform .15s;display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;}
+.home-card:hover{box-shadow:0 4px 20px rgba(0,0,0,0.10);transform:translateY(-2px);}
+.home-card-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;color:#fff;flex-shrink:0;}
+.home-card-title{font-size:14px;font-weight:700;color:#1C1C1E;}
+.home-card-sub{font-size:11px;color:#8A8680;}
+.home-btn{background:#fff;border:1px solid #E0DDD8;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;color:#4A90D9;transition:background .12s;flex-shrink:0;white-space:nowrap;}
+.home-btn:hover{background:#F5F3EF;}
+
+/* ── Book Reader Overlay ── */
+#book-reader-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);backdrop-filter:blur(6px);z-index:250;align-items:center;justify-content:center;}
+.br-wrap{width:100%;height:100%;display:flex;align-items:center;justify-content:center;padding:20px;}
+.br-modal{background:#F5F0E8;border-radius:16px;width:min(900px,95vw);max-height:90vh;display:flex;flex-direction:column;box-shadow:0 40px 100px rgba(0,0,0,0.4);overflow:hidden;}
+.br-header{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;background:#302E2C;color:#F0D9B5;}
+.br-title{font-size:14px;font-weight:700;font-family:'Libre Baskerville',serif;}
+.br-close{background:none;border:none;cursor:pointer;color:#F0D9B5;font-size:18px;padding:2px 6px;border-radius:4px;line-height:1;}
+.br-close:hover{background:rgba(255,255,255,0.15);}
+.br-body{display:grid;grid-template-columns:1fr 1fr;flex:1;min-height:0;border-left:3px solid #302E2C;}
+.br-page{display:flex;flex-direction:column;padding:20px;position:relative;background:#FFFDF5;min-height:400px;}
+.br-left{border-right:2px solid #C8C0A8;box-shadow:2px 0 8px rgba(0,0,0,0.08) inset;}
+.br-right{background:#FFFDF5;}
+.br-textarea{flex:1;border:none;background:transparent;font-size:13px;font-family:'Libre Baskerville',serif;color:#1C1C1E;line-height:1.8;resize:none;outline:none;width:100%;}
+.br-textarea::placeholder{color:#C8C0A8;font-style:italic;}
+.br-page-num{text-align:center;font-size:10px;color:#B0ADA8;margin-top:8px;font-family:'Libre Baskerville',serif;}
+.br-cover-info{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;padding:20px;}
+.br-footer{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;background:#EAE4D4;border-top:1px solid #C8C0A8;}
+.br-nav-btn{padding:7px 16px;border-radius:7px;border:1px solid #C8C0A8;background:#fff;color:#5A5755;font-size:12px;font-weight:600;cursor:pointer;transition:background .12s;}
+.br-nav-btn:hover:not(:disabled){background:#E8E4DC;}
+.br-nav-btn:disabled{color:#C8C0A8;cursor:default;}
+
+/* ── Finances page ── */
+.fin-wrap{padding:20px 28px 60px;max-width:1100px;margin:0 auto;}
+.fin-header{display:flex;align-items:center;gap:12px;margin-bottom:20px;}
+.fin-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+@media(max-width:680px){.fin-grid{grid-template-columns:1fr;}.fin-wrap{padding:14px;}}
+.fin-card{background:#fff;border:1px solid rgba(0,0,0,0.07);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:8px;}
+.fin-card-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:4px;}
+.fin-row{display:flex;align-items:center;gap:8px;padding:3px 0;}
+.fin-label{flex:1;min-width:0;}
+.fin-inp-label{border:none;background:transparent;font-size:13px;color:#1C1C1E;outline:none;width:100%;padding:2px 0;border-bottom:1px dashed #E0DDD8;}
+.fin-inp-label:focus{border-bottom-color:#4A90D9;}
+.fin-amount{display:flex;align-items:center;gap:4px;flex-shrink:0;white-space:nowrap;font-size:13px;color:#1C1C1E;}
+.fin-inp{width:80px;border:1px solid #E0DDD8;border-radius:6px;padding:3px 6px;font-size:13px;color:#1C1C1E;background:#FAFAF8;outline:none;text-align:right;-webkit-appearance:none;-moz-appearance:textfield;appearance:textfield;}
+.fin-inp:focus{border-color:#4A90D9;}
+.fin-inp-inline{width:80px;}
+.fin-del{background:none;border:none;cursor:pointer;color:#D0CCC6;font-size:16px;line-height:1;padding:2px 4px;border-radius:4px;flex-shrink:0;transition:color .12s;}
+.fin-del:hover{color:#FF3B30;}
+.fin-add-row{background:none;border:1.5px dashed #D0CCC6;border-radius:7px;color:#8A8680;font-size:12px;cursor:pointer;padding:4px 10px;transition:all .12s;margin-top:4px;}
+.fin-add-row:hover{border-color:#4A90D9;color:#4A90D9;}
+.fin-total{font-size:12px;color:#5A5755;padding:8px 0 0;border-top:1px solid #F0EDE8;margin-top:4px;}
+.fin-total strong{color:#1C1C1E;}
+.fin-reste{font-size:13px;color:#4A90D9;font-weight:600;}
+.fin-synthese{border:2px solid #34C759;}
+.fin-synth-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid #F0EDE8;font-size:13px;color:#3D3B38;gap:12px;}
+.fin-synth-row:last-child{border-bottom:none;}
+.fin-highlight{font-size:16px;font-weight:700;color:#34C759;}
+
+/* ── BOAZ page ── */
+.boaz-wrap{display:flex;flex-direction:column;height:100%;}
+.boaz-header{display:flex;align-items:center;gap:12px;padding:12px 20px;border-bottom:1px solid rgba(0,0,0,0.06);}
+.boaz-title{font-size:18px;font-weight:700;color:#1C1C1E;font-family:'Libre Baskerville',serif;flex:1;text-align:center;}
+.boaz-layout{display:grid;grid-template-columns:220px 1fr;flex:1;overflow:hidden;min-height:0;}
+.boaz-toc{background:#F5F0E8;border-right:2px solid #C8C0A8;padding:14px 10px;display:flex;flex-direction:column;overflow-y:auto;}
+.boaz-toc-title{font-size:10.5px;font-weight:700;color:#8A8680;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;}
+.boaz-toc-list{flex:1;overflow-y:auto;}
+.boaz-toc-item{display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:7px;cursor:pointer;transition:background .1s;}
+.boaz-toc-item:hover{background:rgba(0,0,0,0.06);}
+.boaz-toc-pg{font-size:10px;color:#B0ADA8;flex-shrink:0;font-weight:600;}
+.boaz-toc-lbl{flex:1;font-size:12px;color:#3D3B38;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.boaz-toc-del{background:none;border:none;cursor:pointer;color:#D0CCC6;font-size:14px;opacity:0;transition:opacity .12s;}
+.boaz-toc-item:hover .boaz-toc-del{opacity:1;}
+.boaz-toc-del:hover{color:#FF3B30;}
+.boaz-toc-add{padding:8px 4px 2px;display:flex;flex-direction:column;gap:4px;}
+.boaz-toc-input{border:1px solid #D5D2CC;border-radius:7px;padding:6px 8px;font-size:12px;background:#EAE8E4;outline:none;color:#1C1C1E;width:100%;}
+.boaz-toc-input:focus{border-color:#8A8680;background:#E5E2DC;}
+.boaz-book{display:flex;flex-direction:column;overflow:hidden;}
+.boaz-spread{display:grid;grid-template-columns:1fr 1fr;flex:1;min-height:0;}
+.boaz-page{display:flex;flex-direction:column;padding:20px;background:#FFFDF5;position:relative;}
+.boaz-left{border-right:3px solid #302E2C;box-shadow:2px 0 8px rgba(0,0,0,0.1) inset;}
+.boaz-cover-face{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;}
+@media(max-width:680px){
+  .boaz-layout{grid-template-columns:1fr;}
+  .boaz-toc{display:none;}
+  .boaz-spread{grid-template-columns:1fr;}
+  .boaz-left{display:none;}
+}
 </style>
 </head>
 <body>
@@ -569,12 +679,13 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
       <div class="app-name">Louis'Checklist</div>
       <div class="sidebar-actions">
         <div class="sync-dot" id="sync-dot"></div>
+        <button class="tb-btn" onclick="setView('Home')" title="Accueil">⌂</button>
         <button class="tb-btn" onclick="location.reload()" title="Actualiser">&#8635;</button>
       </div>
     </div>
     <div class="view-bar" id="view-bar">
-      <button class="view-btn active" data-view="Checklist" onclick="setView('Checklist')">Checklist</button>
-      <button class="view-btn" data-view="Books" onclick="setView('Books')">Books</button>
+      <button class="view-btn" data-view="Checklist" onclick="setView('Checklist')">Checklist</button>
+      <button class="view-btn" data-view="Culture" onclick="setView('Culture')">Culture</button>
       <button class="view-btn" data-view="Projection" onclick="setView('Projection')">Projection</button>
       <button class="view-btn" data-view="Networking" onclick="setView('Networking')">Networking</button>
       <button class="view-btn" data-view="Exams" onclick="setView('Exams')">Exams</button>
@@ -595,6 +706,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
     <div class="main-header">
       <button class="mob-back-btn" onclick="mobBack()">&#8592;</button>
       <div class="main-title" id="main-title"><span class="main-title-icon" id="main-title-icon"></span><span id="main-title-text">All</span></div>
+      <button class="home-btn" id="main-home-btn" onclick="setView('Home')" title="Accueil" style="display:none;">⌂ Accueil</button>
     </div>
     <div class="body-card">
       <div id="list"></div>
@@ -606,12 +718,12 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
 <button class="fab" onclick="openModal()">+</button>
 
 <nav class="mobile-nav" id="mobile-nav">
+  <button class="mobile-nav-btn" data-view="Home" onclick="setView('Home')"><span class="mobile-nav-icon">⌂</span><span>Accueil</span></button>
   <button class="mobile-nav-btn" data-view="Checklist" onclick="setView('Checklist')"><span class="mobile-nav-icon">☰</span><span>Liste</span></button>
-  <button class="mobile-nav-btn" data-view="Books" onclick="setView('Books')"><span class="mobile-nav-icon">☷</span><span>Books</span></button>
-  <button class="mobile-nav-btn" data-view="Projection" onclick="setView('Projection')"><span class="mobile-nav-icon">◫</span><span>Plan</span></button>
+  <button class="mobile-nav-btn" data-view="Culture" onclick="setView('Culture')"><span class="mobile-nav-icon">📚</span><span>Culture</span></button>
   <button class="mobile-nav-btn" data-view="Networking" onclick="setView('Networking')"><span class="mobile-nav-icon">◎</span><span>Réseau</span></button>
-  <button class="mobile-nav-btn" data-view="Exams" onclick="setView('Exams')"><span class="mobile-nav-icon">E</span><span>Exams</span></button>
-  <button class="mobile-nav-btn" data-view="Chess" onclick="setView('Chess')"><span class="mobile-nav-icon">♟</span><span>Chess</span></button>
+  <button class="mobile-nav-btn" data-view="Finances" onclick="setView('Finances')"><span class="mobile-nav-icon">💰</span><span>Finances</span></button>
+  <button class="mobile-nav-btn" data-view="BOAZ" onclick="setView('BOAZ')"><span class="mobile-nav-icon">📖</span><span>BOAZ</span></button>
 </nav>
 
 <div class="backdrop" id="bd" onclick="bdClick(event)">
@@ -730,8 +842,9 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
     <div class="modal-row">
       <input type="text" id="ct-linkedin" placeholder="URL LinkedIn" autocomplete="off">
     </div>
-    <div class="modal-row">
-      <input type="text" id="ct-photo" placeholder="URL photo de profil" autocomplete="off">
+    <div class="modal-row" style="gap:6px;">
+      <input type="text" id="ct-photo" placeholder="URL photo de profil" autocomplete="off" style="flex:1;min-width:0;">
+      <label style="flex-shrink:0;padding:8px 12px;border-radius:8px;border:1px solid #E0DDD8;background:#FAFAF8;cursor:pointer;font-size:12px;color:#8A8680;white-space:nowrap;display:flex;align-items:center;gap:4px;" title="Importer une photo">&#128247; Photo<input type="file" id="ct-photo-file" accept="image/*" style="display:none" onchange="handleContactPhotoFile(this)"></label>
     </div>
     <div class="modal-row">
       <textarea id="ct-notes" placeholder="Notes..." style="flex:1;min-height:68px;padding:9px 11px;border:1px solid #E0DDD8;border-radius:8px;font-size:13.5px;color:#1C1C1E;background:#FAFAF8;outline:none;resize:vertical;font-family:inherit;transition:border-color .15s;"></textarea>
@@ -782,7 +895,13 @@ var SUPABASE_TABLE_BOOKS='books';
 var SUPABASE_BUCKET='book-covers';
 var books=[];
 var contacts=[];
-var currentView='Checklist';
+var currentView='Home';
+var todayOrderList=[];
+var bookNotes={};
+var financesData={depenses:[{label:'Loyer Nice',amount:650},{label:'Claude',amount:21.49},{label:'MGCN',amount:25},{label:'Assurance',amount:26.20}],ressources:[{label:'Papa',amount:450},{label:'Maman',amount:400},{label:'CAF',amount:100}],epargne:[{label:'Livret A',amount:30},{label:'Livret Jeune',amount:1689.15},{label:'Livret d\'épargne populaire',amount:6101.71}],comptesCourants:[{label:'Fortuneo',amount:2.53},{label:'Crédit Mutuel',amount:174.69}],depensesAvenir:[{label:'Prêt to',amount:40000}],autresSorties:[{label:'Fortuneo',amount:100},{label:'Livret A',amount:85.20}],mamanReste:15000};
+var boazData={pages:[''],toc:[]};
+var _bookReaderOpen=null;
+var _bookReaderPage=0;
 var SUPABASE_TABLE_CONTACTS='contacts';
 var PROX_ORDER={'Fort':0,'Moyen':1,'Faible':2};
 var netSearch='';
@@ -837,6 +956,234 @@ var projPeriods=[
 ];
 var _pPeriodId=null;
 var _pRowId=null;
+
+function rHome(){
+  var el=document.getElementById('list');
+  if(!el)return;
+  var todayCount=tasks.filter(function(t){return t.today&&!t.done;}).length;
+  var allCount=tasks.filter(function(t){return!t.done;}).length;
+  var booksCount=books.length;
+  var contactsCount=contacts.length;
+  var cards=[
+    {view:'Checklist',icon:'☰',color:'#4A90D9',title:'Checklist',sub:allCount+' tâche'+(allCount!==1?'s':'')},
+    {view:'Checklist',icon:'★',color:'#34C759',title:"Aujourd'hui",sub:todayCount+' tâche'+(todayCount!==1?'s':''),tab:"Aujourd'hui"},
+    {view:'Culture',icon:'📚',color:'#AF52DE',title:'Culture',sub:booksCount+' livre'+(booksCount!==1?'s':'')},
+    {view:'Projection',icon:'◫',color:'#8A8680',title:'Projection',sub:'Feuille de route'},
+    {view:'Networking',icon:'◎',color:'#4A90D9',title:'Networking',sub:contactsCount+' contact'+(contactsCount!==1?'s':'')},
+    {view:'Exams',icon:'E',color:'#5856D6',title:'Exams',sub:'Notes & révisions'},
+    {view:'Chess',icon:'♟',color:'#302E2C',title:'Chess',sub:'Ouvertures'},
+    {view:'Finances',icon:'💰',color:'#34C759',title:'Mes Finances',sub:'Budget & épargne'},
+    {view:'BOAZ',icon:'📖',color:'#302E2C',title:'BOAZ',sub:'Mon livre'},
+  ];
+  var h='<div class="home-grid">';
+  cards.forEach(function(c){
+    var onclick=c.tab?'setView(\''+c.view+'\');tab=\''+e(c.tab)+'\';render();saveTasks();':'setView(\''+c.view+'\');';
+    h+='<div class="home-card" onclick="'+onclick+'" style="--card-color:'+c.color+';">'
+      +'<div class="home-card-icon" style="background:'+c.color+';">'+c.icon+'</div>'
+      +'<div class="home-card-title">'+e(c.title)+'</div>'
+      +'<div class="home-card-sub">'+e(c.sub)+'</div>'
+      +'</div>';
+  });
+  h+='</div>';
+  el.innerHTML=h;
+}
+
+function rFinances(){
+  var el=document.getElementById('list');
+  if(!el)return;
+  var fd=financesData;
+  function sumArr(arr){return arr.reduce(function(s,x){return s+(parseFloat(x.amount)||0);},0);}
+  var totalDep=sumArr(fd.depenses);
+  var totalRes=sumArr(fd.ressources);
+  var totalEp=sumArr(fd.epargne);
+  var totalCC=sumArr(fd.comptesCourants);
+  var totalDA=sumArr(fd.depensesAvenir);
+  var totalSorties=sumArr(fd.autresSorties||[]);
+  var reste=totalRes-totalDep-totalSorties;
+  var montantRestant=totalCC+totalEp-totalDA;
+  var h='<div class="fin-wrap">';
+  h+='<div class="fin-header"><button class="home-btn" onclick="setView(\'Home\')">⌂ Accueil</button></div>';
+  h+='<div class="fin-grid">';
+
+  // Dépenses mensuelles
+  h+='<div class="fin-card"><div class="fin-card-title" style="color:#FF3B30;">💸 Dépenses mensuelles</div>';
+  fd.depenses.forEach(function(d,i){
+    h+='<div class="fin-row"><span class="fin-label"><input class="fin-inp-label" value="'+e(d.label)+'" onchange="updateFinances(\'depenses\','+i+',\'label\',this.value)"></span>'
+      +'<span class="fin-amount"><input class="fin-inp" type="number" value="'+e(String(d.amount))+'" onchange="updateFinances(\'depenses\','+i+',\'amount\',parseFloat(this.value)||0)"> €</span>'
+      +'<button class="fin-del" onclick="deleteFinanceRow(\'depenses\','+i+')">×</button></div>';
+  });
+  h+='<button class="fin-add-row" onclick="addFinanceRow(\'depenses\')">+ Ajouter</button>';
+  h+='<div class="fin-total">Total : <strong>'+totalDep.toFixed(2)+' €</strong></div></div>';
+
+  // Ressources
+  h+='<div class="fin-card"><div class="fin-card-title" style="color:#34C759;">💵 Ressources mensuelles</div>';
+  fd.ressources.forEach(function(d,i){
+    h+='<div class="fin-row"><span class="fin-label"><input class="fin-inp-label" value="'+e(d.label)+'" onchange="updateFinances(\'ressources\','+i+',\'label\',this.value)"></span>'
+      +'<span class="fin-amount"><input class="fin-inp" type="number" value="'+e(String(d.amount))+'" onchange="updateFinances(\'ressources\','+i+',\'amount\',parseFloat(this.value)||0)"> €</span>'
+      +'<button class="fin-del" onclick="deleteFinanceRow(\'ressources\','+i+')">×</button></div>';
+  });
+  h+='<button class="fin-add-row" onclick="addFinanceRow(\'ressources\')">+ Ajouter</button>';
+  h+='<div class="fin-total">Total : <strong>'+totalRes.toFixed(2)+' €</strong></div>';
+  if((fd.autresSorties||[]).length){
+    h+='<div class="fin-card-title" style="color:#FF9500;margin-top:12px;">↗ Autres sorties</div>';
+    (fd.autresSorties||[]).forEach(function(d,i){
+      h+='<div class="fin-row"><span class="fin-label"><input class="fin-inp-label" value="'+e(d.label)+'" onchange="updateFinances(\'autresSorties\','+i+',\'label\',this.value)"></span>'
+        +'<span class="fin-amount"><input class="fin-inp" type="number" value="'+e(String(d.amount))+'" onchange="updateFinances(\'autresSorties\','+i+',\'amount\',parseFloat(this.value)||0)"> €</span>'
+        +'<button class="fin-del" onclick="deleteFinanceRow(\'autresSorties\','+i+')">×</button></div>';
+    });
+    h+='<button class="fin-add-row" onclick="addFinanceRow(\'autresSorties\')">+ Ajouter</button>';
+    h+='<div class="fin-total">Sorties : <strong>'+totalSorties.toFixed(2)+' €</strong></div>';
+  }
+  h+='<div class="fin-total fin-reste">Reste mensuel : <strong>'+reste.toFixed(2)+' €</strong></div></div>';
+
+  // Comptes courants
+  h+='<div class="fin-card"><div class="fin-card-title" style="color:#4A90D9;">🏦 Comptes courants</div>';
+  fd.comptesCourants.forEach(function(d,i){
+    h+='<div class="fin-row"><span class="fin-label"><input class="fin-inp-label" value="'+e(d.label)+'" onchange="updateFinances(\'comptesCourants\','+i+',\'label\',this.value)"></span>'
+      +'<span class="fin-amount"><input class="fin-inp" type="number" value="'+e(String(d.amount))+'" onchange="updateFinances(\'comptesCourants\','+i+',\'amount\',parseFloat(this.value)||0)"> €</span>'
+      +'<button class="fin-del" onclick="deleteFinanceRow(\'comptesCourants\','+i+')">×</button></div>';
+  });
+  h+='<button class="fin-add-row" onclick="addFinanceRow(\'comptesCourants\')">+ Ajouter</button>';
+  h+='<div class="fin-total">Total : <strong>'+totalCC.toFixed(2)+' €</strong></div></div>';
+
+  // Épargne
+  h+='<div class="fin-card"><div class="fin-card-title" style="color:#FF9500;">💎 Épargne</div>';
+  fd.epargne.forEach(function(d,i){
+    h+='<div class="fin-row"><span class="fin-label"><input class="fin-inp-label" value="'+e(d.label)+'" onchange="updateFinances(\'epargne\','+i+',\'label\',this.value)"></span>'
+      +'<span class="fin-amount"><input class="fin-inp" type="number" value="'+e(String(d.amount))+'" onchange="updateFinances(\'epargne\','+i+',\'amount\',parseFloat(this.value)||0)"> €</span>'
+      +'<button class="fin-del" onclick="deleteFinanceRow(\'epargne\','+i+')">×</button></div>';
+  });
+  h+='<button class="fin-add-row" onclick="addFinanceRow(\'epargne\')">+ Ajouter</button>';
+  h+='<div class="fin-total">Total épargne : <strong>'+totalEp.toFixed(2)+' €</strong></div></div>';
+
+  // Dépenses à venir
+  h+='<div class="fin-card"><div class="fin-card-title" style="color:#FF3B30;">⚠️ Dépenses à venir</div>';
+  fd.depensesAvenir.forEach(function(d,i){
+    h+='<div class="fin-row"><span class="fin-label"><input class="fin-inp-label" value="'+e(d.label)+'" onchange="updateFinances(\'depensesAvenir\','+i+',\'label\',this.value)"></span>'
+      +'<span class="fin-amount"><input class="fin-inp" type="number" value="'+e(String(d.amount))+'" onchange="updateFinances(\'depensesAvenir\','+i+',\'amount\',parseFloat(this.value)||0)"> €</span>'
+      +'<button class="fin-del" onclick="deleteFinanceRow(\'depensesAvenir\','+i+')">×</button></div>';
+  });
+  h+='<button class="fin-add-row" onclick="addFinanceRow(\'depensesAvenir\')">+ Ajouter</button>';
+  h+='<div class="fin-total">Total : <strong>'+totalDA.toFixed(2)+' €</strong></div></div>';
+
+  // Synthèse
+  h+='<div class="fin-card fin-synthese"><div class="fin-card-title">📊 Synthèse</div>';
+  h+='<div class="fin-synth-row"><span>Montant total disponible</span><strong class="fin-highlight">'+montantRestant.toFixed(2)+' €</strong></div>';
+  h+='<div class="fin-synth-row"><span>Maman reste (prêt)</span>'
+    +'<strong><input class="fin-inp fin-inp-inline" type="number" value="'+e(String(fd.mamanReste||0))+'" onchange="financesData.mamanReste=parseFloat(this.value)||0;saveTasks();"> €</strong></div>';
+  h+='</div>';
+
+  h+='</div></div>';
+  el.innerHTML=h;
+}
+
+function updateFinances(key,idx,field,val){
+  if(!financesData[key])financesData[key]=[];
+  if(financesData[key][idx])financesData[key][idx][field]=val;
+  saveTasks();rFinances();
+}
+function addFinanceRow(key){
+  if(!financesData[key])financesData[key]=[];
+  financesData[key].push({label:'',amount:0});
+  saveTasks();rFinances();
+}
+function deleteFinanceRow(key,idx){
+  if(!financesData[key])return;
+  financesData[key].splice(idx,1);
+  saveTasks();rFinances();
+}
+
+function rBOAZ(){
+  var el=document.getElementById('list');
+  if(!el)return;
+  var pages=boazData.pages;
+  if(!pages||!pages.length){pages=[''];boazData.pages=pages;}
+  var toc=boazData.toc||[];
+  var totalPages=pages.length;
+  var pageIdx=typeof boazData._currentPage==='number'?boazData._currentPage:0;
+  if(pageIdx>=totalPages)pageIdx=totalPages-1;
+  if(pageIdx<0)pageIdx=0;
+  var leftPageIdx=pageIdx>0?pageIdx-1:-1;
+  var rightPageText=pages[pageIdx]||'';
+  var leftPageText=leftPageIdx>=0?pages[leftPageIdx]:'';
+  var h='<div class="boaz-wrap">'
+    +'<div class="boaz-header"><button class="home-btn" onclick="setView(\'Home\')">⌂ Accueil</button><span class="boaz-title">BOAZ</span></div>'
+    +'<div class="boaz-layout">'
+    // TOC sidebar
+    +'<div class="boaz-toc">'
+    +'<div class="boaz-toc-title">Table des matières</div>'
+    +'<div class="boaz-toc-list" id="boaz-toc-list">';
+  toc.forEach(function(entry,i){
+    h+='<div class="boaz-toc-item" onclick="boazGoPage('+entry.page+')">'
+      +'<span class="boaz-toc-pg">p.'+entry.page+'</span>'
+      +'<span class="boaz-toc-lbl">'+e(entry.label)+'</span>'
+      +'<button class="boaz-toc-del" onclick="event.stopPropagation();boazTocDel('+i+')">×</button>'
+      +'</div>';
+  });
+  h+='</div>'
+    +'<div class="boaz-toc-add"><input id="boaz-toc-inp" class="boaz-toc-input" placeholder="Titre du chapitre..." onkeydown="if(event.key===\'Enter\')boazTocAdd()">'
+    +'<button class="fin-add-row" onclick="boazTocAdd()">+ Ajouter</button></div>'
+    +'</div>'
+    // Book spread
+    +'<div class="boaz-book">'
+    +'<div class="boaz-spread">'
+    +'<div class="boaz-page boaz-left">'
+    +(leftPageIdx>=0?'<textarea class="br-textarea" placeholder="Écrire ici..." onchange="boazSavePage('+leftPageIdx+',this.value)">'+e(leftPageText)+'</textarea><div class="br-page-num">'+(leftPageIdx+1)+'</div>':'<div class="boaz-cover-face"><div style="font-size:48px;">📖</div><div style="font-size:18px;font-weight:700;margin-top:12px;color:#1C1C1E;">BOAZ</div></div>')
+    +'</div>'
+    +'<div class="boaz-page boaz-right">'
+    +'<textarea class="br-textarea" placeholder="Écrire ici..." onchange="boazSavePage('+pageIdx+',this.value)">'+e(rightPageText)+'</textarea>'
+    +'<div class="br-page-num">'+(pageIdx+1)+'</div>'
+    +'</div>'
+    +'</div>'
+    +'<div class="br-footer">'
+    +'<button class="br-nav-btn" onclick="boazPrev()" '+(pageIdx<=0?'disabled':'')+'>&#9664; Précédent</button>'
+    +'<span style="font-size:12px;color:#8A8680;">Page '+(pageIdx+1)+' / '+totalPages+'</span>'
+    +'<button class="br-nav-btn" onclick="boazNext()">Suivant &#9654;</button>'
+    +'</div>'
+    +'</div>'
+    +'</div>'
+    +'</div>';
+  el.innerHTML=h;
+}
+function boazSavePage(idx,val){
+  if(!boazData.pages)boazData.pages=[];
+  while(boazData.pages.length<=idx)boazData.pages.push('');
+  boazData.pages[idx]=val;
+  saveTasks();
+}
+function boazNext(){
+  var pages=boazData.pages;if(!pages)pages=boazData.pages=[''];
+  var cur=typeof boazData._currentPage==='number'?boazData._currentPage:0;
+  cur++;
+  if(cur>=pages.length)pages.push('');
+  boazData._currentPage=cur;
+  saveTasks();rBOAZ();
+}
+function boazPrev(){
+  var cur=typeof boazData._currentPage==='number'?boazData._currentPage:0;
+  if(cur<=0)return;
+  boazData._currentPage=cur-1;
+  rBOAZ();
+}
+function boazGoPage(pg){
+  boazData._currentPage=Math.max(0,(pg||1)-1);
+  saveTasks();rBOAZ();
+}
+function boazTocAdd(){
+  var inp=document.getElementById('boaz-toc-inp');
+  if(!inp)return;
+  var label=inp.value.trim();if(!label)return;
+  var cur=typeof boazData._currentPage==='number'?boazData._currentPage:0;
+  if(!boazData.toc)boazData.toc=[];
+  boazData.toc.push({label:label,page:cur+1});
+  inp.value='';
+  saveTasks();rBOAZ();
+}
+function boazTocDel(idx){
+  if(!boazData.toc)return;
+  boazData.toc.splice(idx,1);
+  saveTasks();rBOAZ();
+}
 
 async function checkSession() {
   if (!supabaseClient) return false;
@@ -896,6 +1243,10 @@ function loadTasks(){
       if(Array.isArray(data.projRows)&&data.projRows.length) projRows=data.projRows;
       if(Array.isArray(data.projPeriods)&&data.projPeriods.length&&data.projDataVersion===PROJ_DATA_VERSION) projPeriods=data.projPeriods;
       if(Array.isArray(data.projGoals)) projGoals=data.projGoals;
+      if(Array.isArray(data.todayOrderList)) todayOrderList=data.todayOrderList;
+      if(data.bookNotes&&typeof data.bookNotes==='object') bookNotes=data.bookNotes;
+      if(data.financesData&&typeof data.financesData==='object') Object.assign(financesData,data.financesData);
+      if(data.boazData&&typeof data.boazData==='object') Object.assign(boazData,data.boazData);
     }catch(e){}
   }
   // Ensure all task categories are in TABS
@@ -907,7 +1258,7 @@ function loadTasks(){
   tasks.forEach(function(t){ if(t.today && t.prio==='U') t.prio='M'; });
 }
 function saveTasks(){
-  try{localStorage.setItem(STORAGE_KEY, JSON.stringify({tasks:tasks.filter(function(t){return t.cat!==SETTINGS_CAT;}),nid:nid,tab:tab,tabs:TABS,books:books,contacts:contacts,view:currentView,projRows:projRows,projPeriods:projPeriods,projDataVersion:PROJ_DATA_VERSION,projGoals:projGoals}));}catch(e){}
+  try{localStorage.setItem(STORAGE_KEY, JSON.stringify({tasks:tasks.filter(function(t){return t.cat!==SETTINGS_CAT;}),nid:nid,tab:tab,tabs:TABS,books:books,contacts:contacts,view:currentView,projRows:projRows,projPeriods:projPeriods,projDataVersion:PROJ_DATA_VERSION,projGoals:projGoals,todayOrderList:todayOrderList,bookNotes:bookNotes,financesData:financesData,boazData:boazData}));}catch(e){}
 }
 function clearAutoDelete(id){
   if(deleteTimers[id]){ clearTimeout(deleteTimers[id]); delete deleteTimers[id]; }
@@ -1025,6 +1376,10 @@ async function loadTasksRemote(){
         if(s.examData&&typeof s.examData==='object'){loadExamData(s.examData);examData._loaded=true;}
         if(s.companyLogos&&typeof s.companyLogos==='object'){Object.assign(companyLogos,s.companyLogos);}
         if(s.chessData&&typeof s.chessData==='object')loadChessData(s.chessData);
+        if(Array.isArray(s.todayOrderList)) todayOrderList=s.todayOrderList;
+        if(s.bookNotes&&typeof s.bookNotes==='object') bookNotes=s.bookNotes;
+        if(s.financesData&&typeof s.financesData==='object') Object.assign(financesData,s.financesData);
+        if(s.boazData&&typeof s.boazData==='object') Object.assign(boazData,s.boazData);
       }catch(e){}
     }
     var merged = rows.map(function(rt){
@@ -1180,7 +1535,6 @@ function render(){
   var bc=document.querySelector('.body-card');
   var appEl=document.querySelector('.app');
   if(bc)bc.classList.remove('exams-mode');
-  // hide overlay when leaving Networking
   if(currentView!=='Networking'){
     var _no=document.getElementById('net-full-overlay');
     if(_no)_no.style.display='none';
@@ -1191,26 +1545,37 @@ function render(){
     if(_eo)_eo.style.display='none';
     if(appEl)appEl.classList.remove('exam-view');
   }
-  if(currentView==='Books'){
+  // Hide sidebar for Home, Finances, BOAZ
+  var sidebarEl=document.querySelector('.sidebar');
+  var SIDEBAR_HIDDEN_VIEWS=['Home','Finances','BOAZ'];
+  if(sidebarEl)sidebarEl.style.display=SIDEBAR_HIDDEN_VIEWS.indexOf(currentView)>=0?'none':'';
+  // Show Home button in header when sidebar is hidden
+  var mainHomeBtn=document.getElementById('main-home-btn');
+  if(mainHomeBtn)mainHomeBtn.style.display=SIDEBAR_HIDDEN_VIEWS.indexOf(currentView)>=0&&currentView!=='Home'?'':'none';
+  if(currentView==='Home'){
+    if(bc){bc.classList.remove('proj-mode');bc.classList.remove('net-mode');}
+    var mti=document.getElementById('main-title-icon');var mtt=document.getElementById('main-title-text');
+    if(mti){mti.textContent='⌂';mti.style.background='#4A90D9';mti.style.color='#fff';mti.style.fontSize='';}
+    if(mtt)mtt.textContent='Accueil';
+    rHome();
+  } else if(currentView==='Culture'){
     if(appEl)appEl.classList.remove('proj-view');
     var twb=document.getElementById('tabs-wrap');
     if(twb){twb.style.display='flex';twb.style.flexDirection='column';twb.style.padding='0';}
     var ctmB=document.getElementById('cat-treemap');if(ctmB)ctmB.style.display='none';
     if(bc){bc.classList.remove('proj-mode');bc.classList.remove('net-mode');}
-    var mti=document.getElementById('main-title-icon');
-    var mtt=document.getElementById('main-title-text');
-    if(mti){var bi=getTabIcon('Books');mti.textContent=bi.icon;mti.style.background=bi.bg;mti.style.color='#fff';}
-    if(mtt)mtt.textContent='Books';
+    var mti=document.getElementById('main-title-icon');var mtt=document.getElementById('main-title-text');
+    if(mti){mti.textContent='📚';mti.style.background='#AF52DE';mti.style.color='#fff';mti.style.fontSize='';}
+    if(mtt)mtt.textContent='Culture';
     rBooksChart();
-    rBooks();
+    rCulture();
   } else if(currentView==='Projection'){
     if(appEl)appEl.classList.add('proj-view');
     document.getElementById('tabs-wrap').style.display='block';
     var ctmP=document.getElementById('cat-treemap');if(ctmP)ctmP.style.display='none';
     if(bc){bc.classList.add('proj-mode');bc.classList.remove('net-mode');}
-    var mti=document.getElementById('main-title-icon');
-    var mtt=document.getElementById('main-title-text');
-    if(mti){mti.textContent='◫';mti.style.background='#8A8680';mti.style.color='#fff';}
+    var mti=document.getElementById('main-title-icon');var mtt=document.getElementById('main-title-text');
+    if(mti){mti.textContent='◫';mti.style.background='#8A8680';mti.style.color='#fff';mti.style.fontSize='';}
     if(mtt)mtt.textContent='Projection';
     rProjectionGoals();
     rProjection();
@@ -1219,9 +1584,8 @@ function render(){
     var twn=document.getElementById('tabs-wrap');
     if(twn){twn.style.display='none';}
     if(bc){bc.classList.remove('proj-mode');bc.classList.add('net-mode');}
-    var mti=document.getElementById('main-title-icon');
-    var mtt=document.getElementById('main-title-text');
-    if(mti){mti.textContent='◎';mti.style.background='#4A90D9';mti.style.color='#fff';}
+    var mti=document.getElementById('main-title-icon');var mtt=document.getElementById('main-title-text');
+    if(mti){mti.textContent='◎';mti.style.background='#4A90D9';mti.style.color='#fff';mti.style.fontSize='';}
     if(mtt)mtt.textContent='Networking';
     rNetworking();
   } else if(currentView==='Exams'){
@@ -1229,8 +1593,7 @@ function render(){
     var twe=document.getElementById('tabs-wrap');
     if(twe){twe.style.display='none';}
     if(bc){bc.classList.remove('proj-mode');bc.classList.remove('net-mode');bc.classList.add('exams-mode');}
-    var mti=document.getElementById('main-title-icon');
-    var mtt=document.getElementById('main-title-text');
+    var mti=document.getElementById('main-title-icon');var mtt=document.getElementById('main-title-text');
     if(mti){mti.textContent='E';mti.style.background='#5856D6';mti.style.color='#fff';mti.style.fontWeight='700';mti.style.fontSize='20px';}
     if(mtt)mtt.textContent='Exams';
     rExams();
@@ -1239,12 +1602,23 @@ function render(){
     var twch=document.getElementById('tabs-wrap');
     if(twch){twch.style.display='block';twch.style.flexDirection='';twch.style.padding='';}
     if(bc){bc.classList.remove('proj-mode');bc.classList.remove('net-mode');}
-    var mti=document.getElementById('main-title-icon');
-    var mtt=document.getElementById('main-title-text');
+    var mti=document.getElementById('main-title-icon');var mtt=document.getElementById('main-title-text');
     if(mti){mti.textContent='♟';mti.style.background='#5856D6';mti.style.color='#fff';mti.style.fontWeight='700';mti.style.fontSize='20px';}
     if(mtt)mtt.textContent='Chess';
     rChessNav();
     rChess();
+  } else if(currentView==='Finances'){
+    if(bc){bc.classList.remove('proj-mode');bc.classList.remove('net-mode');}
+    var mti=document.getElementById('main-title-icon');var mtt=document.getElementById('main-title-text');
+    if(mti){mti.textContent='💰';mti.style.background='#34C759';mti.style.color='#fff';mti.style.fontSize='';}
+    if(mtt)mtt.textContent='Mes Finances';
+    rFinances();
+  } else if(currentView==='BOAZ'){
+    if(bc){bc.classList.remove('proj-mode');bc.classList.remove('net-mode');}
+    var mti=document.getElementById('main-title-icon');var mtt=document.getElementById('main-title-text');
+    if(mti){mti.textContent='📖';mti.style.background='#302E2C';mti.style.color='#fff';mti.style.fontSize='';}
+    if(mtt)mtt.textContent='BOAZ';
+    rBOAZ();
   } else {
     if(appEl)appEl.classList.remove('proj-view');
     var tw2=document.getElementById('tabs-wrap');
@@ -1319,40 +1693,16 @@ function rCategoryTreemap(){
   if(!cats.length){el.style.display='none';return;}
   el.style.display='block';
   cats.sort(function(a,b){return b.count-a.count;});
-  var isMob=window.innerWidth<=680;
-  var W=isMob?(window.innerWidth-32):(el.offsetWidth||220);
-  var mapH=isMob?Math.max(window.innerHeight-390,160):Math.min(Math.max(cats.length*42,130),260);
-  function layout(items,x,y,w,h){
-    if(!items.length) return [];
-    if(items.length===1) return [{item:items[0],x:x,y:y,w:w,h:h}];
-    var tot=items.reduce(function(s,i){return s+i.count;},0);
-    var half=tot/2,sum=0,split=1;
-    for(var i=0;i<items.length-1;i++){sum+=items[i].count;if(sum>=half){split=i+1;break;}}
-    var L=items.slice(0,split),R=items.slice(split);
-    var lt=L.reduce(function(s,i){return s+i.count;},0);
-    var ratio=lt/tot;
-    var res=[];
-    if(w>=h){var lw=Math.round(w*ratio);res=res.concat(layout(L,x,y,lw,h));res=res.concat(layout(R,x+lw,y,w-lw,h));}
-    else{var lh=Math.round(h*ratio);res=res.concat(layout(L,x,y,w,lh));res=res.concat(layout(R,x,y+lh,w,h-lh));}
-    return res;
-  }
-  var cells=layout(cats,0,0,W,mapH);
-  var G=2;
-  var html='<div class="tm-label">Catégories</div><div class="tm-map" style="height:'+mapH+'px;">';
-  html+=cells.map(function(c){
-    var color=getCatTreemapColor(c.item.name);
-    var isActive=tab===c.item.name;
-    var gx=c.x+(c.x>0?G/2:0);
-    var gy=c.y+(c.y>0?G/2:0);
-    var gw=c.w-(c.x>0?G/2:0)-(c.x+c.w<W?G/2:0);
-    var gh=c.h-(c.y>0?G/2:0)-(c.y+c.h<mapH?G/2:0);
-    var isVert=gw<gh*0.85&&gw<90;
-    var vertCls=isVert?' tm-vert':'';
-    return '<div class="tm-cell'+vertCls+(isActive?' active':'')+'" style="left:'+gx+'px;top:'+gy+'px;width:'+gw+'px;height:'+gh+'px;background:'+color+';" data-tab="'+c.item.name+'" onclick="setTab(this.dataset.tab)">'
-      +'<span class="tm-cell-name">'+c.item.name+'</span>'
-      +(gh>22||isVert?'<span class="tm-cell-count">'+c.item.count+'</span>':'')
+  var html='<div class="tm-label">Catégories</div><div class="cat-list">';
+  cats.forEach(function(c){
+    var color=getCatTreemapColor(c.name);
+    var isActive=tab===c.name;
+    html+='<div class="cat-list-item'+(isActive?' active':'')+'" data-tab="'+e(c.name)+'" onclick="setTab(this.dataset.tab)" style="--cat-color:'+color+';">'
+      +'<span class="cat-list-dot" style="background:'+color+';"></span>'
+      +'<span class="cat-list-name">'+e(c.name)+'</span>'
+      +'<span class="cat-list-badge">'+c.count+'</span>'
       +'</div>';
-  }).join('');
+  });
   html+='</div>';
   el.innerHTML=html;
 }
@@ -1379,7 +1729,7 @@ async function saveSettingsRemote(){
   if(!supabaseClient) return;
   const { data: { user } } = await supabaseClient.auth.getUser();
   if (!user) return;
-  var settingsData = JSON.stringify({tabs: TABS, tab: tab, projRows: projRows, projPeriods: projPeriods, projDataVersion: PROJ_DATA_VERSION, projGoals: projGoals, examData:{subjects:examData.subjects,s1NumExams:examData.s1NumExams,s2NumExams:examData.s2NumExams,s1Grades:examData.s1Grades,s2Grades:examData.s2Grades}, companyLogos:companyLogos, chessData:{boards:chessData.boards}});
+  var settingsData = JSON.stringify({tabs: TABS, tab: tab, projRows: projRows, projPeriods: projPeriods, projDataVersion: PROJ_DATA_VERSION, projGoals: projGoals, examData:{subjects:examData.subjects,s1NumExams:examData.s1NumExams,s2NumExams:examData.s2NumExams,s1Grades:examData.s1Grades,s2Grades:examData.s2Grades}, companyLogos:companyLogos, chessData:{boards:chessData.boards}, todayOrderList:todayOrderList, bookNotes:bookNotes, financesData:financesData, boazData:boazData});
   var payload={cat:SETTINGS_CAT,text:settingsData,prio:'L',done:true,user_id:user.id};
   if(settingsId){
     await updateRemoteTask(settingsId,{text:settingsData});
@@ -1406,12 +1756,71 @@ function rTasks(){
   if(isG){
     var cats=[];rows.forEach(function(t){if(cats.indexOf(t.cat)<0)cats.push(t.cat);});cats.sort(function(a,b){return sc({cat:a},{cat:b});});
     cats.forEach(function(cat){var cr=rows.filter(function(t){return t.cat===cat;});cr.sort(function(a,b){return taskSortKey(a)-taskSortKey(b);});h+='<div class="cat-grp"><div class="cat-sep">'+cat+'</div>';cr.forEach(function(t){h+=rh(t,true,i++%2===0?'sa':'sb');});h+='</div>';});
+  } else if(isTodayTab(tab)){
+    // Today tab: numbered ordered tasks with drag-and-drop
+    var todayRows=rows.slice();
+    // Sort by todayOrderList first, then remaining tasks
+    todayRows.sort(function(a,b){
+      var ai=todayOrderList.indexOf(String(a.id));
+      var bi=todayOrderList.indexOf(String(b.id));
+      if(ai>=0&&bi>=0) return ai-bi;
+      if(ai>=0) return -1;
+      if(bi>=0) return 1;
+      return taskSortKey(a)-taskSortKey(b);
+    });
+    // Sync todayOrderList to match current tasks
+    todayOrderList=todayRows.map(function(t){return String(t.id);});
+    h='<div class="today-ordered-list" id="today-ordered-list">';
+    todayRows.forEach(function(t,idx){
+      h+='<div class="today-row" data-tid="'+e(String(t.id))+'" onpointerdown="todayPointerDown(event,\''+e(String(t.id))+'\')" onpointermove="todayPointerMove(event)" onpointerup="todayPointerUp(event)" onpointercancel="todayPointerUp(event)">'
+        +'<span class="today-num">'+(idx+1)+'.</span>'
+        +rh(t,false,'sa',true)
+        +'</div>';
+    });
+    h+='</div>';
   } else {
     // No Urgent separator — just sort: Today first, then by priority
     var sorted=rows.slice().sort(function(a,b){return taskSortKey(a)-taskSortKey(b);});
     sorted.forEach(function(t){h+=rh(t,false,i++%2===0?'sa':'sb');});
   }
   el.innerHTML=h;
+}
+var todayDrag={active:false,startY:0,moved:false,pointerId:null,tid:null,el:null,clone:null};
+var todayDropTarget=null;
+function todayPointerDown(e,tid){
+  var row=e.target.closest('.today-row');
+  if(!row)return;
+  e.stopPropagation();
+  todayDrag.active=true;todayDrag.startY=e.clientY;todayDrag.moved=false;
+  todayDrag.pointerId=e.pointerId||null;todayDrag.tid=tid;todayDrag.el=row;
+  if(row.setPointerCapture)row.setPointerCapture(e.pointerId);
+}
+function todayPointerMove(e){
+  if(!todayDrag.active)return;
+  var dy=Math.abs(e.clientY-todayDrag.startY);
+  if(dy<10)return;
+  todayDrag.moved=true;
+  if(todayDrag.el)todayDrag.el.classList.add('today-row-dragging');
+  var target=document.elementFromPoint(e.clientX,e.clientY);
+  var row=target&&target.closest('.today-row[data-tid]');
+  if(row&&row.getAttribute('data-tid')!==todayDrag.tid){
+    if(todayDropTarget&&todayDropTarget!==row)todayDropTarget.classList.remove('today-row-over');
+    todayDropTarget=row;todayDropTarget.classList.add('today-row-over');
+  }else if(!row||row.getAttribute('data-tid')===todayDrag.tid){
+    if(todayDropTarget){todayDropTarget.classList.remove('today-row-over');todayDropTarget=null;}
+  }
+}
+function todayPointerUp(e){
+  if(!todayDrag.active)return;
+  if(todayDrag.el)todayDrag.el.classList.remove('today-row-dragging');
+  if(todayDrag.moved&&todayDrag.tid&&todayDropTarget){
+    var fromId=todayDrag.tid,toId=todayDropTarget.getAttribute('data-tid');
+    var fi=todayOrderList.indexOf(fromId),ti=todayOrderList.indexOf(toId);
+    if(fi>=0&&ti>=0){var item=todayOrderList.splice(fi,1)[0];todayOrderList.splice(ti,0,item);}
+    saveTasks();rTasks();
+  }
+  if(todayDropTarget){todayDropTarget.classList.remove('today-row-over');todayDropTarget=null;}
+  todayDrag.active=false;todayDrag.tid=null;todayDrag.el=null;
 }
 
 function rBooksChart(){
@@ -1469,20 +1878,99 @@ function rBooksChart(){
   el.innerHTML=h;
 }
 
-function rBooks(){
+function rBooks(){rCulture();}
+function rCulture(){
   var el=document.getElementById('list');
   if(!books.length){el.innerHTML='<div class="empty"><div class="empty-icon">&#128214;</div><div class="empty-txt">Aucun livre enregistré.</div></div>';return;}
   var h='';
-  BOOK_STATUS_ORDER.forEach(function(status){
-    var group=books.filter(function(b){return b.status===status;});
-    if(!group.length) return;
+  // Group by category
+  var catMap={};
+  var noCat='Sans catégorie';
+  books.forEach(function(b){
+    var cat=b.category&&b.category.trim()?b.category:noCat;
+    if(!catMap[cat])catMap[cat]=[];
+    catMap[cat].push(b);
+  });
+  var catNames=Object.keys(catMap).sort(function(a,b){
+    if(a===noCat)return 1;if(b===noCat)return-1;return a.localeCompare(b);
+  });
+  catNames.forEach(function(cat){
+    var group=catMap[cat];
     group.sort(function(a,b){ var d=(b.sortOrder||0)-(a.sortOrder||0); if(d!==0)return d; if(typeof a.id==='number'&&typeof b.id==='number')return b.id-a.id; return String(b.id).localeCompare(String(a.id)); });
-    h+='<div class="book-status-group"><div class="book-status-heading" data-status="'+status+'"><div class="ps-dot"></div><span>'+BOOK_STATUS_LABELS[status]+'</span></div>';
+    h+='<div class="book-status-group"><div class="book-status-heading"><div class="ps-dot" style="background:#AF52DE;"></div><span>'+e(cat)+'</span></div>';
     h+='<div class="book-grid">';
-    group.forEach(function(b){var sid=e(String(b.id));var sst=e(status);h+='<div class="book-row" data-book-id="'+sid+'" data-book-status="'+sst+'" onpointerdown="bookPointerDown(event,\''+sid+'\',\''+sst+'\')" onpointermove="bookPointerMove(event)" onpointerup="bookPointerUp(event)" onpointercancel="bookPointerUp(event)">'+rhBook(b)+'</div>';});
+    group.forEach(function(b){var sid=e(String(b.id));var sst=e(b.status);h+='<div class="book-row" data-book-id="'+sid+'" data-book-status="'+sst+'" onpointerdown="bookPointerDown(event,\''+sid+'\',\''+sst+'\')" onpointermove="bookPointerMove(event)" onpointerup="bookPointerUp(event)" onpointercancel="bookPointerUp(event)" ondblclick="openBookReader(\''+sid+'\')">'+rhBook(b)+'</div>';});
     h+='</div></div>';
   });
   el.innerHTML=h;
+}
+
+function openBookReader(bookId){
+  var book=books.find(function(b){return String(b.id)===String(bookId);});
+  if(!book)return;
+  _bookReaderOpen=String(bookId);
+  if(!bookNotes[_bookReaderOpen])bookNotes[_bookReaderOpen]=[''];
+  _bookReaderPage=0;
+  rBookReader();
+  var ov=document.getElementById('book-reader-overlay');
+  if(ov)ov.style.display='flex';
+}
+function closeBookReader(){
+  var ov=document.getElementById('book-reader-overlay');
+  if(ov)ov.style.display='none';
+  _bookReaderOpen=null;
+}
+function rBookReader(){
+  var ov=document.getElementById('book-reader-overlay');
+  if(!ov||!_bookReaderOpen)return;
+  var book=books.find(function(b){return String(b.id)===String(_bookReaderOpen);});
+  if(!book)return;
+  var pages=bookNotes[_bookReaderOpen];
+  if(!pages||!pages.length)pages=[''];
+  var pageCount=pages.length;
+  var page=pages[_bookReaderPage]||'';
+  var leftPage=(_bookReaderPage>0)?pages[_bookReaderPage-1]:'';
+  var isFirst=_bookReaderPage===0;
+  var isLast=_bookReaderPage>=pageCount-1;
+  ov.innerHTML='<div class="br-wrap" onclick="if(event.target===this)closeBookReader()">'
+    +'<div class="br-modal">'
+    +'<div class="br-header"><span class="br-title">'+e(book.title)+'</span><button class="br-close" onclick="closeBookReader()">&#10005;</button></div>'
+    +'<div class="br-body">'
+    +'<div class="br-page br-left">'
+    +(isFirst?'<div class="br-cover-info"><div style="font-size:40px;margin-bottom:12px;">📖</div><div style="font-size:15px;font-weight:700;color:#1C1C1E;">'+e(book.title)+'</div><div style="font-size:12px;color:#8A8680;margin-top:6px;">'+e(book.author)+'</div></div>':'<textarea class="br-textarea" placeholder="Écrire ici..." onchange="saveBookPage('+((_bookReaderPage-1>=0)?_bookReaderPage-1:0)+',this.value)">'+e(leftPage)+'</textarea>')
+    +'<div class="br-page-num">'+(isFirst?'':_bookReaderPage)+'</div>'
+    +'</div>'
+    +'<div class="br-page br-right">'
+    +'<textarea class="br-textarea" placeholder="Écrire ici..." onchange="saveBookPage('+_bookReaderPage+',this.value)">'+e(page)+'</textarea>'
+    +'<div class="br-page-num">'+(_bookReaderPage+1)+'</div>'
+    +'</div>'
+    +'</div>'
+    +'<div class="br-footer">'
+    +'<button class="br-nav-btn" onclick="bookPagePrev()" '+(isFirst?'disabled':'')+'>&#9664; Précédent</button>'
+    +'<span style="font-size:12px;color:#8A8680;">Page '+(_bookReaderPage+1)+' / '+pageCount+'</span>'
+    +'<button class="br-nav-btn" onclick="bookPageNext()">Suivant &#9654;</button>'
+    +'</div>'
+    +'</div>'
+    +'</div>';
+}
+function saveBookPage(pageIdx,val){
+  if(!_bookReaderOpen)return;
+  if(!bookNotes[_bookReaderOpen])bookNotes[_bookReaderOpen]=[''];
+  while(bookNotes[_bookReaderOpen].length<=pageIdx)bookNotes[_bookReaderOpen].push('');
+  bookNotes[_bookReaderOpen][pageIdx]=val;
+  saveTasks();
+}
+function bookPageNext(){
+  if(!_bookReaderOpen)return;
+  if(!bookNotes[_bookReaderOpen])bookNotes[_bookReaderOpen]=[''];
+  _bookReaderPage++;
+  if(_bookReaderPage>=bookNotes[_bookReaderOpen].length)bookNotes[_bookReaderOpen].push('');
+  saveTasks();rBookReader();
+}
+function bookPagePrev(){
+  if(!_bookReaderOpen||_bookReaderPage<=0)return;
+  _bookReaderPage--;
+  rBookReader();
 }
 
 function rhBook(b){
@@ -1503,18 +1991,19 @@ function rhBook(b){
 }
 
 
-function rh(t,hc,s){
+function rh(t,hc,s,noOuterDiv){
   var catSpan=hc?'':'<span class="rc">'+e(t.cat)+'</span>';
   var todayCls=t.today?' on':'';
   var urgCls=t.prio==='U'?' on':'';
-  return '<div class="row '+(t.done?'done':'')+' '+s+'" id="r'+t.id+'">'
-    +'<div class="chk-wrap"><input type="checkbox" class="chk"'+(t.done?' checked':'')+' onclick="tgl(\''+t.id+'\',this.checked)"></div>'
+  var inner='<div class="chk-wrap"><input type="checkbox" class="chk"'+(t.done?' checked':'')+' onclick="tgl(\''+t.id+'\',this.checked)"></div>'
     +'<div class="rt-wrap"><span class="rt" id="s'+t.id+'">'+e(t.text)+'</span>'+catSpan+'</div>'
     +'<button class="edit-btn" onclick="ed(\''+t.id+'\')">&#9999;</button>'
     +'<div class="act">'
     +'<button class="pb A'+todayCls+'" onclick="st(\''+t.id+'\')">A</button>'
     +'<button class="pb U'+urgCls+'" onclick="sp(\''+t.id+'\',\'U\')">U</button>'
-    +'</div></div>';
+    +'</div>';
+  if(noOuterDiv) return inner;
+  return '<div class="row '+(t.done?'done':'')+' '+s+'" id="r'+t.id+'">'+inner+'</div>';
 }
 
 
@@ -1522,12 +2011,12 @@ function e(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replac
 
 function rGauge(){
   var footer=document.querySelector('.sidebar-footer');
-  if(currentView==='Projection'||currentView==='Networking'||currentView==='Exams'){if(footer)footer.style.display='none';return;}
+  if(['Projection','Networking','Exams','Home','Finances','BOAZ'].indexOf(currentView)>=0){if(footer)footer.style.display='none';return;}
   if(footer)footer.style.display='';
   var dnEl=document.getElementById('dn'),totEl=document.getElementById('tot');
   var fill=document.getElementById('gauge-fill');
   var label=document.getElementById('gauge-label');
-  if(currentView==='Books'){
+  if(currentView==='Culture'){
     var total=books.length;
     var read=books.filter(function(b){return b.status==='read';}).length;
     var pct=total>0?Math.round(read/total*100):0;
@@ -1588,7 +2077,7 @@ async function sv(id){
   if(supabaseClient) await updateRemoteTask(id,changes);
 }
 
-function openModal(){if(currentView==='Projection'){openProjPeriodModal(null,null);return;}if(currentView==='Books'){openBookModal();return;}if(currentView==='Networking'){openContactModal(null);return;}if(currentView==='Chess'){openChessModal();return;}if(currentView==='Exams')return;document.getElementById('bd').classList.add('open');document.querySelectorAll('.apb').forEach(function(b){b.classList.remove('sel');});np='M';na=false;if(isTodayTab(tab)){na=true;var ab=document.querySelector('#bd .apb.A');if(ab)ab.classList.add('sel');}setTimeout(function(){document.getElementById('new-task').focus();},80);}
+function openModal(){if(currentView==='Projection'){openProjPeriodModal(null,null);return;}if(currentView==='Culture'||currentView==='Books'){openBookModal();return;}if(currentView==='Networking'){openContactModal(null);return;}if(currentView==='Chess'){openChessModal();return;}if(currentView==='Exams'||currentView==='Home'||currentView==='Finances'||currentView==='BOAZ')return;document.getElementById('bd').classList.add('open');document.querySelectorAll('.apb').forEach(function(b){b.classList.remove('sel');});np='M';na=false;if(isTodayTab(tab)){na=true;var ab=document.querySelector('#bd .apb.A');if(ab)ab.classList.add('sel');}setTimeout(function(){document.getElementById('new-task').focus();},80);}
 function closeModal(){document.getElementById('bd').classList.remove('open');}
 function bdClick(ev){if(ev.target===document.getElementById('bd'))closeModal();}
 
@@ -2156,6 +2645,42 @@ async function deleteContactDirect(id){
 function contactToPayload(c){
   return {fname:c.fname||'',lname:c.lname||'',company:c.company||'',pos:c.pos||'',date:c.date||'',prox:c.prox||'Faible',mail_url:c.mail_url||'',phone:c.phone||'',linkedin:c.linkedin||'',photo:c.photo||'',notes:c.notes||'',company_logo:c.company_logo||'',sort_order:c.sortOrder||0};
 }
+async function handleContactLogoFile(inp){
+  var file=inp.files&&inp.files[0];
+  if(!file)return;
+  var dataUrl=await fileToDataUrl(file);
+  if(!dataUrl)return;
+  var el=document.getElementById('ct-company-logo');
+  if(!el)return;
+  if(supabaseClient){
+    var uploadedUrl=await uploadContactPhoto(file,'logos');
+    if(uploadedUrl){el.value=uploadedUrl;return;}
+  }
+  el.value=dataUrl;
+}
+async function handleContactPhotoFile(inp){
+  var file=inp.files&&inp.files[0];
+  if(!file)return;
+  var dataUrl=await fileToDataUrl(file);
+  if(!dataUrl)return;
+  var el=document.getElementById('ct-photo');
+  if(!el)return;
+  if(supabaseClient){
+    var uploadedUrl=await uploadContactPhoto(file,'photos');
+    if(uploadedUrl){el.value=uploadedUrl;return;}
+  }
+  el.value=dataUrl;
+}
+async function uploadContactPhoto(file,folder){
+  if(!supabaseClient||!file)return'';
+  const {data:{user}}=await supabaseClient.auth.getUser();
+  if(!user)return'';
+  var path=folder+'/'+user.id+'/'+Date.now()+'-'+file.name.replace(/[^a-zA-Z0-9_.-]/g,'_');
+  var res=await supabaseClient.storage.from(SUPABASE_BUCKET).upload(path,file,{upsert:true});
+  if(res.error)return'';
+  var pub=await supabaseClient.storage.from(SUPABASE_BUCKET).getPublicUrl(path);
+  return(pub.data&&pub.data.publicUrl)?pub.data.publicUrl:'';
+}
 
 async function loadContactsRemote(){
   if(!supabaseClient)return;
@@ -2397,8 +2922,10 @@ function flipChessBoard(id){
 }
 
 function rChessNav(){
-  var wrap=document.getElementById('tabs-wrap');
-  if(!wrap) return;
+  var tabsEl=document.getElementById('tabs');
+  if(!tabsEl) return;
+  var ctm=document.getElementById('cat-treemap');
+  if(ctm)ctm.style.display='none';
   var h='<div class="tab'+(currentChessBoard===null?' active':'')+'" onclick="selectChessBoard(null)">';
   h+='<span class="tab-icon" style="background:#F0EDE8;font-size:15px;">♟</span>';
   h+='<span class="tab-label">Tous les pièges</span>';
@@ -2410,7 +2937,7 @@ function rChessNav(){
     h+='<span class="tab-icon" style="background:'+(active?'#5856D6':'#F0EDE8')+';color:'+(active?'#fff':'#1C1C1E')+';font-size:15px;">'+icon+'</span>';
     h+='<span class="tab-label">'+e(board.title||'Sans titre')+'</span></div>';
   });
-  wrap.innerHTML=h;
+  tabsEl.innerHTML=h;
 }
 
 function selectChessBoard(id){
@@ -3426,6 +3953,9 @@ function deleteProjGoal(id){
 }
 </script>
 
+<!-- BOOK READER OVERLAY -->
+<div id="book-reader-overlay"></div>
+
 <!-- EXAM COMMENT EDITOR -->
 <div id="exam-comment-overlay" onclick="if(event.target===this)closeCommentEditor()">
   <div class="exam-comment-modal">
@@ -3451,12 +3981,15 @@ function deleteProjGoal(id){
     <button class="nav-drawer-close" onclick="closeNavDrawer()">&#10005;</button>
   </div>
   <div class="nav-drawer-items">
+    <button class="nav-drawer-item" data-view="Home" onclick="navDrawerGo('Home')"><span class="nav-drawer-item-icon">⌂</span><span class="nav-drawer-item-label">Accueil</span></button>
     <button class="nav-drawer-item" data-view="Checklist" onclick="navDrawerGo('Checklist')"><span class="nav-drawer-item-icon">☰</span><span class="nav-drawer-item-label">Checklist</span></button>
-    <button class="nav-drawer-item" data-view="Books" onclick="navDrawerGo('Books')"><span class="nav-drawer-item-icon">☷</span><span class="nav-drawer-item-label">Books</span></button>
+    <button class="nav-drawer-item" data-view="Culture" onclick="navDrawerGo('Culture')"><span class="nav-drawer-item-icon">📚</span><span class="nav-drawer-item-label">Culture</span></button>
     <button class="nav-drawer-item" data-view="Projection" onclick="navDrawerGo('Projection')"><span class="nav-drawer-item-icon">◫</span><span class="nav-drawer-item-label">Projection</span></button>
     <button class="nav-drawer-item" data-view="Networking" onclick="navDrawerGo('Networking')"><span class="nav-drawer-item-icon">◎</span><span class="nav-drawer-item-label">Réseau</span></button>
     <button class="nav-drawer-item" data-view="Exams" onclick="navDrawerGo('Exams')"><span class="nav-drawer-item-icon" style="font-weight:700;">E</span><span class="nav-drawer-item-label">Exams</span></button>
     <button class="nav-drawer-item" data-view="Chess" onclick="navDrawerGo('Chess')"><span class="nav-drawer-item-icon">♟</span><span class="nav-drawer-item-label">Chess</span></button>
+    <button class="nav-drawer-item" data-view="Finances" onclick="navDrawerGo('Finances')"><span class="nav-drawer-item-icon">💰</span><span class="nav-drawer-item-label">Finances</span></button>
+    <button class="nav-drawer-item" data-view="BOAZ" onclick="navDrawerGo('BOAZ')"><span class="nav-drawer-item-icon">📖</span><span class="nav-drawer-item-label">BOAZ</span></button>
   </div>
 </div>
 </body>
