@@ -1693,7 +1693,7 @@ function render(){
   }
   // Hide sidebar for Home, Finances, BOAZ, Culture
   var sidebarEl=document.querySelector('.sidebar');
-  var SIDEBAR_HIDDEN_VIEWS=['Home','Finances','BOAZ','Culture'];
+  var SIDEBAR_HIDDEN_VIEWS=['Home','Finances','BOAZ','Culture','Exams'];
   if(sidebarEl)sidebarEl.style.display=SIDEBAR_HIDDEN_VIEWS.indexOf(currentView)>=0?'none':'';
   // Show Home button in header on all views except Home itself
   var mainHomeBtn=document.getElementById('main-home-btn');
