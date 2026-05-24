@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Check List">
 <link rel="apple-touch-icon" sizes="180x180" id="ati" href="">
-<title>Louis'Checklist</title>
+<title>HAL9000</title>
 <link rel="icon" type="image/png" id="fav" href="">
 <link rel="shortcut icon" type="image/png" id="sfav" href="">
 <script>
@@ -611,38 +611,39 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
 .br-nav-btn:disabled{color:#C8C0A8;cursor:default;}
 
 /* ── Finances page ── */
-.fin-wrap{padding:20px 28px 60px;max-width:1100px;margin:0 auto;}
-.fin-header{display:flex;align-items:center;gap:12px;margin-bottom:20px;}
-.fin-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
-@media(max-width:680px){.fin-grid{grid-template-columns:1fr;}.fin-wrap{padding:14px;}}
-.fin-card{background:#fff;border:1px solid rgba(0,0,0,0.07);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:8px;}
-.fin-card-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:4px;}
-.fin-row{display:flex;align-items:center;gap:8px;padding:3px 0;}
+.fin-wrap{padding:16px 20px 60px;max-width:1200px;margin:0 auto;}
+.fin-header{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
+.fin-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+@media(max-width:680px){.fin-grid{grid-template-columns:1fr;}.fin-wrap{padding:10px;}}
+.fin-card{background:#F0EEEA;border:1px solid rgba(0,0,0,0.09);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:6px;}
+.fin-card-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.09em;margin-bottom:6px;}
+.fin-row{display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid rgba(0,0,0,0.05);}
+.fin-row:last-of-type{border-bottom:none;}
 .fin-label{flex:1;min-width:0;}
-.fin-inp-label{border:none;background:transparent;font-size:13px;color:#1C1C1E;outline:none;width:100%;padding:2px 0;border-bottom:1px dashed #E0DDD8;}
-.fin-inp-label:focus{border-bottom-color:#4A90D9;}
-.fin-amount{display:flex;align-items:center;gap:4px;flex-shrink:0;white-space:nowrap;font-size:13px;color:#1C1C1E;}
-.fin-inp{width:80px;border:1px solid #E0DDD8;border-radius:6px;padding:3px 6px;font-size:13px;color:#1C1C1E;background:#FAFAF8;outline:none;text-align:right;-webkit-appearance:none;-moz-appearance:textfield;appearance:textfield;}
+.fin-inp-label{border:none;background:transparent;font-size:14px;color:#1C1C1E;outline:none;width:100%;padding:2px 0;}
+.fin-inp-label:focus{outline:none;}
+.fin-amount{display:flex;align-items:center;gap:4px;flex-shrink:0;white-space:nowrap;font-size:15px;font-weight:600;color:#1C1C1E;}
+.fin-inp{width:86px;border:1px solid #D5D2CC;border-radius:6px;padding:4px 7px;font-size:15px;font-weight:600;color:#1C1C1E;background:#fff;outline:none;text-align:right;-webkit-appearance:none;-moz-appearance:textfield;appearance:textfield;}
 .fin-inp:focus{border-color:#4A90D9;}
-.fin-inp-inline{width:80px;}
+.fin-inp-inline{width:86px;}
 .fin-del{background:none;border:none;cursor:pointer;color:#D0CCC6;font-size:16px;line-height:1;padding:2px 4px;border-radius:4px;flex-shrink:0;transition:color .12s;}
 .fin-del:hover{color:#FF3B30;}
-.fin-add-row{background:none;border:1.5px dashed #D0CCC6;border-radius:7px;color:#8A8680;font-size:12px;cursor:pointer;padding:4px 10px;transition:all .12s;margin-top:4px;}
+.fin-add-row{background:none;border:1.5px dashed #C8C5BF;border-radius:7px;color:#8A8680;font-size:12px;cursor:pointer;padding:5px 10px;transition:all .12s;margin-top:6px;align-self:flex-start;}
 .fin-add-row:hover{border-color:#4A90D9;color:#4A90D9;}
-.fin-total{font-size:12px;color:#5A5755;padding:8px 0 0;border-top:1px solid #F0EDE8;margin-top:4px;}
+.fin-total{font-size:13px;font-weight:700;color:#1C1C1E;padding:8px 0 0;border-top:2px solid rgba(0,0,0,0.08);margin-top:6px;}
 .fin-total strong{color:#1C1C1E;}
-.fin-reste{font-size:13px;color:#4A90D9;font-weight:600;}
-.fin-synthese{border:2px solid #34C759;}
-.fin-synth-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid #F0EDE8;font-size:13px;color:#3D3B38;gap:12px;}
+.fin-reste{font-size:15px;color:#4A90D9;font-weight:700;}
+.fin-synthese{border:2px solid #34C759;background:#F0FAF3;}
+.fin-synth-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(0,0,0,0.06);font-size:14px;color:#3D3B38;gap:12px;}
 .fin-synth-row:last-child{border-bottom:none;}
-.fin-highlight{font-size:16px;font-weight:700;color:#34C759;}
+.fin-highlight{font-size:20px;font-weight:800;color:#34C759;}
 
 /* ── BOAZ page ── */
 .boaz-wrap{display:flex;flex-direction:column;height:100%;}
 .boaz-header{display:flex;align-items:center;gap:12px;padding:12px 20px;border-bottom:1px solid rgba(0,0,0,0.06);}
 .boaz-title{font-size:18px;font-weight:700;color:#1C1C1E;font-family:'Libre Baskerville',serif;flex:1;text-align:center;}
 .boaz-layout{display:grid;grid-template-columns:220px 1fr;flex:1;overflow:hidden;min-height:0;}
-.boaz-toc{background:#F5F0E8;border-right:2px solid #C8C0A8;padding:14px 10px;display:flex;flex-direction:column;overflow-y:auto;}
+.boaz-toc{background:#F0EEEA;border-right:1px solid #D5D2CC;padding:14px 10px;display:flex;flex-direction:column;overflow-y:auto;}
 .boaz-toc-title{font-size:10.5px;font-weight:700;color:#8A8680;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;}
 .boaz-toc-list{flex:1;overflow-y:auto;}
 .boaz-toc-item{display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:7px;cursor:pointer;transition:background .1s;}
@@ -656,16 +657,52 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
 .boaz-toc-input{border:1px solid #D5D2CC;border-radius:7px;padding:6px 8px;font-size:12px;background:#EAE8E4;outline:none;color:#1C1C1E;width:100%;}
 .boaz-toc-input:focus{border-color:#8A8680;background:#E5E2DC;}
 .boaz-book{display:flex;flex-direction:column;overflow:hidden;}
-.boaz-spread{display:grid;grid-template-columns:1fr 1fr;flex:1;min-height:0;}
-.boaz-page{display:flex;flex-direction:column;padding:20px;background:#FFFDF5;position:relative;}
-.boaz-left{border-right:3px solid #302E2C;box-shadow:2px 0 8px rgba(0,0,0,0.1) inset;}
+.boaz-spread{display:grid;grid-template-columns:1fr 2px 1fr;flex:1;min-height:0;}
+.boaz-page{display:flex;flex-direction:column;padding:28px 24px;background:#FFFFFF;position:relative;}
+.boaz-spine{background:#D5D2CC;flex-shrink:0;}
+.boaz-left{border:none;}
 .boaz-cover-face{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;}
+.boaz-page-textarea{flex:1;border:none;background:transparent;font-size:14px;font-family:'Libre Baskerville',serif;color:#1C1C1E;line-height:1.9;resize:none;outline:none;width:100%;}
+.boaz-page-textarea::placeholder{color:#C8C5BF;font-style:italic;}
+.boaz-pgnum{text-align:center;font-size:10px;color:#B0ADA8;margin-top:10px;font-family:'Libre Baskerville',serif;}
 @media(max-width:680px){
   .boaz-layout{grid-template-columns:1fr;}
   .boaz-toc{display:none;}
   .boaz-spread{grid-template-columns:1fr;}
+  .boaz-spine{display:none;}
   .boaz-left{display:none;}
 }
+
+/* ── New Book Reader ── */
+.br-shell{width:100%;height:100%;display:flex;flex-direction:column;background:#1A1A1A;}
+.br-topbar{display:flex;align-items:center;justify-content:space-between;padding:10px 20px;background:#111;flex-shrink:0;}
+.br-book-name{font-size:13px;font-weight:600;color:#AAA;font-family:'Libre Baskerville',serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.br-x-btn{background:none;border:none;cursor:pointer;color:#888;font-size:17px;padding:4px 8px;border-radius:5px;line-height:1;transition:background .12s,color .12s;}
+.br-x-btn:hover{background:rgba(255,255,255,0.1);color:#fff;}
+.br-stage{flex:1;display:flex;align-items:center;justify-content:center;padding:28px 32px;overflow:hidden;background:#1A1A1A;}
+.br-spread{display:flex;width:min(860px,100%);height:min(560px,100%);box-shadow:0 20px 80px rgba(0,0,0,0.7);border-radius:2px;overflow:hidden;}
+.br-pg{flex:1;display:flex;flex-direction:column;background:#FFFFFF;padding:32px 28px 20px;}
+.br-pg-left{border-right:1px solid #E0DDD8;}
+.br-page-textarea{flex:1;border:none;background:transparent;font-size:14px;font-family:'Libre Baskerville',serif;color:#1C1C1E;line-height:1.9;resize:none;outline:none;width:100%;}
+.br-page-textarea::placeholder{color:#C8C5BF;font-style:italic;}
+.br-pgnum{text-align:center;font-size:10px;color:#B0ADA8;margin-top:10px;font-family:'Libre Baskerville',serif;}
+.br-spine-line{width:2px;background:#D5D2CC;flex-shrink:0;}
+.br-cover-face{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:#FFFFFF;}
+.br-bottombar{display:flex;align-items:center;justify-content:space-between;padding:10px 24px;background:#111;flex-shrink:0;}
+.br-nav-btn2{padding:7px 18px;border-radius:7px;border:1px solid #444;background:transparent;color:#AAA;font-size:12px;font-weight:600;cursor:pointer;transition:background .12s,color .12s;}
+.br-nav-btn2:hover:not(:disabled){background:rgba(255,255,255,0.1);color:#fff;border-color:#666;}
+.br-nav-btn2:disabled{color:#555;cursor:default;border-color:#333;}
+.br-pg-info{font-size:12px;color:#777;}
+@keyframes brSlideLeft{from{transform:translateX(30px);opacity:0}to{transform:translateX(0);opacity:1}}
+@keyframes brSlideRight{from{transform:translateX(-30px);opacity:0}to{transform:translateX(0);opacity:1}}
+.br-anim-next{animation:brSlideLeft 0.2s ease-out;}
+.br-anim-prev{animation:brSlideRight 0.2s ease-out;}
+
+/* ── Home page title ── */
+.home-hal-title{font-size:38px;font-weight:800;color:#1C1C1E;text-align:center;padding:32px 24px 8px;letter-spacing:-1px;}
+.home-card{background:#F0EEEA;border:1px solid rgba(0,0,0,0.10);border-radius:12px;padding:22px 18px;cursor:pointer;transition:box-shadow .15s,background .15s;display:flex;flex-direction:column;align-items:center;text-align:center;}
+.home-card:hover{box-shadow:0 4px 16px rgba(0,0,0,0.10);background:#E8E6E2;}
+.home-card-title{font-size:15px;font-weight:700;color:#1C1C1E;}
 </style>
 </head>
 <body>
@@ -676,21 +713,14 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
   <div class="sidebar">
     <div class="sidebar-header">
       <button class="hamburger-btn" onclick="openNavDrawer()" aria-label="Menu">☰</button>
-      <div class="app-name">Louis'Checklist</div>
+      <div class="app-name">HAL9000</div>
       <div class="sidebar-actions">
         <div class="sync-dot" id="sync-dot"></div>
         <button class="tb-btn" onclick="setView('Home')" title="Accueil">⌂</button>
         <button class="tb-btn" onclick="location.reload()" title="Actualiser">&#8635;</button>
       </div>
     </div>
-    <div class="view-bar" id="view-bar">
-      <button class="view-btn" data-view="Checklist" onclick="setView('Checklist')">Checklist</button>
-      <button class="view-btn" data-view="Culture" onclick="setView('Culture')">Culture</button>
-      <button class="view-btn" data-view="Projection" onclick="setView('Projection')">Projection</button>
-      <button class="view-btn" data-view="Networking" onclick="setView('Networking')">Networking</button>
-      <button class="view-btn" data-view="Exams" onclick="setView('Exams')">Exams</button>
-      <button class="view-btn" data-view="Chess" onclick="setView('Chess')">Chess</button>
-    </div>
+    <div class="view-bar" id="view-bar" style="display:none;"></div>
     <div class="tabs-wrap" id="tabs-wrap">
       <div class="tabs" id="tabs"></div>
       <div id="cat-treemap"></div>
@@ -720,10 +750,10 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
 <nav class="mobile-nav" id="mobile-nav">
   <button class="mobile-nav-btn" data-view="Home" onclick="setView('Home')"><span class="mobile-nav-icon">⌂</span><span>Accueil</span></button>
   <button class="mobile-nav-btn" data-view="Checklist" onclick="setView('Checklist')"><span class="mobile-nav-icon">☰</span><span>Liste</span></button>
-  <button class="mobile-nav-btn" data-view="Culture" onclick="setView('Culture')"><span class="mobile-nav-icon">📚</span><span>Culture</span></button>
+  <button class="mobile-nav-btn" data-view="Culture" onclick="setView('Culture')"><span class="mobile-nav-icon">◻</span><span>Culture</span></button>
   <button class="mobile-nav-btn" data-view="Networking" onclick="setView('Networking')"><span class="mobile-nav-icon">◎</span><span>Réseau</span></button>
-  <button class="mobile-nav-btn" data-view="Finances" onclick="setView('Finances')"><span class="mobile-nav-icon">💰</span><span>Finances</span></button>
-  <button class="mobile-nav-btn" data-view="BOAZ" onclick="setView('BOAZ')"><span class="mobile-nav-icon">📖</span><span>BOAZ</span></button>
+  <button class="mobile-nav-btn" data-view="Finances" onclick="setView('Finances')"><span class="mobile-nav-icon">€</span><span>Finances</span></button>
+  <button class="mobile-nav-btn" data-view="BOAZ" onclick="setView('BOAZ')"><span class="mobile-nav-icon">B</span><span>BOAZ</span></button>
 </nav>
 
 <div class="backdrop" id="bd" onclick="bdClick(event)">
@@ -960,28 +990,21 @@ var _pRowId=null;
 function rHome(){
   var el=document.getElementById('list');
   if(!el)return;
-  var todayCount=tasks.filter(function(t){return t.today&&!t.done;}).length;
-  var allCount=tasks.filter(function(t){return!t.done;}).length;
-  var booksCount=books.length;
-  var contactsCount=contacts.length;
   var cards=[
-    {view:'Checklist',icon:'☰',color:'#4A90D9',title:'Checklist',sub:allCount+' tâche'+(allCount!==1?'s':'')},
-    {view:'Checklist',icon:'★',color:'#34C759',title:"Aujourd'hui",sub:todayCount+' tâche'+(todayCount!==1?'s':''),tab:"Aujourd'hui"},
-    {view:'Culture',icon:'📚',color:'#AF52DE',title:'Culture',sub:booksCount+' livre'+(booksCount!==1?'s':'')},
-    {view:'Projection',icon:'◫',color:'#8A8680',title:'Projection',sub:'Feuille de route'},
-    {view:'Networking',icon:'◎',color:'#4A90D9',title:'Networking',sub:contactsCount+' contact'+(contactsCount!==1?'s':'')},
-    {view:'Exams',icon:'E',color:'#5856D6',title:'Exams',sub:'Notes & révisions'},
-    {view:'Chess',icon:'♟',color:'#302E2C',title:'Chess',sub:'Ouvertures'},
-    {view:'Finances',icon:'💰',color:'#34C759',title:'Mes Finances',sub:'Budget & épargne'},
-    {view:'BOAZ',icon:'📖',color:'#302E2C',title:'BOAZ',sub:'Mon livre'},
+    {view:'Checklist',title:'Checklist'},
+    {view:'Culture',title:'Culture'},
+    {view:'Projection',title:'Projection'},
+    {view:'Networking',title:'Networking'},
+    {view:'Exams',title:'Exams'},
+    {view:'Chess',title:'Chess'},
+    {view:'Finances',title:'Finances'},
+    {view:'BOAZ',title:'BOAZ'},
   ];
-  var h='<div class="home-grid">';
+  var h='<div class="home-hal-title">HAL9000</div>';
+  h+='<div class="home-grid">';
   cards.forEach(function(c){
-    var onclick=c.tab?'setView(\''+c.view+'\');tab=\''+e(c.tab)+'\';render();saveTasks();':'setView(\''+c.view+'\');';
-    h+='<div class="home-card" onclick="'+onclick+'" style="--card-color:'+c.color+';">'
-      +'<div class="home-card-icon" style="background:'+c.color+';">'+c.icon+'</div>'
+    h+='<div class="home-card" onclick="setView(\''+c.view+'\')">'
       +'<div class="home-card-title">'+e(c.title)+'</div>'
-      +'<div class="home-card-sub">'+e(c.sub)+'</div>'
       +'</div>';
   });
   h+='</div>';
@@ -1006,7 +1029,7 @@ function rFinances(){
   h+='<div class="fin-grid">';
 
   // Dépenses mensuelles
-  h+='<div class="fin-card"><div class="fin-card-title" style="color:#FF3B30;">💸 Dépenses mensuelles</div>';
+  h+='<div class="fin-card"><div class="fin-card-title" style="color:#FF3B30;">Dépenses mensuelles</div>';
   fd.depenses.forEach(function(d,i){
     h+='<div class="fin-row"><span class="fin-label"><input class="fin-inp-label" value="'+e(d.label)+'" onchange="updateFinances(\'depenses\','+i+',\'label\',this.value)"></span>'
       +'<span class="fin-amount"><input class="fin-inp" type="number" value="'+e(String(d.amount))+'" onchange="updateFinances(\'depenses\','+i+',\'amount\',parseFloat(this.value)||0)"> €</span>'
@@ -1016,7 +1039,7 @@ function rFinances(){
   h+='<div class="fin-total">Total : <strong>'+totalDep.toFixed(2)+' €</strong></div></div>';
 
   // Ressources
-  h+='<div class="fin-card"><div class="fin-card-title" style="color:#34C759;">💵 Ressources mensuelles</div>';
+  h+='<div class="fin-card"><div class="fin-card-title" style="color:#34C759;">Ressources mensuelles</div>';
   fd.ressources.forEach(function(d,i){
     h+='<div class="fin-row"><span class="fin-label"><input class="fin-inp-label" value="'+e(d.label)+'" onchange="updateFinances(\'ressources\','+i+',\'label\',this.value)"></span>'
       +'<span class="fin-amount"><input class="fin-inp" type="number" value="'+e(String(d.amount))+'" onchange="updateFinances(\'ressources\','+i+',\'amount\',parseFloat(this.value)||0)"> €</span>'
@@ -1025,7 +1048,7 @@ function rFinances(){
   h+='<button class="fin-add-row" onclick="addFinanceRow(\'ressources\')">+ Ajouter</button>';
   h+='<div class="fin-total">Total : <strong>'+totalRes.toFixed(2)+' €</strong></div>';
   if((fd.autresSorties||[]).length){
-    h+='<div class="fin-card-title" style="color:#FF9500;margin-top:12px;">↗ Autres sorties</div>';
+    h+='<div class="fin-card-title" style="color:#FF9500;margin-top:12px;">Autres sorties</div>';
     (fd.autresSorties||[]).forEach(function(d,i){
       h+='<div class="fin-row"><span class="fin-label"><input class="fin-inp-label" value="'+e(d.label)+'" onchange="updateFinances(\'autresSorties\','+i+',\'label\',this.value)"></span>'
         +'<span class="fin-amount"><input class="fin-inp" type="number" value="'+e(String(d.amount))+'" onchange="updateFinances(\'autresSorties\','+i+',\'amount\',parseFloat(this.value)||0)"> €</span>'
@@ -1037,7 +1060,7 @@ function rFinances(){
   h+='<div class="fin-total fin-reste">Reste mensuel : <strong>'+reste.toFixed(2)+' €</strong></div></div>';
 
   // Comptes courants
-  h+='<div class="fin-card"><div class="fin-card-title" style="color:#4A90D9;">🏦 Comptes courants</div>';
+  h+='<div class="fin-card"><div class="fin-card-title" style="color:#4A90D9;">Comptes courants</div>';
   fd.comptesCourants.forEach(function(d,i){
     h+='<div class="fin-row"><span class="fin-label"><input class="fin-inp-label" value="'+e(d.label)+'" onchange="updateFinances(\'comptesCourants\','+i+',\'label\',this.value)"></span>'
       +'<span class="fin-amount"><input class="fin-inp" type="number" value="'+e(String(d.amount))+'" onchange="updateFinances(\'comptesCourants\','+i+',\'amount\',parseFloat(this.value)||0)"> €</span>'
@@ -1047,7 +1070,7 @@ function rFinances(){
   h+='<div class="fin-total">Total : <strong>'+totalCC.toFixed(2)+' €</strong></div></div>';
 
   // Épargne
-  h+='<div class="fin-card"><div class="fin-card-title" style="color:#FF9500;">💎 Épargne</div>';
+  h+='<div class="fin-card"><div class="fin-card-title" style="color:#FF9500;">Épargne</div>';
   fd.epargne.forEach(function(d,i){
     h+='<div class="fin-row"><span class="fin-label"><input class="fin-inp-label" value="'+e(d.label)+'" onchange="updateFinances(\'epargne\','+i+',\'label\',this.value)"></span>'
       +'<span class="fin-amount"><input class="fin-inp" type="number" value="'+e(String(d.amount))+'" onchange="updateFinances(\'epargne\','+i+',\'amount\',parseFloat(this.value)||0)"> €</span>'
@@ -1057,7 +1080,7 @@ function rFinances(){
   h+='<div class="fin-total">Total épargne : <strong>'+totalEp.toFixed(2)+' €</strong></div></div>';
 
   // Dépenses à venir
-  h+='<div class="fin-card"><div class="fin-card-title" style="color:#FF3B30;">⚠️ Dépenses à venir</div>';
+  h+='<div class="fin-card"><div class="fin-card-title" style="color:#FF3B30;">Dépenses à venir</div>';
   fd.depensesAvenir.forEach(function(d,i){
     h+='<div class="fin-row"><span class="fin-label"><input class="fin-inp-label" value="'+e(d.label)+'" onchange="updateFinances(\'depensesAvenir\','+i+',\'label\',this.value)"></span>'
       +'<span class="fin-amount"><input class="fin-inp" type="number" value="'+e(String(d.amount))+'" onchange="updateFinances(\'depensesAvenir\','+i+',\'amount\',parseFloat(this.value)||0)"> €</span>'
@@ -1067,7 +1090,7 @@ function rFinances(){
   h+='<div class="fin-total">Total : <strong>'+totalDA.toFixed(2)+' €</strong></div></div>';
 
   // Synthèse
-  h+='<div class="fin-card fin-synthese"><div class="fin-card-title">📊 Synthèse</div>';
+  h+='<div class="fin-card fin-synthese"><div class="fin-card-title">Synthèse</div>';
   h+='<div class="fin-synth-row"><span>Montant total disponible</span><strong class="fin-highlight">'+montantRestant.toFixed(2)+' €</strong></div>';
   h+='<div class="fin-synth-row"><span>Maman reste (prêt)</span>'
     +'<strong><input class="fin-inp fin-inp-inline" type="number" value="'+e(String(fd.mamanReste||0))+'" onchange="financesData.mamanReste=parseFloat(this.value)||0;saveTasks();"> €</strong></div>';
@@ -1128,17 +1151,18 @@ function rBOAZ(){
     +'<div class="boaz-book">'
     +'<div class="boaz-spread">'
     +'<div class="boaz-page boaz-left">'
-    +(leftPageIdx>=0?'<textarea class="br-textarea" placeholder="Écrire ici..." onchange="boazSavePage('+leftPageIdx+',this.value)">'+e(leftPageText)+'</textarea><div class="br-page-num">'+(leftPageIdx+1)+'</div>':'<div class="boaz-cover-face"><div style="font-size:48px;">📖</div><div style="font-size:18px;font-weight:700;margin-top:12px;color:#1C1C1E;">BOAZ</div></div>')
+    +(leftPageIdx>=0?'<textarea class="boaz-page-textarea" placeholder="Écrire ici..." onblur="boazSavePage('+leftPageIdx+',this.value)" onchange="boazSavePage('+leftPageIdx+',this.value)">'+e(leftPageText)+'</textarea><div class="boaz-pgnum">'+(leftPageIdx+1)+'</div>':'<div class="boaz-cover-face"><div style="font-size:28px;font-weight:800;color:#1C1C1E;letter-spacing:-1px;">BOAZ</div></div>')
     +'</div>'
-    +'<div class="boaz-page boaz-right">'
-    +'<textarea class="br-textarea" placeholder="Écrire ici..." onchange="boazSavePage('+pageIdx+',this.value)">'+e(rightPageText)+'</textarea>'
-    +'<div class="br-page-num">'+(pageIdx+1)+'</div>'
+    +'<div class="boaz-spine"></div>'
+    +'<div class="boaz-page">'
+    +'<textarea class="boaz-page-textarea" placeholder="Écrire ici..." onblur="boazSavePage('+pageIdx+',this.value)" onchange="boazSavePage('+pageIdx+',this.value)">'+e(rightPageText)+'</textarea>'
+    +'<div class="boaz-pgnum">'+(pageIdx+1)+'</div>'
     +'</div>'
     +'</div>'
-    +'<div class="br-footer">'
-    +'<button class="br-nav-btn" onclick="boazPrev()" '+(pageIdx<=0?'disabled':'')+'>&#9664; Précédent</button>'
+    +'<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 20px;background:#F0EEEA;border-top:1px solid #D5D2CC;flex-shrink:0;">'
+    +'<button class="br-nav-btn2" style="border-color:#C8C5BF;color:#5A5755;" onclick="boazPrev()" '+(pageIdx<=0?'disabled':'')+'>&#9664; Précédent</button>'
     +'<span style="font-size:12px;color:#8A8680;">Page '+(pageIdx+1)+' / '+totalPages+'</span>'
-    +'<button class="br-nav-btn" onclick="boazNext()">Suivant &#9654;</button>'
+    +'<button class="br-nav-btn2" style="border-color:#C8C5BF;color:#5A5755;" onclick="boazNext()">Suivant &#9654;</button>'
     +'</div>'
     +'</div>'
     +'</div>'
@@ -1149,7 +1173,7 @@ function boazSavePage(idx,val){
   if(!boazData.pages)boazData.pages=[];
   while(boazData.pages.length<=idx)boazData.pages.push('');
   boazData.pages[idx]=val;
-  saveTasks();
+  saveTasks();scheduleSettingsSync();
 }
 function boazNext(){
   var pages=boazData.pages;if(!pages)pages=boazData.pages=[''];
@@ -1565,7 +1589,7 @@ function render(){
     var ctmB=document.getElementById('cat-treemap');if(ctmB)ctmB.style.display='none';
     if(bc){bc.classList.remove('proj-mode');bc.classList.remove('net-mode');}
     var mti=document.getElementById('main-title-icon');var mtt=document.getElementById('main-title-text');
-    if(mti){mti.textContent='📚';mti.style.background='#AF52DE';mti.style.color='#fff';mti.style.fontSize='';}
+    if(mti){mti.textContent='◻';mti.style.background='#AF52DE';mti.style.color='#fff';mti.style.fontSize='';}
     if(mtt)mtt.textContent='Culture';
     rBooksChart();
     rCulture();
@@ -1610,13 +1634,13 @@ function render(){
   } else if(currentView==='Finances'){
     if(bc){bc.classList.remove('proj-mode');bc.classList.remove('net-mode');}
     var mti=document.getElementById('main-title-icon');var mtt=document.getElementById('main-title-text');
-    if(mti){mti.textContent='💰';mti.style.background='#34C759';mti.style.color='#fff';mti.style.fontSize='';}
+    if(mti){mti.textContent='€';mti.style.background='#34C759';mti.style.color='#fff';mti.style.fontSize='18px';mti.style.fontWeight='700';}
     if(mtt)mtt.textContent='Mes Finances';
     rFinances();
   } else if(currentView==='BOAZ'){
     if(bc){bc.classList.remove('proj-mode');bc.classList.remove('net-mode');}
     var mti=document.getElementById('main-title-icon');var mtt=document.getElementById('main-title-text');
-    if(mti){mti.textContent='📖';mti.style.background='#302E2C';mti.style.color='#fff';mti.style.fontSize='';}
+    if(mti){mti.textContent='B';mti.style.background='#302E2C';mti.style.color='#fff';mti.style.fontSize='18px';mti.style.fontWeight='800';}
     if(mtt)mtt.textContent='BOAZ';
     rBOAZ();
   } else {
@@ -1768,8 +1792,10 @@ function rTasks(){
       if(bi>=0) return 1;
       return taskSortKey(a)-taskSortKey(b);
     });
-    // Sync todayOrderList to match current tasks
-    todayOrderList=todayRows.map(function(t){return String(t.id);});
+    // Sync todayOrderList: add new, remove gone, preserve existing order
+    var _curIdSet={};todayRows.forEach(function(t){_curIdSet[String(t.id)]=true;});
+    todayOrderList=todayOrderList.filter(function(id){return _curIdSet[id];});
+    todayRows.forEach(function(t){var sid=String(t.id);if(todayOrderList.indexOf(sid)<0)todayOrderList.push(sid);});
     h='<div class="today-ordered-list" id="today-ordered-list">';
     todayRows.forEach(function(t,idx){
       h+='<div class="today-row" data-tid="'+e(String(t.id))+'" onpointerdown="todayPointerDown(event,\''+e(String(t.id))+'\')" onpointermove="todayPointerMove(event)" onpointerup="todayPointerUp(event)" onpointercancel="todayPointerUp(event)">'
@@ -1817,7 +1843,7 @@ function todayPointerUp(e){
     var fromId=todayDrag.tid,toId=todayDropTarget.getAttribute('data-tid');
     var fi=todayOrderList.indexOf(fromId),ti=todayOrderList.indexOf(toId);
     if(fi>=0&&ti>=0){var item=todayOrderList.splice(fi,1)[0];todayOrderList.splice(ti,0,item);}
-    saveTasks();rTasks();
+    saveTasks();scheduleSettingsSync();rTasks();
   }
   if(todayDropTarget){todayDropTarget.classList.remove('today-row-over');todayDropTarget=null;}
   todayDrag.active=false;todayDrag.tid=null;todayDrag.el=null;
@@ -1899,7 +1925,7 @@ function rCulture(){
     group.sort(function(a,b){ var d=(b.sortOrder||0)-(a.sortOrder||0); if(d!==0)return d; if(typeof a.id==='number'&&typeof b.id==='number')return b.id-a.id; return String(b.id).localeCompare(String(a.id)); });
     h+='<div class="book-status-group"><div class="book-status-heading"><div class="ps-dot" style="background:#AF52DE;"></div><span>'+e(cat)+'</span></div>';
     h+='<div class="book-grid">';
-    group.forEach(function(b){var sid=e(String(b.id));var sst=e(b.status);h+='<div class="book-row" data-book-id="'+sid+'" data-book-status="'+sst+'" onpointerdown="bookPointerDown(event,\''+sid+'\',\''+sst+'\')" onpointermove="bookPointerMove(event)" onpointerup="bookPointerUp(event)" onpointercancel="bookPointerUp(event)" ondblclick="openBookReader(\''+sid+'\')">'+rhBook(b)+'</div>';});
+    group.forEach(function(b){var sid=e(String(b.id));var sst=e(b.status);h+='<div class="book-row" data-book-id="'+sid+'" data-book-status="'+sst+'" onpointerdown="bookPointerDown(event,\''+sid+'\',\''+sst+'\')" onpointermove="bookPointerMove(event)" onpointerup="bookPointerUp(event)" onpointercancel="bookPointerUp(event)">'+rhBook(b)+'</div>';});
     h+='</div></div>';
   });
   el.innerHTML=h;
@@ -1920,36 +1946,51 @@ function closeBookReader(){
   if(ov)ov.style.display='none';
   _bookReaderOpen=null;
 }
-function rBookReader(){
+function rBookReader(animDir){
   var ov=document.getElementById('book-reader-overlay');
   if(!ov||!_bookReaderOpen)return;
   var book=books.find(function(b){return String(b.id)===String(_bookReaderOpen);});
   if(!book)return;
+  if(!bookNotes[_bookReaderOpen])bookNotes[_bookReaderOpen]=[''];
   var pages=bookNotes[_bookReaderOpen];
-  if(!pages||!pages.length)pages=[''];
   var pageCount=pages.length;
-  var page=pages[_bookReaderPage]||'';
-  var leftPage=(_bookReaderPage>0)?pages[_bookReaderPage-1]:'';
+  var rightIdx=_bookReaderPage;
+  var leftIdx=_bookReaderPage-1;
+  var rightText=pages[rightIdx]||'';
+  var leftText=leftIdx>=0?pages[leftIdx]:'';
   var isFirst=_bookReaderPage===0;
-  var isLast=_bookReaderPage>=pageCount-1;
-  ov.innerHTML='<div class="br-wrap" onclick="if(event.target===this)closeBookReader()">'
-    +'<div class="br-modal">'
-    +'<div class="br-header"><span class="br-title">'+e(book.title)+'</span><button class="br-close" onclick="closeBookReader()">&#10005;</button></div>'
-    +'<div class="br-body">'
-    +'<div class="br-page br-left">'
-    +(isFirst?'<div class="br-cover-info"><div style="font-size:40px;margin-bottom:12px;">📖</div><div style="font-size:15px;font-weight:700;color:#1C1C1E;">'+e(book.title)+'</div><div style="font-size:12px;color:#8A8680;margin-top:6px;">'+e(book.author)+'</div></div>':'<textarea class="br-textarea" placeholder="Écrire ici..." onchange="saveBookPage('+((_bookReaderPage-1>=0)?_bookReaderPage-1:0)+',this.value)">'+e(leftPage)+'</textarea>')
-    +'<div class="br-page-num">'+(isFirst?'':_bookReaderPage)+'</div>'
+
+  var leftContent=isFirst
+    ?('<div class="br-cover-face">'
+      +'<div style="font-size:18px;font-weight:700;color:#1C1C1E;font-family:\'Libre Baskerville\',serif;text-align:center;">'+e(book.title)+'</div>'
+      +(book.author?'<div style="font-size:12px;color:#8A8680;margin-top:6px;font-family:\'Libre Baskerville\',serif;">'+e(book.author)+'</div>':'')
+      +'</div>')
+    :('<textarea class="br-page-textarea" placeholder="Écrire ici..." onblur="saveBookPage('+leftIdx+',this.value)" onchange="saveBookPage('+leftIdx+',this.value)">'+e(leftText)+'</textarea>');
+
+  var animCls=animDir?' '+animDir:'';
+  ov.innerHTML=
+    '<div class="br-shell">'
+    +'<div class="br-topbar">'
+    +'<span class="br-book-name">'+e(book.title)+'</span>'
+    +'<button class="br-x-btn" onclick="closeBookReader()">&#10005;</button>'
     +'</div>'
-    +'<div class="br-page br-right">'
-    +'<textarea class="br-textarea" placeholder="Écrire ici..." onchange="saveBookPage('+_bookReaderPage+',this.value)">'+e(page)+'</textarea>'
-    +'<div class="br-page-num">'+(_bookReaderPage+1)+'</div>'
+    +'<div class="br-stage">'
+    +'<div class="br-spread'+animCls+'" id="br-spread">'
+    +'<div class="br-pg br-pg-left">'
+    +leftContent
+    +'<div class="br-pgnum">'+(isFirst?'':leftIdx+1)+'</div>'
+    +'</div>'
+    +'<div class="br-spine-line"></div>'
+    +'<div class="br-pg br-pg-right">'
+    +'<textarea class="br-page-textarea" placeholder="Écrire ici..." onblur="saveBookPage('+rightIdx+',this.value)" onchange="saveBookPage('+rightIdx+',this.value)">'+e(rightText)+'</textarea>'
+    +'<div class="br-pgnum">'+(rightIdx+1)+'</div>'
     +'</div>'
     +'</div>'
-    +'<div class="br-footer">'
-    +'<button class="br-nav-btn" onclick="bookPagePrev()" '+(isFirst?'disabled':'')+'>&#9664; Précédent</button>'
-    +'<span style="font-size:12px;color:#8A8680;">Page '+(_bookReaderPage+1)+' / '+pageCount+'</span>'
-    +'<button class="br-nav-btn" onclick="bookPageNext()">Suivant &#9654;</button>'
     +'</div>'
+    +'<div class="br-bottombar">'
+    +'<button class="br-nav-btn2" onclick="bookPagePrev()" '+(isFirst?'disabled':'')+'>&#9664; Précédent</button>'
+    +'<span class="br-pg-info">Page '+(rightIdx+1)+' / '+pageCount+'</span>'
+    +'<button class="br-nav-btn2" onclick="bookPageNext()">Suivant &#9654;</button>'
     +'</div>'
     +'</div>';
 }
@@ -1958,23 +1999,26 @@ function saveBookPage(pageIdx,val){
   if(!bookNotes[_bookReaderOpen])bookNotes[_bookReaderOpen]=[''];
   while(bookNotes[_bookReaderOpen].length<=pageIdx)bookNotes[_bookReaderOpen].push('');
   bookNotes[_bookReaderOpen][pageIdx]=val;
-  saveTasks();
+  saveTasks();scheduleSettingsSync();
 }
 function bookPageNext(){
   if(!_bookReaderOpen)return;
   if(!bookNotes[_bookReaderOpen])bookNotes[_bookReaderOpen]=[''];
   _bookReaderPage++;
   if(_bookReaderPage>=bookNotes[_bookReaderOpen].length)bookNotes[_bookReaderOpen].push('');
-  saveTasks();rBookReader();
+  saveTasks();scheduleSettingsSync();rBookReader('br-anim-next');
 }
 function bookPagePrev(){
   if(!_bookReaderOpen||_bookReaderPage<=0)return;
   _bookReaderPage--;
-  rBookReader();
+  rBookReader('br-anim-prev');
 }
 
 function rhBook(b){
-  var cover=b.coverUrl?'<img class="book-cover" src="'+e(b.coverUrl)+'" alt="">':'<div class="book-cover-placeholder">&#128218;</div>';
+  var bid=String(b.id);
+  var cover=b.coverUrl
+    ?'<img class="book-cover" src="'+e(b.coverUrl)+'" alt="" onclick="openBookReader(\''+e(bid)+'\')" title="Ouvrir le livre" style="cursor:pointer;">'
+    :'<div class="book-cover-placeholder" onclick="openBookReader(\''+e(bid)+'\')" title="Ouvrir le livre" style="cursor:pointer;">&#9632;</div>';
   var actions='';
   BOOK_STATUS_ORDER.forEach(function(s){
     if(s!==b.status) actions+='<button class="book-action" data-bid="'+b.id+'" data-bst="'+s+'" onclick="setBookStatus(+this.dataset.bid,this.dataset.bst)">'+BOOK_STATUS_LABELS[s]+'</button>';
@@ -3977,19 +4021,19 @@ function deleteProjGoal(id){
 <div class="nav-overlay" id="nav-overlay" onclick="closeNavDrawer()"></div>
 <div class="nav-drawer" id="nav-drawer">
   <div class="nav-drawer-header">
-    <span class="nav-drawer-title">Louis'Checklist</span>
+    <span class="nav-drawer-title">HAL9000</span>
     <button class="nav-drawer-close" onclick="closeNavDrawer()">&#10005;</button>
   </div>
   <div class="nav-drawer-items">
     <button class="nav-drawer-item" data-view="Home" onclick="navDrawerGo('Home')"><span class="nav-drawer-item-icon">⌂</span><span class="nav-drawer-item-label">Accueil</span></button>
     <button class="nav-drawer-item" data-view="Checklist" onclick="navDrawerGo('Checklist')"><span class="nav-drawer-item-icon">☰</span><span class="nav-drawer-item-label">Checklist</span></button>
-    <button class="nav-drawer-item" data-view="Culture" onclick="navDrawerGo('Culture')"><span class="nav-drawer-item-icon">📚</span><span class="nav-drawer-item-label">Culture</span></button>
+    <button class="nav-drawer-item" data-view="Culture" onclick="navDrawerGo('Culture')"><span class="nav-drawer-item-icon">◻</span><span class="nav-drawer-item-label">Culture</span></button>
     <button class="nav-drawer-item" data-view="Projection" onclick="navDrawerGo('Projection')"><span class="nav-drawer-item-icon">◫</span><span class="nav-drawer-item-label">Projection</span></button>
     <button class="nav-drawer-item" data-view="Networking" onclick="navDrawerGo('Networking')"><span class="nav-drawer-item-icon">◎</span><span class="nav-drawer-item-label">Réseau</span></button>
     <button class="nav-drawer-item" data-view="Exams" onclick="navDrawerGo('Exams')"><span class="nav-drawer-item-icon" style="font-weight:700;">E</span><span class="nav-drawer-item-label">Exams</span></button>
     <button class="nav-drawer-item" data-view="Chess" onclick="navDrawerGo('Chess')"><span class="nav-drawer-item-icon">♟</span><span class="nav-drawer-item-label">Chess</span></button>
-    <button class="nav-drawer-item" data-view="Finances" onclick="navDrawerGo('Finances')"><span class="nav-drawer-item-icon">💰</span><span class="nav-drawer-item-label">Finances</span></button>
-    <button class="nav-drawer-item" data-view="BOAZ" onclick="navDrawerGo('BOAZ')"><span class="nav-drawer-item-icon">📖</span><span class="nav-drawer-item-label">BOAZ</span></button>
+    <button class="nav-drawer-item" data-view="Finances" onclick="navDrawerGo('Finances')"><span class="nav-drawer-item-icon" style="font-weight:700;">€</span><span class="nav-drawer-item-label">Finances</span></button>
+    <button class="nav-drawer-item" data-view="BOAZ" onclick="navDrawerGo('BOAZ')"><span class="nav-drawer-item-icon" style="font-weight:700;">B</span><span class="nav-drawer-item-label">BOAZ</span></button>
   </div>
 </div>
 </body>
