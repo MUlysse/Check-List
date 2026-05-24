@@ -429,7 +429,8 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
 #exam-full-overlay::-webkit-scrollbar{width:5px;}
 #exam-full-overlay::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.12);border-radius:3px;}
 .exam-toolbar{display:flex;align-items:center;gap:8px;padding:10px 16px;border-bottom:1px solid rgba(0,0,0,0.10);background:#fff;}
-.exams-layout{display:grid;grid-template-columns:1fr 1fr;gap:28px;padding:24px 28px 60px;align-items:start;}
+.exams-layout{display:flex;flex-direction:column;gap:28px;padding:24px 28px 60px;}
+.exams-grades-row{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start;}
 .exams-col-title{font-size:12px;font-weight:700;color:#5A5755;letter-spacing:0.09em;text-transform:uppercase;margin-bottom:12px;}
 
 /* Revision tracker */
@@ -507,7 +508,8 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
 
 @media(max-width:680px){
   #exam-full-overlay{bottom:0!important;}
-  .exams-layout{grid-template-columns:1fr;padding:16px 14px 80px;}
+  .exams-layout{padding:16px 14px 80px;}
+  .exams-grades-row{grid-template-columns:1fr;}
   .exam-cards-grid{grid-template-columns:1fr;}
   .grades-table th,.grades-table td{padding:7px 7px;}
   .grade-input{width:46px;font-size:12px;}
@@ -3569,10 +3571,7 @@ function rExams(){
   if(!examData._loaded){loadExamData();examData._loaded=true;}
 
   // Toolbar anchored in body-card
-  el.innerHTML='<div class="exam-toolbar" id="exam-toolbar-el">'
-    +'<span style="font-size:12px;font-weight:700;color:#8A8680;letter-spacing:0.07em;text-transform:uppercase;flex:1;">Matières</span>'
-    +'<button class="add-btn" style="margin:0;padding:7px 14px;font-size:13px" onclick="addExamSubject()">+ Ajouter</button>'
-    +'</div>';
+  el.innerHTML='<div id="exam-toolbar-el" style="height:0;overflow:hidden;"></div>';
 
   // Get or create full-width overlay
   var overlay=document.getElementById('exam-full-overlay');
@@ -3588,20 +3587,25 @@ function rExams(){
   overlay.style.top=overlayTop+'px';
   overlay.style.display='block';
 
-  // Side-by-side layout: grades LEFT, revision RIGHT
+  // Layout: S1+S2 side by side, then matières + cards below
   var gh='<div class="exams-layout">';
 
-  // ── LEFT: grades tables ──
-  gh+='<div class="exams-grades-col">';
-  gh+='<div class="exams-col-title">Notes — M1 Semestre 1</div>';
+  // ── TOP: S1 and S2 tables side by side ──
+  gh+='<div class="exams-grades-row">';
+  gh+='<div><div class="exams-col-title">Notes — M1 Semestre 1</div>';
   gh+=buildGradesTable('s1');
-  gh+='<div class="exams-col-title" style="margin-top:28px">Notes — M1 Semestre 2</div>';
+  gh+='</div>';
+  gh+='<div><div class="exams-col-title">Notes — M1 Semestre 2</div>';
   gh+=buildGradesTable('s2');
   gh+='</div>';
+  gh+='</div>';
 
-  // ── RIGHT: revision cards ──
-  gh+='<div class="exams-revision-col">';
-  gh+='<div class="exams-col-title">Progression — Révisions</div>';
+  // ── BOTTOM: Matières header + revision cards ──
+  gh+='<div>';
+  gh+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">';
+  gh+='<span class="exams-col-title" style="margin:0;">Progression — Révisions</span>';
+  gh+='<button class="add-btn" style="margin:0;padding:7px 14px;font-size:13px" onclick="addExamSubject()">+ Ajouter</button>';
+  gh+='</div>';
   gh+='<div class="exam-cards-grid">';
   examData.subjects.forEach(function(s){
     var stepsDone=s.step;
@@ -3649,7 +3653,7 @@ function rExams(){
     gh+='</div>';
   });
   gh+='</div>'; // exam-cards-grid
-  gh+='</div>'; // exams-revision-col
+  gh+='</div>'; // matières section
 
   gh+='</div>'; // exams-layout
   overlay.innerHTML=gh;
