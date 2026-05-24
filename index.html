@@ -826,6 +826,17 @@ html,body{background:#F4F4F4;color:#111;}
 /* ── Checklist: edit btn always visible ── */
 .edit-btn{opacity:0.45!important;}
 .row:hover .edit-btn{opacity:1!important;}
+
+/* ── Sidebar: hide HAL9000 label ── */
+.app-name{display:none;}
+
+/* ── Sidebar: white text + card blocks for categories ── */
+.cat-list-name{color:#D8D8D8;}
+.cat-list-item{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.06);margin-bottom:3px;}
+.cat-list-item:hover{background:rgba(255,255,255,0.13);}
+.cat-list-item.active{background:rgba(255,255,255,0.18);}
+.cat-list-item.active .cat-list-name{color:#fff;}
+.tm-label{color:#888;}
 </style>
 </head>
 <body>
@@ -839,7 +850,7 @@ html,body{background:#F4F4F4;color:#111;}
       <div class="app-name">HAL9000</div>
       <div class="sidebar-actions">
         <div class="sync-dot" id="sync-dot"></div>
-        <button class="tb-btn" onclick="setView('Home')" title="Home" style="font-size:12px;font-weight:700;letter-spacing:0.01em;">Home</button>
+        <button class="tb-btn" onclick="setView('Home')" title="Home" style="display:none;">Home</button>
         <button class="tb-btn" onclick="location.reload()" title="Actualiser">&#8635;</button>
       </div>
     </div>
@@ -1940,6 +1951,7 @@ function rTasks(){
 var todayDrag={active:false,startY:0,moved:false,pointerId:null,tid:null,el:null,clone:null};
 var todayDropTarget=null;
 function todayPointerDown(e,tid){
+  if(e.target.closest('input,button,textarea,select,a'))return;
   var row=e.target.closest('.today-row');
   if(!row)return;
   e.stopPropagation();
