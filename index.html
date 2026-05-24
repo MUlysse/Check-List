@@ -618,30 +618,43 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
 /* ── Finances page ── */
 .fin-wrap{padding:16px 20px 60px;max-width:1200px;margin:0 auto;}
 .fin-header{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
-.fin-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-@media(max-width:680px){.fin-grid{grid-template-columns:1fr;}.fin-wrap{padding:10px;}}
-.fin-card{background:#F0EEEA;border:1px solid rgba(0,0,0,0.09);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:6px;}
-.fin-card-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.09em;margin-bottom:6px;}
-.fin-row{display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid rgba(0,0,0,0.05);}
+.fin-cols{display:flex;gap:0;align-items:flex-start;}
+.fin-col{flex:1;min-width:0;padding:0 24px;}
+.fin-col:first-child{padding-left:0;}
+.fin-col:last-child{padding-right:0;}
+.fin-divider{width:1px;background:#D0CCC6;align-self:stretch;flex-shrink:0;margin:0 4px;}
+.fin-col-hdr{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;padding:6px 0 12px;margin-bottom:8px;border-bottom:2px solid;}
+.fin-col-hdr-out{color:#C62828;border-color:#FFCDD2;}
+.fin-col-hdr-in{color:#2E7D32;border-color:#C8E6C9;}
+.fin-section{margin-bottom:20px;}
+.fin-section-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#888;margin-bottom:6px;}
+.fin-row{display:flex;align-items:center;gap:8px;padding:3px 0;border-bottom:1px solid rgba(0,0,0,0.05);}
 .fin-row:last-of-type{border-bottom:none;}
 .fin-label{flex:1;min-width:0;}
 .fin-inp-label{border:none;background:transparent;font-size:14px;color:#1C1C1E;outline:none;width:100%;padding:2px 0;}
 .fin-inp-label:focus{outline:none;}
-.fin-amount{display:flex;align-items:center;gap:4px;flex-shrink:0;white-space:nowrap;font-size:15px;font-weight:600;color:#1C1C1E;}
-.fin-inp{width:86px;border:1px solid #D5D2CC;border-radius:6px;padding:4px 7px;font-size:15px;font-weight:600;color:#1C1C1E;background:#fff;outline:none;text-align:right;-webkit-appearance:none;-moz-appearance:textfield;appearance:textfield;}
-.fin-inp:focus{border-color:#4A90D9;}
-.fin-inp-inline{width:86px;}
+.fin-amount{display:flex;align-items:center;gap:4px;flex-shrink:0;white-space:nowrap;font-size:14px;font-weight:600;}
+.fin-amt-out{color:#C62828;}
+.fin-amt-in{color:#2E7D32;}
+.fin-inp{width:90px;border:1px solid #D5D2CC;border-radius:6px;padding:4px 7px;font-size:14px;font-weight:600;color:inherit;background:#fff;outline:none;text-align:right;}
+.fin-inp:focus{border-color:#333;box-shadow:0 0 0 2px rgba(0,0,0,0.06);}
 .fin-del{background:none;border:none;cursor:pointer;color:#D0CCC6;font-size:16px;line-height:1;padding:2px 4px;border-radius:4px;flex-shrink:0;transition:color .12s;}
-.fin-del:hover{color:#FF3B30;}
-.fin-add-row{background:none;border:1.5px dashed #C8C5BF;border-radius:7px;color:#8A8680;font-size:12px;cursor:pointer;padding:5px 10px;transition:all .12s;margin-top:6px;align-self:flex-start;}
-.fin-add-row:hover{border-color:#4A90D9;color:#4A90D9;}
-.fin-total{font-size:13px;font-weight:700;color:#1C1C1E;padding:8px 0 0;border-top:2px solid rgba(0,0,0,0.08);margin-top:6px;}
-.fin-total strong{color:#1C1C1E;}
-.fin-reste{font-size:15px;color:#4A90D9;font-weight:700;}
-.fin-synthese{border:2px solid #34C759;background:#F0FAF3;}
-.fin-synth-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(0,0,0,0.06);font-size:14px;color:#3D3B38;gap:12px;}
-.fin-synth-row:last-child{border-bottom:none;}
-.fin-highlight{font-size:20px;font-weight:800;color:#34C759;}
+.fin-del:hover{color:#C62828;}
+.fin-add-row{background:none;border:1.5px dashed #D0CCC6;border-radius:7px;color:#999;font-size:12px;cursor:pointer;padding:4px 10px;transition:all .12s;margin-top:4px;display:block;}
+.fin-add-row:hover{border-color:#555;color:#555;}
+.fin-row-total{font-size:12px;font-weight:700;padding:6px 0 0;border-top:1px solid rgba(0,0,0,0.08);margin-top:4px;}
+.fin-row-total-out{color:#C62828;}
+.fin-row-total-in{color:#2E7D32;}
+.fin-synth-block{display:flex;margin-top:24px;border-radius:10px;overflow:hidden;border:1px solid #E0E0E0;background:#F8F8F8;}
+.fin-synth-cell{flex:1;padding:16px 18px;border-right:1px solid #E0E0E0;}
+.fin-synth-cell:last-child{border-right:none;}
+.fin-synth-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#888;margin-bottom:8px;}
+.fin-synth-val{font-size:20px;font-weight:800;color:#1C1C1E;}
+.fin-synth-val-out{color:#C62828;}
+.fin-synth-val-in{color:#2E7D32;}
+.fin-inp-synth{width:110px;font-size:18px;}
+.fin-synth-eur{font-size:16px;font-weight:700;color:#555;}
+@media(max-width:700px){.fin-cols{flex-direction:column;}.fin-divider{width:100%;height:1px;margin:16px 0;align-self:auto;}.fin-col{padding:0;}.fin-synth-block{flex-direction:column;}.fin-synth-cell{border-right:none;border-bottom:1px solid #E0E0E0;}.fin-synth-cell:last-child{border-bottom:none;}.fin-wrap{padding:10px;}}
 
 /* ── BOAZ page ── */
 .boaz-wrap{display:flex;flex-direction:column;height:100%;}
@@ -781,12 +794,11 @@ html,body{background:#F4F4F4;color:#111;}
 .book-action-edit{color:#AAA;}
 .book-action-del{color:#CCC;}
 .book-drag-handle{color:#CCC;}
-.fin-card{background:#F5F5F5;border:1px solid #E5E5E5;}
-.fin-card-title{color:#333;}
-.fin-synthese{border-color:#333;background:#F5F5F5;}
-.fin-reste{color:#333;}
+.fin-divider{background:#DDD;}
 .fin-add-row{border-color:#CCC;color:#888;}
-.fin-add-row:hover{border-color:#333;color:#333;}
+.fin-add-row:hover{border-color:#555;color:#555;}
+.fin-synth-block{border-color:#E5E5E5;background:#F5F5F5;}
+.fin-synth-cell{border-color:#E5E5E5;}
 .home-hal-title{color:#111;}
 .home-card{background:#F5F5F5;border:1px solid #E5E5E5;}
 .home-card:hover{background:#EBEBEB;box-shadow:0 4px 16px rgba(0,0,0,0.08);}
@@ -1176,7 +1188,9 @@ function rHome(){
   el.innerHTML=h;
 }
 
-function fmtEur(n){return n.toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';}
+function fmtEur(n){return (parseFloat(n)||0).toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';}
+function fmtFinNum(n){return (parseFloat(n)||0).toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function parseFinNum(s){return parseFloat(String(s).replace(/\s/g,'').replace(',','.'))||0;}
 function rFinances(){
   var el=document.getElementById('list');
   if(!el)return;
@@ -1190,85 +1204,78 @@ function rFinances(){
   var totalSorties=sumArr(fd.autresSorties||[]);
   var reste=totalRes-totalDep-totalSorties;
   var montantRestant=totalCC+totalEp-totalDA;
+  var mamanReste=parseFloat(fd.mamanReste)||0;
+  function finRow(key,i,d,amtClass){
+    var raw=String(parseFloat(d.amount)||0);
+    return '<div class="fin-row">'
+      +'<span class="fin-label"><input class="fin-inp-label" value="'+e(d.label)+'" onchange="updateFinances(\''+key+'\','+i+',\'label\',this.value)"></span>'
+      +'<span class="fin-amount '+amtClass+'"><input class="fin-inp" type="text" value="'+fmtFinNum(d.amount)+'" onfocus="this.value=\''+raw+'\'" onblur="updateFinances(\''+key+'\','+i+',\'amount\',parseFinNum(this.value))"></span>'
+      +'<button class="fin-del" onclick="deleteFinanceRow(\''+key+'\','+i+')">×</button>'
+      +'</div>';
+  }
   var h='<div class="fin-wrap">';
   h+='<div class="fin-header"><button class="home-btn" onclick="setView(\'Home\')">Home</button></div>';
-  h+='<div class="fin-grid">';
-
-  // Dépenses mensuelles
-  h+='<div class="fin-card"><div class="fin-card-title" style="color:#FF3B30;">Dépenses mensuelles</div>';
-  fd.depenses.forEach(function(d,i){
-    h+='<div class="fin-row"><span class="fin-label"><input class="fin-inp-label" value="'+e(d.label)+'" onchange="updateFinances(\'depenses\','+i+',\'label\',this.value)"></span>'
-      +'<span class="fin-amount"><input class="fin-inp" type="number" value="'+e(String(d.amount))+'" onchange="updateFinances(\'depenses\','+i+',\'amount\',parseFloat(this.value)||0)"> €</span>'
-      +'<button class="fin-del" onclick="deleteFinanceRow(\'depenses\','+i+')">×</button></div>';
-  });
+  h+='<div class="fin-cols">';
+  // LEFT — Sorties
+  h+='<div class="fin-col fin-col-out">';
+  h+='<div class="fin-col-hdr fin-col-hdr-out">Sorties</div>';
+  h+='<div class="fin-section"><div class="fin-section-title">Dépenses mensuelles</div>';
+  fd.depenses.forEach(function(d,i){h+=finRow('depenses',i,d,'fin-amt-out');});
   h+='<button class="fin-add-row" onclick="addFinanceRow(\'depenses\')">+ Ajouter</button>';
-  h+='<div class="fin-total">Total : <strong>'+fmtEur(totalDep)+'</strong></div></div>';
-
-  // Ressources
-  h+='<div class="fin-card"><div class="fin-card-title" style="color:#34C759;">Ressources mensuelles</div>';
-  fd.ressources.forEach(function(d,i){
-    h+='<div class="fin-row"><span class="fin-label"><input class="fin-inp-label" value="'+e(d.label)+'" onchange="updateFinances(\'ressources\','+i+',\'label\',this.value)"></span>'
-      +'<span class="fin-amount"><input class="fin-inp" type="number" value="'+e(String(d.amount))+'" onchange="updateFinances(\'ressources\','+i+',\'amount\',parseFloat(this.value)||0)"> €</span>'
-      +'<button class="fin-del" onclick="deleteFinanceRow(\'ressources\','+i+')">×</button></div>';
-  });
-  h+='<button class="fin-add-row" onclick="addFinanceRow(\'ressources\')">+ Ajouter</button>';
-  h+='<div class="fin-total">Total : <strong>'+fmtEur(totalRes)+'</strong></div>';
-  if((fd.autresSorties||[]).length){
-    h+='<div class="fin-card-title" style="color:#FF9500;margin-top:12px;">Autres sorties</div>';
-    (fd.autresSorties||[]).forEach(function(d,i){
-      h+='<div class="fin-row"><span class="fin-label"><input class="fin-inp-label" value="'+e(d.label)+'" onchange="updateFinances(\'autresSorties\','+i+',\'label\',this.value)"></span>'
-        +'<span class="fin-amount"><input class="fin-inp" type="number" value="'+e(String(d.amount))+'" onchange="updateFinances(\'autresSorties\','+i+',\'amount\',parseFloat(this.value)||0)"> €</span>'
-        +'<button class="fin-del" onclick="deleteFinanceRow(\'autresSorties\','+i+')">×</button></div>';
-    });
-    h+='<button class="fin-add-row" onclick="addFinanceRow(\'autresSorties\')">+ Ajouter</button>';
-    h+='<div class="fin-total">Sorties : <strong>'+fmtEur(totalSorties)+'</strong></div>';
-  }
-  h+='<div class="fin-total fin-reste">Reste mensuel : <strong>'+fmtEur(reste)+'</strong></div></div>';
-
-  // Comptes courants
-  h+='<div class="fin-card"><div class="fin-card-title" style="color:#4A90D9;">Comptes courants</div>';
-  fd.comptesCourants.forEach(function(d,i){
-    h+='<div class="fin-row"><span class="fin-label"><input class="fin-inp-label" value="'+e(d.label)+'" onchange="updateFinances(\'comptesCourants\','+i+',\'label\',this.value)"></span>'
-      +'<span class="fin-amount"><input class="fin-inp" type="number" value="'+e(String(d.amount))+'" onchange="updateFinances(\'comptesCourants\','+i+',\'amount\',parseFloat(this.value)||0)"> €</span>'
-      +'<button class="fin-del" onclick="deleteFinanceRow(\'comptesCourants\','+i+')">×</button></div>';
-  });
-  h+='<button class="fin-add-row" onclick="addFinanceRow(\'comptesCourants\')">+ Ajouter</button>';
-  h+='<div class="fin-total">Total : <strong>'+fmtEur(totalCC)+'</strong></div></div>';
-
-  // Épargne
-  h+='<div class="fin-card"><div class="fin-card-title" style="color:#FF9500;">Épargne</div>';
-  fd.epargne.forEach(function(d,i){
-    h+='<div class="fin-row"><span class="fin-label"><input class="fin-inp-label" value="'+e(d.label)+'" onchange="updateFinances(\'epargne\','+i+',\'label\',this.value)"></span>'
-      +'<span class="fin-amount"><input class="fin-inp" type="number" value="'+e(String(d.amount))+'" onchange="updateFinances(\'epargne\','+i+',\'amount\',parseFloat(this.value)||0)"> €</span>'
-      +'<button class="fin-del" onclick="deleteFinanceRow(\'epargne\','+i+')">×</button></div>';
-  });
-  h+='<button class="fin-add-row" onclick="addFinanceRow(\'epargne\')">+ Ajouter</button>';
-  h+='<div class="fin-total">Total épargne : <strong>'+fmtEur(totalEp)+'</strong></div></div>';
-
-  // Dépenses à venir
-  h+='<div class="fin-card"><div class="fin-card-title" style="color:#FF3B30;">Dépenses à venir</div>';
-  fd.depensesAvenir.forEach(function(d,i){
-    h+='<div class="fin-row"><span class="fin-label"><input class="fin-inp-label" value="'+e(d.label)+'" onchange="updateFinances(\'depensesAvenir\','+i+',\'label\',this.value)"></span>'
-      +'<span class="fin-amount"><input class="fin-inp" type="number" value="'+e(String(d.amount))+'" onchange="updateFinances(\'depensesAvenir\','+i+',\'amount\',parseFloat(this.value)||0)"> €</span>'
-      +'<button class="fin-del" onclick="deleteFinanceRow(\'depensesAvenir\','+i+')">×</button></div>';
-  });
-  h+='<button class="fin-add-row" onclick="addFinanceRow(\'depensesAvenir\')">+ Ajouter</button>';
-  h+='<div class="fin-total">Total : <strong>'+fmtEur(totalDA)+'</strong></div></div>';
-
-  // Synthèse
-  h+='<div class="fin-card fin-synthese"><div class="fin-card-title">Synthèse</div>';
-  h+='<div class="fin-synth-row"><span>Montant total disponible</span><strong class="fin-highlight">'+fmtEur(montantRestant)+'</strong></div>';
-  h+='<div class="fin-synth-row"><span>Maman reste (prêt)</span>'
-    +'<strong><input class="fin-inp fin-inp-inline" type="number" value="'+e(String(fd.mamanReste||0))+'" onchange="financesData.mamanReste=parseFloat(this.value)||0;saveTasks();scheduleSettingsSync();"> €</strong></div>';
+  h+='<div class="fin-row-total fin-row-total-out">Total : <strong>'+fmtEur(totalDep)+'</strong></div>';
   h+='</div>';
-
-  h+='</div></div>';
+  h+='<div class="fin-section"><div class="fin-section-title">Autres sorties</div>';
+  (fd.autresSorties||[]).forEach(function(d,i){h+=finRow('autresSorties',i,d,'fin-amt-out');});
+  h+='<button class="fin-add-row" onclick="addFinanceRow(\'autresSorties\')">+ Ajouter</button>';
+  h+='<div class="fin-row-total fin-row-total-out">Total : <strong>'+fmtEur(totalSorties)+'</strong></div>';
+  h+='</div>';
+  h+='<div class="fin-section"><div class="fin-section-title">Dépenses à venir</div>';
+  fd.depensesAvenir.forEach(function(d,i){h+=finRow('depensesAvenir',i,d,'fin-amt-out');});
+  h+='<button class="fin-add-row" onclick="addFinanceRow(\'depensesAvenir\')">+ Ajouter</button>';
+  h+='<div class="fin-row-total fin-row-total-out">Total : <strong>'+fmtEur(totalDA)+'</strong></div>';
+  h+='</div>';
+  h+='</div>';
+  // Divider
+  h+='<div class="fin-divider"></div>';
+  // RIGHT — Entrées
+  h+='<div class="fin-col fin-col-in">';
+  h+='<div class="fin-col-hdr fin-col-hdr-in">Entrées</div>';
+  h+='<div class="fin-section"><div class="fin-section-title">Ressources mensuelles</div>';
+  fd.ressources.forEach(function(d,i){h+=finRow('ressources',i,d,'fin-amt-in');});
+  h+='<button class="fin-add-row" onclick="addFinanceRow(\'ressources\')">+ Ajouter</button>';
+  h+='<div class="fin-row-total fin-row-total-in">Total : <strong>'+fmtEur(totalRes)+'</strong></div>';
+  h+='</div>';
+  h+='<div class="fin-section"><div class="fin-section-title">Comptes courants</div>';
+  fd.comptesCourants.forEach(function(d,i){h+=finRow('comptesCourants',i,d,'fin-amt-in');});
+  h+='<button class="fin-add-row" onclick="addFinanceRow(\'comptesCourants\')">+ Ajouter</button>';
+  h+='<div class="fin-row-total fin-row-total-in">Total : <strong>'+fmtEur(totalCC)+'</strong></div>';
+  h+='</div>';
+  h+='<div class="fin-section"><div class="fin-section-title">Épargne</div>';
+  fd.epargne.forEach(function(d,i){h+=finRow('epargne',i,d,'fin-amt-in');});
+  h+='<button class="fin-add-row" onclick="addFinanceRow(\'epargne\')">+ Ajouter</button>';
+  h+='<div class="fin-row-total fin-row-total-in">Total : <strong>'+fmtEur(totalEp)+'</strong></div>';
+  h+='</div>';
+  h+='</div>';
+  h+='</div>'; // fin-cols
+  // Synthesis block
+  h+='<div class="fin-synth-block">';
+  h+='<div class="fin-synth-cell"><div class="fin-synth-lbl">Reste mensuel</div>'
+    +'<div class="fin-synth-val '+(reste>=0?'fin-synth-val-in':'fin-synth-val-out')+'">'+fmtEur(reste)+'</div></div>';
+  h+='<div class="fin-synth-cell"><div class="fin-synth-lbl">Disponible total</div>'
+    +'<div class="fin-synth-val '+(montantRestant>=0?'fin-synth-val-in':'fin-synth-val-out')+'">'+fmtEur(montantRestant)+'</div></div>';
+  h+='<div class="fin-synth-cell"><div class="fin-synth-lbl">Maman reste (prêt)</div>'
+    +'<div class="fin-synth-val"><input class="fin-inp fin-inp-synth" type="text" value="'+fmtFinNum(mamanReste)+'" '
+    +'onfocus="this.value=\''+String(mamanReste)+'\'" '
+    +'onblur="financesData.mamanReste=parseFinNum(this.value);saveTasks();scheduleSettingsSync();rFinances();">'
+    +' <span class="fin-synth-eur">€</span></div></div>';
+  h+='</div>'; // fin-synth-block
+  h+='</div>'; // fin-wrap
   el.innerHTML=h;
 }
 
 function updateFinances(key,idx,field,val){
   if(!financesData[key])financesData[key]=[];
-  if(financesData[key][idx])financesData[key][idx][field]=val;
+  if(financesData[key][idx]!==undefined)financesData[key][idx][field]=val;
   saveTasks();scheduleSettingsSync();rFinances();
 }
 function addFinanceRow(key){
@@ -2136,12 +2143,22 @@ function openBookReader(bookId){
   if(!book)return;
   _bookReaderOpen=String(bookId);
   if(!bookNotes[_bookReaderOpen])bookNotes[_bookReaderOpen]=[''];
+  brTrimEmptyPages(_bookReaderOpen);
   _bookReaderPage=0;
   rBookReader();
   var ov=document.getElementById('book-reader-overlay');
   if(ov)ov.style.display='flex';
 }
 function closeBookReader(){
+  if(_bookReaderOpen){
+    var _idx=_brIndices();
+    var _lc=document.getElementById('br-left-content');
+    var _rc=document.getElementById('br-right-content');
+    if(_lc&&_idx.leftIdx>=0)saveBookPage(_idx.leftIdx,_lc.innerHTML);
+    if(_rc&&_idx.rightIdx>=0)saveBookPage(_idx.rightIdx,_rc.innerHTML);
+    brTrimEmptyPages(_bookReaderOpen);
+    saveTasks();scheduleSettingsSync();
+  }
   var ov=document.getElementById('book-reader-overlay');
   if(ov)ov.style.display='none';
   _bookReaderOpen=null;
@@ -2284,6 +2301,15 @@ function brHandleInput(el,pageIdx){
   if(el.scrollHeight<=el.clientHeight)return;
   var _el=el,_pg=pageIdx;
   setTimeout(function(){if(document.contains(_el))brCheckOverflow(_el,_pg);},0);
+}
+function brTrimEmptyPages(bookId){
+  var pages=bookNotes[bookId];
+  if(!pages)return;
+  while(pages.length>1){
+    var last=pages[pages.length-1];
+    var txt=(last||'').replace(/<br\s*\/?>/gi,'').replace(/<[^>]*>/g,'').trim();
+    if(!txt)pages.pop();else break;
+  }
 }
 function brSanitizePasteHtml(raw){
   raw=raw.replace(/<!--\[if[^\]]*\]>[\s\S]*?<!\[endif\]-->/gi,'');
@@ -2854,7 +2880,7 @@ function editBook(id){
 
 function pfc(){var sp=['All','Urgent','Completed'];document.getElementById('new-cat').value=(sp.indexOf(tab)<0&&!isTodayTab(tab))?tab:'';}
 
-document.addEventListener('keydown',function(e){if(e.ctrlKey&&e.key==='r'){e.preventDefault();location.reload();}if(e.key==='Escape'){closeModal();closeBookModal();closeProjPeriodModal();closeProjRowModal();closeContactModal();closeNavDrawer();closeCommentEditor();}});
+document.addEventListener('keydown',function(e){if(e.ctrlKey&&e.key==='r'){e.preventDefault();var ae=document.activeElement;if(ae&&ae.tagName==='INPUT'||ae&&ae.tagName==='TEXTAREA')ae.dispatchEvent(new Event('change',{bubbles:true}));saveTasks();scheduleSettingsSync();location.reload();}if(e.key==='Escape'){closeModal();closeBookModal();closeProjPeriodModal();closeProjRowModal();closeContactModal();closeNavDrawer();closeCommentEditor();}});
 window.addEventListener('resize',function(){if(currentView==='Projection')rProjection();if(currentView==='Networking')rNetworking();});
 
 // ── Pull-to-refresh (iPhone) ──
