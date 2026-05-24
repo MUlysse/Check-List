@@ -703,6 +703,108 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
 .home-card{background:#F0EEEA;border:1px solid rgba(0,0,0,0.10);border-radius:12px;padding:22px 18px;cursor:pointer;transition:box-shadow .15s,background .15s;display:flex;flex-direction:column;align-items:center;text-align:center;}
 .home-card:hover{box-shadow:0 4px 16px rgba(0,0,0,0.10);background:#E8E6E2;}
 .home-card-title{font-size:15px;font-weight:700;color:#1C1C1E;}
+
+/* ── BOAZ full-height mode ── */
+.body-card.boaz-mode{padding:0;overflow:hidden;display:flex;flex-direction:column;}
+.body-card.boaz-mode #list{flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0;}
+
+/* ── 3D page flip ── */
+@keyframes brFlipFwd{0%{transform:rotateY(0deg);opacity:1;}60%{opacity:0.6;}100%{transform:rotateY(-175deg);opacity:0;}}
+@keyframes brFlipBwd{0%{transform:rotateY(0deg);opacity:1;}60%{opacity:0.6;}100%{transform:rotateY(175deg);opacity:0;}}
+.br-spread{perspective:2000px;position:relative;}
+
+/* ── Book reader: contenteditable pages ── */
+.br-page-content{flex:1;border:none;background:transparent;font-size:14px;font-family:'Libre Baskerville',serif;color:#1C1C1E;line-height:1.9;outline:none;overflow-y:auto;cursor:text;word-break:break-word;min-height:0;}
+.br-page-content:empty::before{content:attr(data-placeholder);color:#C8C5BF;font-style:italic;pointer-events:none;}
+.br-page-content img{max-width:100%;height:auto;border-radius:4px;margin:4px 0;display:block;}
+.br-tool-btn{background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:#AAA;border-radius:5px;padding:4px 10px;font-size:12px;font-weight:600;cursor:pointer;transition:background .12s;display:inline-flex;align-items:center;justify-content:center;line-height:1;}
+.br-tool-btn:hover{background:rgba(255,255,255,0.22);color:#fff;}
+.br-tools{display:flex;gap:6px;align-items:center;}
+
+/* ── Book status badge ── */
+.book-status-badge{display:inline-block;font-size:10px;font-weight:600;padding:2px 7px;border-radius:4px;margin-top:4px;letter-spacing:0.02em;}
+.book-status-badge.reading{background:rgba(74,144,217,0.12);color:#4A90D9;}
+.book-status-badge.to_read{background:rgba(176,173,168,0.15);color:#8A8680;}
+.book-status-badge.read{background:rgba(52,199,89,0.12);color:#34C759;}
+
+/* ════ BLACK / GREY / WHITE SCHEME ════ */
+html,body{background:#F4F4F4;color:#111;}
+.sidebar{background:#111;border-right:1px solid #222;}
+.app-name{color:#777;}
+.tb-btn{color:#777;}
+.tb-btn:hover{background:rgba(255,255,255,0.08);}
+.view-btn{color:#777;}
+.view-btn.active{background:rgba(255,255,255,0.12);color:#fff;}
+.tab{color:#AAAAAA;}
+.tab:hover{background:rgba(255,255,255,0.06);}
+.tab.active{background:#2A2A2A;color:#fff;box-shadow:none;}
+.tab-icon{background:#2A2A2A!important;}
+.sidebar-footer{border-top:1px solid #222;}
+.prog-label{color:#666;}
+.prog-label em{color:#CCC;}
+.gauge{background:#222;}
+.gauge-fill{background:#DDD;}
+.sync-dot.ok{background:#777;}
+.main{background:#fff;}
+.main-header{border-bottom:1px solid #EBEBEB;}
+.main-title{color:#111;}
+.main-title-icon{background:#222!important;color:#fff!important;}
+.body-card{background:#fff;}
+.row:hover{background:#F8F8F8;}
+.rt{color:#111;}
+.rc{color:#999;}
+.chk{border-color:#CCC;}
+.chk:checked{background:#111;border-color:#111;}
+.edit-btn:hover{color:#333;}
+.pb{background:#F0F0F0;color:#CCC;}
+.pb.A.on{background:#111;color:#fff;}
+.fab{background:#111;box-shadow:0 4px 16px rgba(0,0,0,0.28);}
+.fab:hover{box-shadow:0 6px 20px rgba(0,0,0,0.38);}
+.modal{background:#fff;}
+.modal input[type=text],.modal input[type=email],.modal input[type=password],.modal select{border-color:#E5E5E5;background:#FAFAFA;color:#111;}
+.modal input:focus,.modal select:focus{border-color:#333;box-shadow:0 0 0 3px rgba(0,0,0,0.06);}
+.add-btn{background:#111;}
+.add-btn:hover{background:#333;}
+.apb.A.sel{background:#111;border-color:#111;color:#fff;}
+.save-btn{background:#111;}
+.rt-input{border-color:#333;}
+.book-row{background:#fff;border:1px solid #EBEBEB;}
+.book-row:hover{box-shadow:0 2px 8px rgba(0,0,0,0.06);border-color:#DDD;}
+.book-cover-placeholder{background:#F0F0F0;}
+.book-action{border-color:#E5E5E5;color:#888;}
+.book-action:hover:not(.book-action-del){background:#F5F5F5;border-color:#CCC;color:#333;}
+.book-action-edit{color:#AAA;}
+.book-action-del{color:#CCC;}
+.book-drag-handle{color:#CCC;}
+.fin-card{background:#F5F5F5;border:1px solid #E5E5E5;}
+.fin-card-title{color:#333;}
+.fin-synthese{border-color:#333;background:#F5F5F5;}
+.fin-reste{color:#333;}
+.fin-add-row{border-color:#CCC;color:#888;}
+.fin-add-row:hover{border-color:#333;color:#333;}
+.home-hal-title{color:#111;}
+.home-card{background:#F5F5F5;border:1px solid #E5E5E5;}
+.home-card:hover{background:#EBEBEB;box-shadow:0 4px 16px rgba(0,0,0,0.08);}
+.home-card-title{color:#111;}
+.home-btn{background:#F5F5F5;border-color:#E5E5E5;color:#333;}
+.home-btn:hover{background:#EBEBEB;}
+.boaz-toc{background:#F5F5F5;border-right:1px solid #E5E5E5;}
+.boaz-toc-title{color:#888;}
+.boaz-toc-lbl{color:#333;}
+.boaz-page{background:#fff;}
+.boaz-spine{background:#E0E0E0;}
+.boaz-header{border-bottom:1px solid #EBEBEB;}
+.boaz-title{color:#111;}
+.br-bottombar,.br-topbar{background:#111!important;}
+.br-stage{background:#1A1A1A!important;}
+.br-shell{background:#1A1A1A!important;}
+.mobile-nav{background:#111;border-top:1px solid #222;}
+.mobile-nav-btn{color:#888;}
+.mobile-nav-btn.active{color:#fff;}
+.cat-sep{color:#999;}
+.ps-label{color:#999;}
+.tm-label{color:#888;}
+.modal-close:hover{background:#F0F0F0;color:#333;}
 </style>
 </head>
 <body>
@@ -716,7 +818,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
       <div class="app-name">HAL9000</div>
       <div class="sidebar-actions">
         <div class="sync-dot" id="sync-dot"></div>
-        <button class="tb-btn" onclick="setView('Home')" title="Accueil">⌂</button>
+        <button class="tb-btn" onclick="setView('Home')" title="Home" style="font-size:12px;font-weight:700;letter-spacing:0.01em;">Home</button>
         <button class="tb-btn" onclick="location.reload()" title="Actualiser">&#8635;</button>
       </div>
     </div>
@@ -736,7 +838,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
     <div class="main-header">
       <button class="mob-back-btn" onclick="mobBack()">&#8592;</button>
       <div class="main-title" id="main-title"><span class="main-title-icon" id="main-title-icon"></span><span id="main-title-text">All</span></div>
-      <button class="home-btn" id="main-home-btn" onclick="setView('Home')" title="Accueil" style="display:none;">⌂ Accueil</button>
+      <button class="home-btn" id="main-home-btn" onclick="setView('Home')" title="Home" style="display:none;">Home</button>
     </div>
     <div class="body-card">
       <div id="list"></div>
@@ -748,7 +850,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
 <button class="fab" onclick="openModal()">+</button>
 
 <nav class="mobile-nav" id="mobile-nav">
-  <button class="mobile-nav-btn" data-view="Home" onclick="setView('Home')"><span class="mobile-nav-icon">⌂</span><span>Accueil</span></button>
+  <button class="mobile-nav-btn" data-view="Home" onclick="setView('Home')"><span class="mobile-nav-icon" style="font-size:12px;font-weight:700;">H</span><span>Home</span></button>
   <button class="mobile-nav-btn" data-view="Checklist" onclick="setView('Checklist')"><span class="mobile-nav-icon">☰</span><span>Liste</span></button>
   <button class="mobile-nav-btn" data-view="Culture" onclick="setView('Culture')"><span class="mobile-nav-icon">◻</span><span>Culture</span></button>
   <button class="mobile-nav-btn" data-view="Networking" onclick="setView('Networking')"><span class="mobile-nav-icon">◎</span><span>Réseau</span></button>
@@ -1025,7 +1127,7 @@ function rFinances(){
   var reste=totalRes-totalDep-totalSorties;
   var montantRestant=totalCC+totalEp-totalDA;
   var h='<div class="fin-wrap">';
-  h+='<div class="fin-header"><button class="home-btn" onclick="setView(\'Home\')">⌂ Accueil</button></div>';
+  h+='<div class="fin-header"><button class="home-btn" onclick="setView(\'Home\')">Home</button></div>';
   h+='<div class="fin-grid">';
 
   // Dépenses mensuelles
@@ -1130,7 +1232,7 @@ function rBOAZ(){
   var rightPageText=pages[pageIdx]||'';
   var leftPageText=leftPageIdx>=0?pages[leftPageIdx]:'';
   var h='<div class="boaz-wrap">'
-    +'<div class="boaz-header"><button class="home-btn" onclick="setView(\'Home\')">⌂ Accueil</button><span class="boaz-title">BOAZ</span></div>'
+    +'<div class="boaz-header"><button class="home-btn" onclick="setView(\'Home\')">Home</button><span class="boaz-title">BOAZ</span></div>'
     +'<div class="boaz-layout">'
     // TOC sidebar
     +'<div class="boaz-toc">'
@@ -1558,7 +1660,7 @@ function render(){
   rViewBar();
   var bc=document.querySelector('.body-card');
   var appEl=document.querySelector('.app');
-  if(bc)bc.classList.remove('exams-mode');
+  if(bc){bc.classList.remove('exams-mode');bc.classList.remove('boaz-mode');}
   if(currentView!=='Networking'){
     var _no=document.getElementById('net-full-overlay');
     if(_no)_no.style.display='none';
@@ -1569,29 +1671,31 @@ function render(){
     if(_eo)_eo.style.display='none';
     if(appEl)appEl.classList.remove('exam-view');
   }
-  // Hide sidebar for Home, Finances, BOAZ
+  // Hide sidebar for Home, Finances, BOAZ, Culture
   var sidebarEl=document.querySelector('.sidebar');
-  var SIDEBAR_HIDDEN_VIEWS=['Home','Finances','BOAZ'];
+  var SIDEBAR_HIDDEN_VIEWS=['Home','Finances','BOAZ','Culture'];
   if(sidebarEl)sidebarEl.style.display=SIDEBAR_HIDDEN_VIEWS.indexOf(currentView)>=0?'none':'';
-  // Show Home button in header when sidebar is hidden
+  // Show Home button in header when sidebar is hidden (not on Home itself)
   var mainHomeBtn=document.getElementById('main-home-btn');
   if(mainHomeBtn)mainHomeBtn.style.display=SIDEBAR_HIDDEN_VIEWS.indexOf(currentView)>=0&&currentView!=='Home'?'':'none';
+  // FAB: only show on Checklist view
+  var fabEl=document.querySelector('.fab');
+  if(fabEl)fabEl.style.display=currentView==='Checklist'?'':'none';
   if(currentView==='Home'){
     if(bc){bc.classList.remove('proj-mode');bc.classList.remove('net-mode');}
     var mti=document.getElementById('main-title-icon');var mtt=document.getElementById('main-title-text');
-    if(mti){mti.textContent='⌂';mti.style.background='#4A90D9';mti.style.color='#fff';mti.style.fontSize='';}
-    if(mtt)mtt.textContent='Accueil';
+    if(mti){mti.textContent='';mti.style.background='transparent';mti.style.boxShadow='none';mti.style.width='0';mti.style.padding='0';}
+    if(mtt)mtt.textContent='';
     rHome();
   } else if(currentView==='Culture'){
     if(appEl)appEl.classList.remove('proj-view');
     var twb=document.getElementById('tabs-wrap');
-    if(twb){twb.style.display='flex';twb.style.flexDirection='column';twb.style.padding='0';}
+    if(twb){twb.style.display='none';}
     var ctmB=document.getElementById('cat-treemap');if(ctmB)ctmB.style.display='none';
     if(bc){bc.classList.remove('proj-mode');bc.classList.remove('net-mode');}
     var mti=document.getElementById('main-title-icon');var mtt=document.getElementById('main-title-text');
-    if(mti){mti.textContent='◻';mti.style.background='#AF52DE';mti.style.color='#fff';mti.style.fontSize='';}
+    if(mti){mti.textContent='◻';mti.style.background='#333';mti.style.color='#fff';mti.style.fontSize='';mti.style.width='';mti.style.padding='';}
     if(mtt)mtt.textContent='Culture';
-    rBooksChart();
     rCulture();
   } else if(currentView==='Projection'){
     if(appEl)appEl.classList.add('proj-view');
@@ -1627,7 +1731,7 @@ function render(){
     if(twch){twch.style.display='block';twch.style.flexDirection='';twch.style.padding='';}
     if(bc){bc.classList.remove('proj-mode');bc.classList.remove('net-mode');}
     var mti=document.getElementById('main-title-icon');var mtt=document.getElementById('main-title-text');
-    if(mti){mti.textContent='♟';mti.style.background='#5856D6';mti.style.color='#fff';mti.style.fontWeight='700';mti.style.fontSize='20px';}
+    if(mti){mti.textContent='C';mti.style.background='#333';mti.style.color='#fff';mti.style.fontWeight='800';mti.style.fontSize='18px';mti.style.width='';mti.style.padding='';}
     if(mtt)mtt.textContent='Chess';
     rChessNav();
     rChess();
@@ -1638,9 +1742,9 @@ function render(){
     if(mtt)mtt.textContent='Mes Finances';
     rFinances();
   } else if(currentView==='BOAZ'){
-    if(bc){bc.classList.remove('proj-mode');bc.classList.remove('net-mode');}
+    if(bc){bc.classList.remove('proj-mode');bc.classList.remove('net-mode');bc.classList.add('boaz-mode');}
     var mti=document.getElementById('main-title-icon');var mtt=document.getElementById('main-title-text');
-    if(mti){mti.textContent='B';mti.style.background='#302E2C';mti.style.color='#fff';mti.style.fontSize='18px';mti.style.fontWeight='800';}
+    if(mti){mti.textContent='B';mti.style.background='#222';mti.style.color='#fff';mti.style.fontSize='18px';mti.style.fontWeight='800';mti.style.width='';mti.style.padding='';}
     if(mtt)mtt.textContent='BOAZ';
     rBOAZ();
   } else {
@@ -1946,72 +2050,176 @@ function closeBookReader(){
   if(ov)ov.style.display='none';
   _bookReaderOpen=null;
 }
-function rBookReader(animDir){
+function _brPageContent(pageIdx){
+  if(!bookNotes[_bookReaderOpen])return '';
+  return bookNotes[_bookReaderOpen][pageIdx]||'';
+}
+function rBookReader(){
   var ov=document.getElementById('book-reader-overlay');
   if(!ov||!_bookReaderOpen)return;
   var book=books.find(function(b){return String(b.id)===String(_bookReaderOpen);});
   if(!book)return;
   if(!bookNotes[_bookReaderOpen])bookNotes[_bookReaderOpen]=[''];
   var pages=bookNotes[_bookReaderOpen];
-  var pageCount=pages.length;
   var rightIdx=_bookReaderPage;
   var leftIdx=_bookReaderPage-1;
-  var rightText=pages[rightIdx]||'';
-  var leftText=leftIdx>=0?pages[leftIdx]:'';
   var isFirst=_bookReaderPage===0;
-
   var leftContent=isFirst
     ?('<div class="br-cover-face">'
       +'<div style="font-size:18px;font-weight:700;color:#1C1C1E;font-family:\'Libre Baskerville\',serif;text-align:center;">'+e(book.title)+'</div>'
       +(book.author?'<div style="font-size:12px;color:#8A8680;margin-top:6px;font-family:\'Libre Baskerville\',serif;">'+e(book.author)+'</div>':'')
       +'</div>')
-    :('<textarea class="br-page-textarea" placeholder="Écrire ici..." onblur="saveBookPage('+leftIdx+',this.value)" onchange="saveBookPage('+leftIdx+',this.value)">'+e(leftText)+'</textarea>');
-
-  var animCls=animDir?' '+animDir:'';
+    :('<div class="br-page-content" id="br-left-content" contenteditable="true" data-placeholder="Écrire ici…" onblur="saveBookPage('+leftIdx+',this.innerHTML)">'+(_brPageContent(leftIdx))+'</div>'
+      +'<div class="br-pgnum">'+(leftIdx+1)+'</div>');
   ov.innerHTML=
     '<div class="br-shell">'
     +'<div class="br-topbar">'
     +'<span class="br-book-name">'+e(book.title)+'</span>'
+    +'<div class="br-tools">'
+    +'<button class="br-tool-btn" onclick="brToolBold()" title="Gras"><b style="font-family:sans-serif;">B</b></button>'
+    +'<label class="br-tool-btn" title="Insérer image" style="cursor:pointer;">&#128247;<input type="file" accept="image/*" style="display:none" onchange="brInsertImage(this)"></label>'
     +'<button class="br-x-btn" onclick="closeBookReader()">&#10005;</button>'
     +'</div>'
-    +'<div class="br-stage">'
-    +'<div class="br-spread'+animCls+'" id="br-spread">'
-    +'<div class="br-pg br-pg-left">'
-    +leftContent
-    +'<div class="br-pgnum">'+(isFirst?'':leftIdx+1)+'</div>'
     +'</div>'
+    +'<div class="br-stage">'
+    +'<div class="br-spread" id="br-spread">'
+    +'<div class="br-pg br-pg-left" id="br-pg-left">'+leftContent+'</div>'
     +'<div class="br-spine-line"></div>'
-    +'<div class="br-pg br-pg-right">'
-    +'<textarea class="br-page-textarea" placeholder="Écrire ici..." onblur="saveBookPage('+rightIdx+',this.value)" onchange="saveBookPage('+rightIdx+',this.value)">'+e(rightText)+'</textarea>'
-    +'<div class="br-pgnum">'+(rightIdx+1)+'</div>'
+    +'<div class="br-pg br-pg-right" id="br-pg-right">'
+    +'<div class="br-page-content" id="br-right-content" contenteditable="true" data-placeholder="Écrire ici…" onblur="saveBookPage('+rightIdx+',this.innerHTML)">'+(_brPageContent(rightIdx))+'</div>'
+    +'<div class="br-pgnum" id="br-right-pgnum">'+(rightIdx+1)+'</div>'
     +'</div>'
     +'</div>'
     +'</div>'
     +'<div class="br-bottombar">'
-    +'<button class="br-nav-btn2" onclick="bookPagePrev()" '+(isFirst?'disabled':'')+'>&#9664; Précédent</button>'
-    +'<span class="br-pg-info">Page '+(rightIdx+1)+' / '+pageCount+'</span>'
+    +'<button class="br-nav-btn2" id="br-prev-btn" onclick="bookPagePrev()" '+(isFirst?'disabled':'')+'>&#9664; Précédent</button>'
+    +'<span class="br-pg-info" id="br-pg-info">Page '+(rightIdx+1)+' / '+pages.length+'</span>'
     +'<button class="br-nav-btn2" onclick="bookPageNext()">Suivant &#9654;</button>'
     +'</div>'
     +'</div>';
 }
-function saveBookPage(pageIdx,val){
+function updateBrSpread(){
+  var book=books.find(function(b){return String(b.id)===String(_bookReaderOpen);});
+  if(!book)return;
+  if(!bookNotes[_bookReaderOpen])bookNotes[_bookReaderOpen]=[''];
+  var pages=bookNotes[_bookReaderOpen];
+  var rightIdx=_bookReaderPage;
+  var leftIdx=_bookReaderPage-1;
+  var isFirst=_bookReaderPage===0;
+  var leftPg=document.getElementById('br-pg-left');
+  var rightPg=document.getElementById('br-pg-right');
+  var pgInfo=document.getElementById('br-pg-info');
+  var prevBtn=document.getElementById('br-prev-btn');
+  if(leftPg){
+    if(isFirst){
+      leftPg.innerHTML='<div class="br-cover-face">'
+        +'<div style="font-size:18px;font-weight:700;color:#1C1C1E;font-family:\'Libre Baskerville\',serif;text-align:center;">'+e(book.title)+'</div>'
+        +(book.author?'<div style="font-size:12px;color:#8A8680;margin-top:6px;font-family:\'Libre Baskerville\',serif;">'+e(book.author)+'</div>':'')
+        +'</div>';
+    } else {
+      leftPg.innerHTML='<div class="br-page-content" id="br-left-content" contenteditable="true" data-placeholder="Écrire ici…" onblur="saveBookPage('+leftIdx+',this.innerHTML)">'+(_brPageContent(leftIdx))+'</div>'
+        +'<div class="br-pgnum">'+(leftIdx+1)+'</div>';
+    }
+  }
+  if(rightPg){
+    rightPg.innerHTML='<div class="br-page-content" id="br-right-content" contenteditable="true" data-placeholder="Écrire ici…" onblur="saveBookPage('+rightIdx+',this.innerHTML)">'+(_brPageContent(rightIdx))+'</div>'
+      +'<div class="br-pgnum" id="br-right-pgnum">'+(rightIdx+1)+'</div>';
+  }
+  if(pgInfo)pgInfo.textContent='Page '+(rightIdx+1)+' / '+pages.length;
+  if(prevBtn)prevBtn.disabled=isFirst;
+}
+function saveBookPage(pageIdx,html){
   if(!_bookReaderOpen)return;
   if(!bookNotes[_bookReaderOpen])bookNotes[_bookReaderOpen]=[''];
   while(bookNotes[_bookReaderOpen].length<=pageIdx)bookNotes[_bookReaderOpen].push('');
-  bookNotes[_bookReaderOpen][pageIdx]=val;
+  bookNotes[_bookReaderOpen][pageIdx]=html;
   saveTasks();scheduleSettingsSync();
 }
 function bookPageNext(){
   if(!_bookReaderOpen)return;
   if(!bookNotes[_bookReaderOpen])bookNotes[_bookReaderOpen]=[''];
+  // Save current right page content
+  var rightContent=document.getElementById('br-right-content');
+  if(rightContent)saveBookPage(_bookReaderPage,rightContent.innerHTML);
+  var spread=document.getElementById('br-spread');
+  if(spread){
+    // Grab right page HTML for flip card
+    var rightPg=document.getElementById('br-pg-right');
+    var flipHTML=rightPg?rightPg.querySelector('.br-page-content')?rightPg.querySelector('.br-page-content').innerHTML:'':'';
+    // Create flip card
+    var flip=document.createElement('div');
+    flip.style.cssText='position:absolute;top:0;right:0;width:calc(50% - 1px);height:100%;background:#fff;transform-origin:left center;transform-style:preserve-3d;z-index:20;overflow:hidden;padding:32px 28px 20px;box-sizing:border-box;font-family:\'Libre Baskerville\',serif;font-size:14px;color:#1C1C1E;line-height:1.9;border-left:1px solid #E0E0E0;box-shadow:-4px 0 12px rgba(0,0,0,0.12);';
+    flip.innerHTML=flipHTML;
+    spread.appendChild(flip);
+    // Advance page
+    _bookReaderPage++;
+    if(_bookReaderPage>=bookNotes[_bookReaderOpen].length)bookNotes[_bookReaderOpen].push('');
+    saveTasks();scheduleSettingsSync();
+    updateBrSpread();
+    // Animate flip
+    flip.style.animation='brFlipFwd 0.55s cubic-bezier(0.45,0,0.55,1) forwards';
+    flip.addEventListener('animationend',function(){if(flip.parentNode)flip.parentNode.removeChild(flip);});
+    return;
+  }
   _bookReaderPage++;
   if(_bookReaderPage>=bookNotes[_bookReaderOpen].length)bookNotes[_bookReaderOpen].push('');
-  saveTasks();scheduleSettingsSync();rBookReader('br-anim-next');
+  saveTasks();scheduleSettingsSync();
+  rBookReader();
 }
 function bookPagePrev(){
   if(!_bookReaderOpen||_bookReaderPage<=0)return;
+  var leftContent=document.getElementById('br-left-content');
+  if(leftContent)saveBookPage(_bookReaderPage-1,leftContent.innerHTML);
+  var rightContent=document.getElementById('br-right-content');
+  if(rightContent)saveBookPage(_bookReaderPage,rightContent.innerHTML);
   _bookReaderPage--;
-  rBookReader('br-anim-prev');
+  saveTasks();scheduleSettingsSync();
+  var spread=document.getElementById('br-spread');
+  if(spread){
+    updateBrSpread();
+    return;
+  }
+  rBookReader();
+}
+function brToolBold(){
+  document.execCommand('bold');
+}
+var _brImgTimer=null;
+function brInsertImage(input){
+  if(!input.files||!input.files[0])return;
+  var file=input.files[0];
+  var activeEl=document.activeElement;
+  // Try Supabase upload, fallback to base64
+  (async function(){
+    var imgSrc='';
+    try{
+      if(supabaseClient&&currentUser){
+        var ts=Date.now();
+        var path='pages/'+currentUser.id+'/'+ts+'-'+file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
+        var res=await supabaseClient.storage.from('book-covers').upload(path,file,{upsert:true});
+        if(!res.error){
+          var pub=supabaseClient.storage.from('book-covers').getPublicUrl(path);
+          imgSrc=pub.data&&pub.data.publicUrl?pub.data.publicUrl:'';
+        }
+      }
+    }catch(err){}
+    if(!imgSrc){
+      imgSrc=await new Promise(function(resolve){
+        var fr=new FileReader();
+        fr.onload=function(ev){resolve(ev.target.result);};
+        fr.readAsDataURL(file);
+      });
+    }
+    // Find active contenteditable
+    var target=document.querySelector('#br-right-content');
+    if(!target)target=document.querySelector('.br-page-content');
+    if(target){
+      target.focus();
+      document.execCommand('insertHTML',false,'<img src="'+imgSrc+'" style="max-width:100%;height:auto;border-radius:4px;margin:4px 0;">');
+      saveBookPage(_bookReaderPage,target.innerHTML);
+    }
+  })();
+  input.value='';
 }
 
 function rhBook(b){
