@@ -719,7 +719,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
 .br-spread{perspective:2000px;position:relative;overflow:visible!important;}
 
 /* ── Book reader: contenteditable pages ── */
-.br-page-content{flex:1;border:none;background:transparent;font-size:14px;font-family:'Libre Baskerville',serif;color:#1C1C1E;line-height:1.9;outline:none;overflow-y:auto;cursor:text;word-break:break-word;min-height:0;}
+.br-page-content{flex:1;border:none;background:transparent;font-size:14px;font-family:'Libre Baskerville',serif;color:#1C1C1E;line-height:1.9;outline:none;overflow:hidden;cursor:text;word-break:break-word;min-height:0;}
 .br-page-content:empty::before{content:attr(data-placeholder);color:#C8C5BF;font-style:italic;pointer-events:none;}
 .br-page-content img{max-width:100%;height:auto;border-radius:4px;margin:4px 0;display:block;}
 .br-tool-btn{background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:#AAA;border-radius:5px;padding:4px 10px;font-size:12px;font-weight:600;cursor:pointer;transition:background .12s;display:inline-flex;align-items:center;justify-content:center;line-height:1;}
@@ -887,6 +887,7 @@ html,body{background:#F4F4F4;color:#111;}
       <button class="mob-back-btn" onclick="mobBack()">&#8592;</button>
       <div class="main-title" id="main-title"><span class="main-title-icon" id="main-title-icon"></span><span id="main-title-text">All</span></div>
       <button class="home-btn" id="main-home-btn" onclick="setView('Home')" title="Home" style="display:none;">Home</button>
+      <button class="culture-fab" id="checklist-add-btn" onclick="openModal()" title="Ajouter une tâche" style="display:none;">+</button>
       <button class="culture-fab" id="culture-add-btn" onclick="openBookModal()" title="Ajouter un livre" style="display:none;">+</button>
     </div>
     <div class="body-card">
@@ -895,8 +896,6 @@ html,body{background:#F4F4F4;color:#111;}
   </div>
 
 </div>
-
-<button class="fab" onclick="openModal()">+</button>
 
 <nav class="mobile-nav" id="mobile-nav">
   <button class="mobile-nav-btn" data-view="Home" onclick="setView('Home')" style="display:none;"><span class="mobile-nav-icon" style="font-size:12px;font-weight:700;">H</span><span>Home</span></button>
@@ -1729,9 +1728,9 @@ function render(){
   // Show Home button in header on all views except Home itself
   var mainHomeBtn=document.getElementById('main-home-btn');
   if(mainHomeBtn)mainHomeBtn.style.display=currentView!=='Home'?'':'none';
-  // FAB: only show on Checklist view
-  var fabEl=document.querySelector('.fab');
-  if(fabEl)fabEl.style.display=currentView==='Checklist'?'':'none';
+  // Checklist "+" button
+  var clAddBtn=document.getElementById('checklist-add-btn');
+  if(clAddBtn)clAddBtn.style.display=currentView==='Checklist'?'':'none';
   // Culture "+" button
   var cultAddBtn=document.getElementById('culture-add-btn');
   if(cultAddBtn)cultAddBtn.style.display=currentView==='Culture'?'':'none';
@@ -2156,12 +2155,12 @@ function rBookReader(){
       +'<div style="font-size:18px;font-weight:700;color:#1C1C1E;font-family:\'Libre Baskerville\',serif;text-align:center;">'+e(book.title)+'</div>'
       +(book.author?'<div style="font-size:12px;color:#8A8680;margin-top:6px;font-family:\'Libre Baskerville\',serif;">'+e(book.author)+'</div>':'')
       +'</div>')
-    :('<div class="br-page-content" id="br-left-content" contenteditable="true" data-placeholder="Écrire ici…" onblur="saveBookPage('+leftIdx+',this.innerHTML)">'+(_brPageContent(leftIdx))+'</div>'
+    :('<div class="br-page-content" id="br-left-content" contenteditable="true" data-placeholder="Écrire ici…" onblur="saveBookPage('+leftIdx+',this.innerHTML)" oninput="brHandleInput(this,'+leftIdx+')">'+(_brPageContent(leftIdx))+'</div>'
       +'<div class="br-pgnum">'+(leftIdx+1)+'</div>');
   var pgLabel=isFirst?'Couverture':'Pages '+(leftIdx+1)+'-'+(rightIdx+1);
   var rightPageHTML=isFirst
     ?'<div class="br-cover-face" style="color:#C0BDB7;font-style:italic;font-family:\'Libre Baskerville\',serif;font-size:13px;">Tournez la page →</div>'
-    :'<div class="br-page-content" id="br-right-content" contenteditable="true" data-placeholder="Écrire ici…" onblur="saveBookPage('+rightIdx+',this.innerHTML)">'+(_brPageContent(rightIdx))+'</div>'
+    :'<div class="br-page-content" id="br-right-content" contenteditable="true" data-placeholder="Écrire ici…" onblur="saveBookPage('+rightIdx+',this.innerHTML)" oninput="brHandleInput(this,'+rightIdx+')">'+(_brPageContent(rightIdx))+'</div>'
       +'<div class="br-pgnum" id="br-right-pgnum">'+(rightIdx+1)+'</div>';
   ov.innerHTML=
     '<div class="br-shell">'
@@ -2207,7 +2206,7 @@ function updateBrSpread(){
         +(book.author?'<div style="font-size:12px;color:#8A8680;margin-top:6px;font-family:\'Libre Baskerville\',serif;">'+e(book.author)+'</div>':'')
         +'</div>';
     } else {
-      leftPg.innerHTML='<div class="br-page-content" id="br-left-content" contenteditable="true" data-placeholder="Écrire ici…" onblur="saveBookPage('+leftIdx+',this.innerHTML)">'+(_brPageContent(leftIdx))+'</div>'
+      leftPg.innerHTML='<div class="br-page-content" id="br-left-content" contenteditable="true" data-placeholder="Écrire ici…" onblur="saveBookPage('+leftIdx+',this.innerHTML)" oninput="brHandleInput(this,'+leftIdx+')">'+(_brPageContent(leftIdx))+'</div>'
         +'<div class="br-pgnum">'+(leftIdx+1)+'</div>';
     }
   }
@@ -2215,13 +2214,71 @@ function updateBrSpread(){
     if(isFirst){
       rightPg.innerHTML='<div class="br-cover-face" style="color:#C0BDB7;font-style:italic;font-family:\'Libre Baskerville\',serif;font-size:13px;">Tournez la page →</div>';
     } else {
-      rightPg.innerHTML='<div class="br-page-content" id="br-right-content" contenteditable="true" data-placeholder="Écrire ici…" onblur="saveBookPage('+rightIdx+',this.innerHTML)">'+(_brPageContent(rightIdx))+'</div>'
+      rightPg.innerHTML='<div class="br-page-content" id="br-right-content" contenteditable="true" data-placeholder="Écrire ici…" onblur="saveBookPage('+rightIdx+',this.innerHTML)" oninput="brHandleInput(this,'+rightIdx+')">'+(_brPageContent(rightIdx))+'</div>'
         +'<div class="br-pgnum" id="br-right-pgnum">'+(rightIdx+1)+'</div>';
     }
   }
   var pgLabel=isFirst?'Couverture':'Pages '+(leftIdx+1)+'-'+(rightIdx+1);
   if(pgInfo)pgInfo.textContent=pgLabel+' / '+pages.length+' p.';
   if(prevBtn)prevBtn.disabled=isFirst;
+}
+function brExtractOverflow(el){
+  if(el.scrollHeight<=el.clientHeight)return '';
+  var overflowNodes=[];
+  while(el.childNodes.length>0&&el.scrollHeight>el.clientHeight){
+    var last=el.lastChild;
+    if(last.nodeType===3){
+      var t=last.textContent;
+      if(!t.trim()){el.removeChild(last);overflowNodes.unshift(document.createTextNode(t));continue;}
+      var lo=0,hi=t.length,best=0;
+      while(lo<=hi){var mid=(lo+hi)>>1;last.textContent=t.slice(0,mid);if(el.scrollHeight<=el.clientHeight){best=mid;lo=mid+1;}else hi=mid-1;}
+      var kept=t.slice(0,best),extra=t.slice(best);
+      if(kept&&extra){var sp=kept.lastIndexOf(' ');if(sp>0){extra=kept.slice(sp)+extra;kept=kept.slice(0,sp);}}
+      if(kept)last.textContent=kept;else el.removeChild(last);
+      if(extra)overflowNodes.unshift(document.createTextNode(extra));
+      break;
+    }else{el.removeChild(last);overflowNodes.unshift(last);}
+  }
+  var tmp=document.createElement('div');
+  overflowNodes.forEach(function(n){tmp.appendChild(n.cloneNode?n.cloneNode(true):n);});
+  return tmp.innerHTML;
+}
+function brCheckOverflow(el,pageIdx){
+  if(!el||el.scrollHeight<=el.clientHeight)return;
+  var overflow=brExtractOverflow(el);
+  if(!overflow)return;
+  saveBookPage(pageIdx,el.innerHTML);
+  var nextIdx=pageIdx+1;
+  if(!bookNotes[_bookReaderOpen])bookNotes[_bookReaderOpen]=[''];
+  while(bookNotes[_bookReaderOpen].length<=nextIdx)bookNotes[_bookReaderOpen].push('');
+  bookNotes[_bookReaderOpen][nextIdx]=overflow+(bookNotes[_bookReaderOpen][nextIdx]||'');
+  saveTasks();
+  var idx=_brIndices();
+  var nextElId=nextIdx===idx.leftIdx?'br-left-content':nextIdx===idx.rightIdx?'br-right-content':null;
+  if(nextElId){
+    var nextEl=document.getElementById(nextElId);
+    if(nextEl){nextEl.innerHTML=bookNotes[_bookReaderOpen][nextIdx];setTimeout(function(){brCheckOverflow(nextEl,nextIdx);},0);}
+    return;
+  }
+  if(_bookReaderPage<0)_bookReaderPage=0;else _bookReaderPage+=2;
+  while(bookNotes[_bookReaderOpen].length<=_bookReaderPage+1)bookNotes[_bookReaderOpen].push('');
+  scheduleSettingsSync();
+  updateBrSpread();
+  setTimeout(function(){
+    var newIdx=_brIndices();
+    var newEl=nextIdx===newIdx.leftIdx?document.getElementById('br-left-content'):document.getElementById('br-right-content');
+    if(newEl){
+      newEl.focus();
+      var range=document.createRange();range.selectNodeContents(newEl);range.collapse(false);
+      window.getSelection().removeAllRanges();window.getSelection().addRange(range);
+      if(newEl.scrollHeight>newEl.clientHeight)brCheckOverflow(newEl,nextIdx);
+    }
+  },100);
+}
+function brHandleInput(el,pageIdx){
+  if(el.scrollHeight<=el.clientHeight)return;
+  var _el=el,_pg=pageIdx;
+  setTimeout(function(){if(document.contains(_el))brCheckOverflow(_el,_pg);},0);
 }
 function saveBookPage(pageIdx,html){
   if(!_bookReaderOpen||pageIdx<0)return;
@@ -2399,8 +2456,8 @@ function rGauge(){
 function rDl(){var c=[];tasks.forEach(function(t){if(c.indexOf(t.cat)<0)c.push(t.cat);});document.getElementById('cl').innerHTML=c.map(function(x){return'<option value="'+e(x)+'">';}).join('');}
 
 function setTab(x){var ico=getTabIcon(x);var mti=document.getElementById("main-title-icon");var mtt=document.getElementById("main-title-text");if(mti){mti.textContent=ico.icon;mti.style.background=ico.bg;mti.style.color="#fff";}if(mtt)mtt.textContent=x;if(ignoreClick){ignoreClick=false;return;}tab=x;render();pfc();saveTasks();saveSettingsRemote();if(window.innerWidth<=680)mobGoList();}
-function mobGoList(){var a=document.querySelector('.app');if(a)a.classList.add('mob-list');var fab=document.querySelector('.fab');if(fab)fab.style.display='';}
-function mobBack(){var a=document.querySelector('.app');if(a)a.classList.remove('mob-list');var fab=document.querySelector('.fab');if(fab)fab.style.display='none';}
+function mobGoList(){var a=document.querySelector('.app');if(a)a.classList.add('mob-list');}
+function mobBack(){var a=document.querySelector('.app');if(a)a.classList.remove('mob-list');}
 function setView(v){if(window.innerWidth<=680&&v!=='Checklist')return;currentView=v;render();saveTasks();}
 async function tgl(id,v){var t=tasks.find(function(t){return String(t.id)===String(id);});if(t){t.done=v;if(v){t.doneAt=Date.now();scheduleAutoDelete(t);}else{delete t.doneAt;clearAutoDelete(id);}}render();saveTasks(); if(supabaseClient) await updateRemoteTask(id,{done:v,doneAt:v?t.doneAt:null});}
 async function sp(id,p){var t=tasks.find(function(t){return String(t.id)===String(id);});if(t){if(t.prio===p){t.prio='M';}else{t.prio=p;t.today=false;}t.done=false;delete t.doneAt;clearAutoDelete(id);}render();saveTasks();if(supabaseClient) await updateRemoteTask(id,{prio:t?t.prio:'M',done:false,doneAt:null,today:t?!!t.today:false});}
@@ -2724,9 +2781,6 @@ window.addEventListener('resize',function(){if(currentView==='Projection')rProje
 // ── Mobile init & swipe-right to go back ──
 (function(){
   if(window.innerWidth>680)return;
-  // Hide FAB on nav page initially
-  var fab=document.querySelector('.fab');
-  if(fab)fab.style.display='none';
   // Swipe right on list page → back to nav
   var sx=0,sy=0;
   document.addEventListener('touchstart',function(e){sx=e.touches[0].clientX;sy=e.touches[0].clientY;},{passive:true});
