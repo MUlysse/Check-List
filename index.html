@@ -192,8 +192,8 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
 .book-row.book-drag-over{border-color:#4A90D9;box-shadow:0 0 0 2px rgba(74,144,217,.25);}
 .book-drag-handle{width:22px;display:flex;align-items:center;justify-content:center;color:#D0CCC6;font-size:13px;cursor:grab;flex-shrink:0;transition:color .12s;}
 .book-drag-handle:hover{color:#8A8680;}
-.book-cover{width:100%;height:200px;object-fit:cover;flex-shrink:0;display:block;border-radius:0;}
-.book-cover-placeholder{width:100%;height:200px;flex-shrink:0;background:#F0EDE8;display:flex;align-items:center;justify-content:center;font-size:40px;}
+.book-cover{width:100%;aspect-ratio:2/3;object-fit:cover;flex-shrink:0;display:block;border-radius:0;}
+.book-cover-placeholder{width:100%;aspect-ratio:2/3;flex-shrink:0;background:#F0EDE8;display:flex;align-items:center;justify-content:center;font-size:40px;}
 .book-card{display:flex;flex-direction:column;padding:8px 10px 10px;gap:3px;}
 .book-title{font-size:13px;font-weight:600;color:#1C1C1E;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .book-author{font-size:11px;color:#8A8680;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
@@ -2091,7 +2091,7 @@ function _brPageContent(pageIdx){
 function _brIndices(){
   var isFirst=_bookReaderPage<0;
   var leftIdx=isFirst?-1:_bookReaderPage;
-  var rightIdx=isFirst?0:_bookReaderPage+1;
+  var rightIdx=isFirst?-2:_bookReaderPage+1;
   return{isFirst:isFirst,leftIdx:leftIdx,rightIdx:rightIdx};
 }
 function rBookReader(){
@@ -2110,14 +2110,18 @@ function rBookReader(){
       +'</div>')
     :('<div class="br-page-content" id="br-left-content" contenteditable="true" data-placeholder="Écrire ici…" onblur="saveBookPage('+leftIdx+',this.innerHTML)">'+(_brPageContent(leftIdx))+'</div>'
       +'<div class="br-pgnum">'+(leftIdx+1)+'</div>');
-  var pgLabel=isFirst?'Page 1':'Pages '+(leftIdx+1)+'-'+(rightIdx+1);
+  var pgLabel=isFirst?'Couverture':'Pages '+(leftIdx+1)+'-'+(rightIdx+1);
+  var rightPageHTML=isFirst
+    ?'<div class="br-cover-face" style="color:#C0BDB7;font-style:italic;font-family:\'Libre Baskerville\',serif;font-size:13px;">Tournez la page →</div>'
+    :'<div class="br-page-content" id="br-right-content" contenteditable="true" data-placeholder="Écrire ici…" onblur="saveBookPage('+rightIdx+',this.innerHTML)">'+(_brPageContent(rightIdx))+'</div>'
+      +'<div class="br-pgnum" id="br-right-pgnum">'+(rightIdx+1)+'</div>';
   ov.innerHTML=
     '<div class="br-shell">'
     +'<div class="br-topbar">'
     +'<span class="br-book-name">'+e(book.title)+'</span>'
     +'<div class="br-tools">'
     +'<button class="br-tool-btn" onclick="brToolBold()" title="Gras"><b style="font-family:sans-serif;">B</b></button>'
-    +'<label class="br-tool-btn" title="Insérer image" style="cursor:pointer;">&#128247;<input type="file" accept="image/*" style="display:none" onchange="brInsertImage(this)"></label>'
+    +'<label class="br-tool-btn" title="Insérer image" style="cursor:pointer;">Image<input type="file" accept="image/*" style="display:none" onchange="brInsertImage(this)"></label>'
     +'<button class="br-x-btn" onclick="closeBookReader()">&#10005;</button>'
     +'</div>'
     +'</div>'
@@ -2126,8 +2130,7 @@ function rBookReader(){
     +'<div class="br-pg br-pg-left" id="br-pg-left">'+leftContent+'</div>'
     +'<div class="br-spine-line"></div>'
     +'<div class="br-pg br-pg-right" id="br-pg-right">'
-    +'<div class="br-page-content" id="br-right-content" contenteditable="true" data-placeholder="Écrire ici…" onblur="saveBookPage('+rightIdx+',this.innerHTML)">'+(_brPageContent(rightIdx))+'</div>'
-    +'<div class="br-pgnum" id="br-right-pgnum">'+(rightIdx+1)+'</div>'
+    +rightPageHTML
     +'</div>'
     +'</div>'
     +'</div>'
@@ -2161,10 +2164,14 @@ function updateBrSpread(){
     }
   }
   if(rightPg){
-    rightPg.innerHTML='<div class="br-page-content" id="br-right-content" contenteditable="true" data-placeholder="Écrire ici…" onblur="saveBookPage('+rightIdx+',this.innerHTML)">'+(_brPageContent(rightIdx))+'</div>'
-      +'<div class="br-pgnum" id="br-right-pgnum">'+(rightIdx+1)+'</div>';
+    if(isFirst){
+      rightPg.innerHTML='<div class="br-cover-face" style="color:#C0BDB7;font-style:italic;font-family:\'Libre Baskerville\',serif;font-size:13px;">Tournez la page →</div>';
+    } else {
+      rightPg.innerHTML='<div class="br-page-content" id="br-right-content" contenteditable="true" data-placeholder="Écrire ici…" onblur="saveBookPage('+rightIdx+',this.innerHTML)">'+(_brPageContent(rightIdx))+'</div>'
+        +'<div class="br-pgnum" id="br-right-pgnum">'+(rightIdx+1)+'</div>';
+    }
   }
-  var pgLabel=isFirst?'Page 1':'Pages '+(leftIdx+1)+'-'+(rightIdx+1);
+  var pgLabel=isFirst?'Couverture':'Pages '+(leftIdx+1)+'-'+(rightIdx+1);
   if(pgInfo)pgInfo.textContent=pgLabel+' / '+pages.length+' p.';
   if(prevBtn)prevBtn.disabled=isFirst;
 }
@@ -2210,11 +2217,24 @@ function bookPagePrev(){
   var leftContent=document.getElementById('br-left-content');
   if(leftContent&&idx.leftIdx>=0)saveBookPage(idx.leftIdx,leftContent.innerHTML);
   var rightContent=document.getElementById('br-right-content');
-  if(rightContent)saveBookPage(idx.rightIdx,rightContent.innerHTML);
+  if(rightContent&&idx.rightIdx>=0)saveBookPage(idx.rightIdx,rightContent.innerHTML);
+  var spread=document.getElementById('br-spread');
+  if(spread){
+    var leftPg=document.getElementById('br-pg-left');
+    var flipHTML=leftPg&&leftPg.querySelector('.br-page-content')?leftPg.querySelector('.br-page-content').innerHTML:'';
+    var flip=document.createElement('div');
+    flip.style.cssText='position:absolute;top:0;left:0;width:calc(50% - 1px);height:100%;background:#fff;transform-origin:right center;transform-style:preserve-3d;z-index:20;overflow:hidden;padding:32px 28px 20px;box-sizing:border-box;font-family:\'Libre Baskerville\',serif;font-size:14px;color:#1C1C1E;line-height:1.9;border-right:1px solid #E0E0E0;box-shadow:4px 0 12px rgba(0,0,0,0.12);';
+    flip.innerHTML=flipHTML;
+    spread.appendChild(flip);
+    if(_bookReaderPage===0){_bookReaderPage=-1;}else{_bookReaderPage-=2;}
+    saveTasks();scheduleSettingsSync();
+    updateBrSpread();
+    flip.style.animation='brFlipBwd 0.55s cubic-bezier(0.45,0,0.55,1) forwards';
+    flip.addEventListener('animationend',function(){if(flip.parentNode)flip.parentNode.removeChild(flip);});
+    return;
+  }
   if(_bookReaderPage===0){_bookReaderPage=-1;}else{_bookReaderPage-=2;}
   saveTasks();scheduleSettingsSync();
-  var spread=document.getElementById('br-spread');
-  if(spread){updateBrSpread();return;}
   rBookReader();
 }
 function brToolBold(){
