@@ -134,7 +134,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
 .rc{font-size:11px;color:#B0ADA8;margin-top:1px;}
 
 /* Edit button */
-.edit-btn{background:none;border:none;cursor:pointer;color:#C8C5BF;font-size:13px;padding:2px 5px;border-radius:4px;opacity:0;transition:opacity .15s,color .15s;flex-shrink:0;}
+.edit-btn{background:none;border:none;cursor:pointer;color:#C8C5BF;font-size:13px;padding:2px 5px;border-radius:4px;opacity:0.45;transition:opacity .15s,color .15s;flex-shrink:0;}
 .row:hover .edit-btn{opacity:1;}
 .edit-btn:hover{color:#4A90D9;}
 
@@ -186,18 +186,17 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
 .book-status-heading[data-status="reading"] .ps-dot{background:#4A90D9;}
 .book-status-heading[data-status="to_read"]  .ps-dot{background:#B0ADA8;}
 .book-status-heading[data-status="read"]     .ps-dot{background:#34C759;}
-.book-row{display:flex;align-items:stretch;margin-bottom:8px;border-radius:10px;background:#fff;border:1px solid rgba(0,0,0,0.06);overflow:hidden;transition:box-shadow .15s,border-color .15s;}
-.book-row:hover{box-shadow:0 2px 8px rgba(0,0,0,0.08);border-color:rgba(0,0,0,0.08);}
+.book-row{display:flex;flex-direction:column;margin-bottom:0;border-radius:10px;background:#fff;border:1px solid rgba(0,0,0,0.06);overflow:hidden;transition:box-shadow .15s,border-color .15s;cursor:pointer;}
+.book-row:hover{box-shadow:0 4px 16px rgba(0,0,0,0.10);border-color:rgba(0,0,0,0.10);}
 .book-row.book-dragging{opacity:.5;box-shadow:0 8px 24px rgba(0,0,0,0.14);}
 .book-row.book-drag-over{border-color:#4A90D9;box-shadow:0 0 0 2px rgba(74,144,217,.25);}
 .book-drag-handle{width:22px;display:flex;align-items:center;justify-content:center;color:#D0CCC6;font-size:13px;cursor:grab;flex-shrink:0;transition:color .12s;}
 .book-drag-handle:hover{color:#8A8680;}
-.book-cover{width:68px;height:100px;object-fit:cover;flex-shrink:0;display:block;}
-.book-cover-placeholder{width:68px;height:100px;flex-shrink:0;background:#F0EDE8;display:flex;align-items:center;justify-content:center;font-size:26px;}
-.book-card{display:flex;flex:1;min-width:0;}
-.book-info{flex:1;padding:11px 13px 10px;display:flex;flex-direction:column;min-width:0;gap:2px;}
-.book-info .book-title{font-size:14px;font-weight:600;color:#1C1C1E;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.book-info .book-author{font-size:12px;color:#8A8680;flex:1;}
+.book-cover{width:100%;height:200px;object-fit:cover;flex-shrink:0;display:block;border-radius:0;}
+.book-cover-placeholder{width:100%;height:200px;flex-shrink:0;background:#F0EDE8;display:flex;align-items:center;justify-content:center;font-size:40px;}
+.book-card{display:flex;flex-direction:column;padding:8px 10px 10px;gap:3px;}
+.book-title{font-size:13px;font-weight:600;color:#1C1C1E;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.book-author{font-size:11px;color:#8A8680;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .book-actions{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px;}
 .book-action{padding:3px 9px;border-radius:5px;border:1px solid #E0DDD8;font-size:11px;font-weight:500;cursor:pointer;background:transparent;color:#8A8680;transition:all .12s;}
 .book-action:hover:not(.book-action-del){background:#F5F3EF;border-color:#C8C5BF;color:#3D3B38;}
@@ -210,8 +209,9 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
 .dl-badge{font-size:10px;color:#FF9500;font-weight:500;margin-top:2px;}
 
 /* ── Book grid layout ── */
-.book-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;padding-bottom:2px;}
-@media(min-width:1400px){.book-grid{grid-template-columns:repeat(3,1fr);}}
+.book-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding-bottom:2px;}
+@media(max-width:900px){.book-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:500px){.book-grid{grid-template-columns:repeat(2,1fr);}}
 .book-cat-tag{display:inline-block;font-size:10px;color:#8A8680;background:#F0EDE8;border-radius:4px;padding:1px 6px;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
 
 /* ── Mobile : layout 2 pages (navigation + liste) ── */
@@ -711,7 +711,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
 /* ── 3D page flip ── */
 @keyframes brFlipFwd{0%{transform:rotateY(0deg);opacity:1;}60%{opacity:0.6;}100%{transform:rotateY(-175deg);opacity:0;}}
 @keyframes brFlipBwd{0%{transform:rotateY(0deg);opacity:1;}60%{opacity:0.6;}100%{transform:rotateY(175deg);opacity:0;}}
-.br-spread{perspective:2000px;position:relative;}
+.br-spread{perspective:2000px;position:relative;overflow:visible!important;}
 
 /* ── Book reader: contenteditable pages ── */
 .br-page-content{flex:1;border:none;background:transparent;font-size:14px;font-family:'Libre Baskerville',serif;color:#1C1C1E;line-height:1.9;outline:none;overflow-y:auto;cursor:text;word-break:break-word;min-height:0;}
@@ -805,6 +805,25 @@ html,body{background:#F4F4F4;color:#111;}
 .ps-label{color:#999;}
 .tm-label{color:#888;}
 .modal-close:hover{background:#F0F0F0;color:#333;}
+
+/* ── BOAZ height fill fix ── */
+.body-card.boaz-mode .boaz-wrap{flex:1;height:auto;}
+.boaz-book{flex:1;min-height:0;}
+
+/* ── Home button - always visible, large ── */
+#main-home-btn{font-size:18px!important;font-weight:900!important;padding:8px 20px!important;border-radius:10px!important;letter-spacing:-0.5px;}
+
+/* ── Culture: book card vertical layout ── */
+.book-card{padding:8px 10px 10px;}
+.book-info .book-title{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.book-info .book-author{font-size:11px;color:#8A8680;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;}
+.book-drag-handle{display:none;}
+.book-status-group{margin-bottom:24px;}
+.book-status-heading{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:#333;margin-bottom:12px;padding:0 2px;}
+
+/* ── Checklist: edit btn always visible ── */
+.edit-btn{opacity:0.45!important;}
+.row:hover .edit-btn{opacity:1!important;}
 </style>
 </head>
 <body>
@@ -1113,6 +1132,7 @@ function rHome(){
   el.innerHTML=h;
 }
 
+function fmtEur(n){return n.toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';}
 function rFinances(){
   var el=document.getElementById('list');
   if(!el)return;
@@ -1138,7 +1158,7 @@ function rFinances(){
       +'<button class="fin-del" onclick="deleteFinanceRow(\'depenses\','+i+')">×</button></div>';
   });
   h+='<button class="fin-add-row" onclick="addFinanceRow(\'depenses\')">+ Ajouter</button>';
-  h+='<div class="fin-total">Total : <strong>'+totalDep.toFixed(2)+' €</strong></div></div>';
+  h+='<div class="fin-total">Total : <strong>'+fmtEur(totalDep)+'</strong></div></div>';
 
   // Ressources
   h+='<div class="fin-card"><div class="fin-card-title" style="color:#34C759;">Ressources mensuelles</div>';
@@ -1148,7 +1168,7 @@ function rFinances(){
       +'<button class="fin-del" onclick="deleteFinanceRow(\'ressources\','+i+')">×</button></div>';
   });
   h+='<button class="fin-add-row" onclick="addFinanceRow(\'ressources\')">+ Ajouter</button>';
-  h+='<div class="fin-total">Total : <strong>'+totalRes.toFixed(2)+' €</strong></div>';
+  h+='<div class="fin-total">Total : <strong>'+fmtEur(totalRes)+'</strong></div>';
   if((fd.autresSorties||[]).length){
     h+='<div class="fin-card-title" style="color:#FF9500;margin-top:12px;">Autres sorties</div>';
     (fd.autresSorties||[]).forEach(function(d,i){
@@ -1157,9 +1177,9 @@ function rFinances(){
         +'<button class="fin-del" onclick="deleteFinanceRow(\'autresSorties\','+i+')">×</button></div>';
     });
     h+='<button class="fin-add-row" onclick="addFinanceRow(\'autresSorties\')">+ Ajouter</button>';
-    h+='<div class="fin-total">Sorties : <strong>'+totalSorties.toFixed(2)+' €</strong></div>';
+    h+='<div class="fin-total">Sorties : <strong>'+fmtEur(totalSorties)+'</strong></div>';
   }
-  h+='<div class="fin-total fin-reste">Reste mensuel : <strong>'+reste.toFixed(2)+' €</strong></div></div>';
+  h+='<div class="fin-total fin-reste">Reste mensuel : <strong>'+fmtEur(reste)+'</strong></div></div>';
 
   // Comptes courants
   h+='<div class="fin-card"><div class="fin-card-title" style="color:#4A90D9;">Comptes courants</div>';
@@ -1169,7 +1189,7 @@ function rFinances(){
       +'<button class="fin-del" onclick="deleteFinanceRow(\'comptesCourants\','+i+')">×</button></div>';
   });
   h+='<button class="fin-add-row" onclick="addFinanceRow(\'comptesCourants\')">+ Ajouter</button>';
-  h+='<div class="fin-total">Total : <strong>'+totalCC.toFixed(2)+' €</strong></div></div>';
+  h+='<div class="fin-total">Total : <strong>'+fmtEur(totalCC)+'</strong></div></div>';
 
   // Épargne
   h+='<div class="fin-card"><div class="fin-card-title" style="color:#FF9500;">Épargne</div>';
@@ -1179,7 +1199,7 @@ function rFinances(){
       +'<button class="fin-del" onclick="deleteFinanceRow(\'epargne\','+i+')">×</button></div>';
   });
   h+='<button class="fin-add-row" onclick="addFinanceRow(\'epargne\')">+ Ajouter</button>';
-  h+='<div class="fin-total">Total épargne : <strong>'+totalEp.toFixed(2)+' €</strong></div></div>';
+  h+='<div class="fin-total">Total épargne : <strong>'+fmtEur(totalEp)+'</strong></div></div>';
 
   // Dépenses à venir
   h+='<div class="fin-card"><div class="fin-card-title" style="color:#FF3B30;">Dépenses à venir</div>';
@@ -1189,13 +1209,13 @@ function rFinances(){
       +'<button class="fin-del" onclick="deleteFinanceRow(\'depensesAvenir\','+i+')">×</button></div>';
   });
   h+='<button class="fin-add-row" onclick="addFinanceRow(\'depensesAvenir\')">+ Ajouter</button>';
-  h+='<div class="fin-total">Total : <strong>'+totalDA.toFixed(2)+' €</strong></div></div>';
+  h+='<div class="fin-total">Total : <strong>'+fmtEur(totalDA)+'</strong></div></div>';
 
   // Synthèse
   h+='<div class="fin-card fin-synthese"><div class="fin-card-title">Synthèse</div>';
-  h+='<div class="fin-synth-row"><span>Montant total disponible</span><strong class="fin-highlight">'+montantRestant.toFixed(2)+' €</strong></div>';
+  h+='<div class="fin-synth-row"><span>Montant total disponible</span><strong class="fin-highlight">'+fmtEur(montantRestant)+'</strong></div>';
   h+='<div class="fin-synth-row"><span>Maman reste (prêt)</span>'
-    +'<strong><input class="fin-inp fin-inp-inline" type="number" value="'+e(String(fd.mamanReste||0))+'" onchange="financesData.mamanReste=parseFloat(this.value)||0;saveTasks();"> €</strong></div>';
+    +'<strong><input class="fin-inp fin-inp-inline" type="number" value="'+e(String(fd.mamanReste||0))+'" onchange="financesData.mamanReste=parseFloat(this.value)||0;saveTasks();scheduleSettingsSync();"> €</strong></div>';
   h+='</div>';
 
   h+='</div></div>';
@@ -1205,17 +1225,17 @@ function rFinances(){
 function updateFinances(key,idx,field,val){
   if(!financesData[key])financesData[key]=[];
   if(financesData[key][idx])financesData[key][idx][field]=val;
-  saveTasks();rFinances();
+  saveTasks();scheduleSettingsSync();rFinances();
 }
 function addFinanceRow(key){
   if(!financesData[key])financesData[key]=[];
   financesData[key].push({label:'',amount:0});
-  saveTasks();rFinances();
+  saveTasks();scheduleSettingsSync();rFinances();
 }
 function deleteFinanceRow(key,idx){
   if(!financesData[key])return;
   financesData[key].splice(idx,1);
-  saveTasks();rFinances();
+  saveTasks();scheduleSettingsSync();rFinances();
 }
 
 function rBOAZ(){
@@ -1261,10 +1281,10 @@ function rBOAZ(){
     +'<div class="boaz-pgnum">'+(pageIdx+1)+'</div>'
     +'</div>'
     +'</div>'
-    +'<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 20px;background:#F0EEEA;border-top:1px solid #D5D2CC;flex-shrink:0;">'
-    +'<button class="br-nav-btn2" style="border-color:#C8C5BF;color:#5A5755;" onclick="boazPrev()" '+(pageIdx<=0?'disabled':'')+'>&#9664; Précédent</button>'
-    +'<span style="font-size:12px;color:#8A8680;">Page '+(pageIdx+1)+' / '+totalPages+'</span>'
-    +'<button class="br-nav-btn2" style="border-color:#C8C5BF;color:#5A5755;" onclick="boazNext()">Suivant &#9654;</button>'
+    +'<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 20px;background:#F5F5F5;border-top:1px solid #E5E5E5;flex-shrink:0;">'
+    +'<button class="br-nav-btn2" onclick="boazPrev()" '+(pageIdx<=0?'disabled':'')+'>&#9664; Précédent</button>'
+    +'<span style="font-size:12px;color:#888;">Page '+(pageIdx+1)+' / '+totalPages+'</span>'
+    +'<button class="br-nav-btn2" onclick="boazNext()">Suivant &#9654;</button>'
     +'</div>'
     +'</div>'
     +'</div>'
@@ -1675,9 +1695,9 @@ function render(){
   var sidebarEl=document.querySelector('.sidebar');
   var SIDEBAR_HIDDEN_VIEWS=['Home','Finances','BOAZ','Culture'];
   if(sidebarEl)sidebarEl.style.display=SIDEBAR_HIDDEN_VIEWS.indexOf(currentView)>=0?'none':'';
-  // Show Home button in header when sidebar is hidden (not on Home itself)
+  // Show Home button in header on all views except Home itself
   var mainHomeBtn=document.getElementById('main-home-btn');
-  if(mainHomeBtn)mainHomeBtn.style.display=SIDEBAR_HIDDEN_VIEWS.indexOf(currentView)>=0&&currentView!=='Home'?'':'none';
+  if(mainHomeBtn)mainHomeBtn.style.display=currentView!=='Home'?'':'none';
   // FAB: only show on Checklist view
   var fabEl=document.querySelector('.fab');
   if(fabEl)fabEl.style.display=currentView==='Checklist'?'':'none';
@@ -1694,7 +1714,7 @@ function render(){
     var ctmB=document.getElementById('cat-treemap');if(ctmB)ctmB.style.display='none';
     if(bc){bc.classList.remove('proj-mode');bc.classList.remove('net-mode');}
     var mti=document.getElementById('main-title-icon');var mtt=document.getElementById('main-title-text');
-    if(mti){mti.textContent='◻';mti.style.background='#333';mti.style.color='#fff';mti.style.fontSize='';mti.style.width='';mti.style.padding='';}
+    if(mti){mti.textContent='';mti.style.background='transparent';mti.style.boxShadow='none';mti.style.width='0';mti.style.padding='0';}
     if(mtt)mtt.textContent='Culture';
     rCulture();
   } else if(currentView==='Projection'){
@@ -1703,7 +1723,7 @@ function render(){
     var ctmP=document.getElementById('cat-treemap');if(ctmP)ctmP.style.display='none';
     if(bc){bc.classList.add('proj-mode');bc.classList.remove('net-mode');}
     var mti=document.getElementById('main-title-icon');var mtt=document.getElementById('main-title-text');
-    if(mti){mti.textContent='◫';mti.style.background='#8A8680';mti.style.color='#fff';mti.style.fontSize='';}
+    if(mti){mti.textContent='';mti.style.background='transparent';mti.style.boxShadow='none';mti.style.width='0';mti.style.padding='0';}
     if(mtt)mtt.textContent='Projection';
     rProjectionGoals();
     rProjection();
@@ -1713,7 +1733,7 @@ function render(){
     if(twn){twn.style.display='none';}
     if(bc){bc.classList.remove('proj-mode');bc.classList.add('net-mode');}
     var mti=document.getElementById('main-title-icon');var mtt=document.getElementById('main-title-text');
-    if(mti){mti.textContent='◎';mti.style.background='#4A90D9';mti.style.color='#fff';mti.style.fontSize='';}
+    if(mti){mti.textContent='';mti.style.background='transparent';mti.style.boxShadow='none';mti.style.width='0';mti.style.padding='0';}
     if(mtt)mtt.textContent='Networking';
     rNetworking();
   } else if(currentView==='Exams'){
@@ -1722,7 +1742,7 @@ function render(){
     if(twe){twe.style.display='none';}
     if(bc){bc.classList.remove('proj-mode');bc.classList.remove('net-mode');bc.classList.add('exams-mode');}
     var mti=document.getElementById('main-title-icon');var mtt=document.getElementById('main-title-text');
-    if(mti){mti.textContent='E';mti.style.background='#5856D6';mti.style.color='#fff';mti.style.fontWeight='700';mti.style.fontSize='20px';}
+    if(mti){mti.textContent='';mti.style.background='transparent';mti.style.boxShadow='none';mti.style.width='0';mti.style.padding='0';}
     if(mtt)mtt.textContent='Exams';
     rExams();
   } else if(currentView==='Chess'){
@@ -1731,20 +1751,20 @@ function render(){
     if(twch){twch.style.display='block';twch.style.flexDirection='';twch.style.padding='';}
     if(bc){bc.classList.remove('proj-mode');bc.classList.remove('net-mode');}
     var mti=document.getElementById('main-title-icon');var mtt=document.getElementById('main-title-text');
-    if(mti){mti.textContent='C';mti.style.background='#333';mti.style.color='#fff';mti.style.fontWeight='800';mti.style.fontSize='18px';mti.style.width='';mti.style.padding='';}
+    if(mti){mti.textContent='';mti.style.background='transparent';mti.style.boxShadow='none';mti.style.width='0';mti.style.padding='0';}
     if(mtt)mtt.textContent='Chess';
     rChessNav();
     rChess();
   } else if(currentView==='Finances'){
     if(bc){bc.classList.remove('proj-mode');bc.classList.remove('net-mode');}
     var mti=document.getElementById('main-title-icon');var mtt=document.getElementById('main-title-text');
-    if(mti){mti.textContent='€';mti.style.background='#34C759';mti.style.color='#fff';mti.style.fontSize='18px';mti.style.fontWeight='700';}
-    if(mtt)mtt.textContent='Mes Finances';
+    if(mti){mti.textContent='';mti.style.background='transparent';mti.style.boxShadow='none';mti.style.width='0';mti.style.padding='0';}
+    if(mtt)mtt.textContent='Finances';
     rFinances();
   } else if(currentView==='BOAZ'){
     if(bc){bc.classList.remove('proj-mode');bc.classList.remove('net-mode');bc.classList.add('boaz-mode');}
     var mti=document.getElementById('main-title-icon');var mtt=document.getElementById('main-title-text');
-    if(mti){mti.textContent='B';mti.style.background='#222';mti.style.color='#fff';mti.style.fontSize='18px';mti.style.fontWeight='800';mti.style.width='';mti.style.padding='';}
+    if(mti){mti.textContent='';mti.style.background='transparent';mti.style.boxShadow='none';mti.style.width='0';mti.style.padding='0';}
     if(mtt)mtt.textContent='BOAZ';
     rBOAZ();
   } else {
@@ -1754,7 +1774,9 @@ function render(){
     if(bc){bc.classList.remove('proj-mode');bc.classList.remove('net-mode');}
     rTabs();
     rTasks();
-    var _ico=getTabIcon(tab);var _mti=document.getElementById('main-title-icon');var _mtt=document.getElementById('main-title-text');if(_mti){_mti.textContent=_ico.icon;_mti.style.background=_ico.bg;_mti.style.color='#fff';}if(_mtt)_mtt.textContent=tab;
+    var _mti=document.getElementById('main-title-icon');var _mtt=document.getElementById('main-title-text');
+    if(_mti){_mti.textContent='';_mti.style.background='transparent';_mti.style.boxShadow='none';_mti.style.width='0';_mti.style.padding='0';}
+    if(_mtt)_mtt.textContent=currentView==='Checklist'?tab:tab;
   }
   rGauge();
   rDl();
@@ -1796,10 +1818,8 @@ function rTabs(){
   if(ts.indexOf(tab)<0&&SYSTEM.indexOf(tab)>=0) tab='All';
   var h='';
   ts.forEach(function(x){
-    var ico=getTabIcon(x);
     var cnt=tc(x);
     h+='<div class="tab'+(tab===x?' active':'')+'" data-tab="'+x+'" onclick="setTab(this.dataset.tab)">'
-      +'<div class="tab-icon" style="background:'+ico.bg+';color:#fff">'+ico.icon+'</div>'
       +'<span class="tab-label">'+x+'</span>'
       +(cnt>0?'<span class="tab-badge">'+cnt+'</span>':'')
       +'</div>';
@@ -2027,7 +2047,7 @@ function rCulture(){
   catNames.forEach(function(cat){
     var group=catMap[cat];
     group.sort(function(a,b){ var d=(b.sortOrder||0)-(a.sortOrder||0); if(d!==0)return d; if(typeof a.id==='number'&&typeof b.id==='number')return b.id-a.id; return String(b.id).localeCompare(String(a.id)); });
-    h+='<div class="book-status-group"><div class="book-status-heading"><div class="ps-dot" style="background:#AF52DE;"></div><span>'+e(cat)+'</span></div>';
+    h+='<div class="book-status-group"><div class="book-status-heading"><span>'+e(cat)+'</span></div>';
     h+='<div class="book-grid">';
     group.forEach(function(b){var sid=e(String(b.id));var sst=e(b.status);h+='<div class="book-row" data-book-id="'+sid+'" data-book-status="'+sst+'" onpointerdown="bookPointerDown(event,\''+sid+'\',\''+sst+'\')" onpointermove="bookPointerMove(event)" onpointerup="bookPointerUp(event)" onpointercancel="bookPointerUp(event)">'+rhBook(b)+'</div>';});
     h+='</div></div>';
@@ -2040,7 +2060,7 @@ function openBookReader(bookId){
   if(!book)return;
   _bookReaderOpen=String(bookId);
   if(!bookNotes[_bookReaderOpen])bookNotes[_bookReaderOpen]=[''];
-  _bookReaderPage=0;
+  _bookReaderPage=-1;
   rBookReader();
   var ov=document.getElementById('book-reader-overlay');
   if(ov)ov.style.display='flex';
@@ -2054,6 +2074,12 @@ function _brPageContent(pageIdx){
   if(!bookNotes[_bookReaderOpen])return '';
   return bookNotes[_bookReaderOpen][pageIdx]||'';
 }
+function _brIndices(){
+  var isFirst=_bookReaderPage<0;
+  var leftIdx=isFirst?-1:_bookReaderPage;
+  var rightIdx=isFirst?0:_bookReaderPage+1;
+  return{isFirst:isFirst,leftIdx:leftIdx,rightIdx:rightIdx};
+}
 function rBookReader(){
   var ov=document.getElementById('book-reader-overlay');
   if(!ov||!_bookReaderOpen)return;
@@ -2061,9 +2087,8 @@ function rBookReader(){
   if(!book)return;
   if(!bookNotes[_bookReaderOpen])bookNotes[_bookReaderOpen]=[''];
   var pages=bookNotes[_bookReaderOpen];
-  var rightIdx=_bookReaderPage;
-  var leftIdx=_bookReaderPage-1;
-  var isFirst=_bookReaderPage===0;
+  var idx=_brIndices();
+  var isFirst=idx.isFirst,leftIdx=idx.leftIdx,rightIdx=idx.rightIdx;
   var leftContent=isFirst
     ?('<div class="br-cover-face">'
       +'<div style="font-size:18px;font-weight:700;color:#1C1C1E;font-family:\'Libre Baskerville\',serif;text-align:center;">'+e(book.title)+'</div>'
@@ -2071,6 +2096,7 @@ function rBookReader(){
       +'</div>')
     :('<div class="br-page-content" id="br-left-content" contenteditable="true" data-placeholder="Écrire ici…" onblur="saveBookPage('+leftIdx+',this.innerHTML)">'+(_brPageContent(leftIdx))+'</div>'
       +'<div class="br-pgnum">'+(leftIdx+1)+'</div>');
+  var pgLabel=isFirst?'Page 1':'Pages '+(leftIdx+1)+'-'+(rightIdx+1);
   ov.innerHTML=
     '<div class="br-shell">'
     +'<div class="br-topbar">'
@@ -2093,7 +2119,7 @@ function rBookReader(){
     +'</div>'
     +'<div class="br-bottombar">'
     +'<button class="br-nav-btn2" id="br-prev-btn" onclick="bookPagePrev()" '+(isFirst?'disabled':'')+'>&#9664; Précédent</button>'
-    +'<span class="br-pg-info" id="br-pg-info">Page '+(rightIdx+1)+' / '+pages.length+'</span>'
+    +'<span class="br-pg-info" id="br-pg-info">'+pgLabel+' / '+pages.length+' p.</span>'
     +'<button class="br-nav-btn2" onclick="bookPageNext()">Suivant &#9654;</button>'
     +'</div>'
     +'</div>';
@@ -2103,9 +2129,8 @@ function updateBrSpread(){
   if(!book)return;
   if(!bookNotes[_bookReaderOpen])bookNotes[_bookReaderOpen]=[''];
   var pages=bookNotes[_bookReaderOpen];
-  var rightIdx=_bookReaderPage;
-  var leftIdx=_bookReaderPage-1;
-  var isFirst=_bookReaderPage===0;
+  var idx=_brIndices();
+  var isFirst=idx.isFirst,leftIdx=idx.leftIdx,rightIdx=idx.rightIdx;
   var leftPg=document.getElementById('br-pg-left');
   var rightPg=document.getElementById('br-pg-right');
   var pgInfo=document.getElementById('br-pg-info');
@@ -2125,11 +2150,12 @@ function updateBrSpread(){
     rightPg.innerHTML='<div class="br-page-content" id="br-right-content" contenteditable="true" data-placeholder="Écrire ici…" onblur="saveBookPage('+rightIdx+',this.innerHTML)">'+(_brPageContent(rightIdx))+'</div>'
       +'<div class="br-pgnum" id="br-right-pgnum">'+(rightIdx+1)+'</div>';
   }
-  if(pgInfo)pgInfo.textContent='Page '+(rightIdx+1)+' / '+pages.length;
+  var pgLabel=isFirst?'Page 1':'Pages '+(leftIdx+1)+'-'+(rightIdx+1);
+  if(pgInfo)pgInfo.textContent=pgLabel+' / '+pages.length+' p.';
   if(prevBtn)prevBtn.disabled=isFirst;
 }
 function saveBookPage(pageIdx,html){
-  if(!_bookReaderOpen)return;
+  if(!_bookReaderOpen||pageIdx<0)return;
   if(!bookNotes[_bookReaderOpen])bookNotes[_bookReaderOpen]=[''];
   while(bookNotes[_bookReaderOpen].length<=pageIdx)bookNotes[_bookReaderOpen].push('');
   bookNotes[_bookReaderOpen][pageIdx]=html;
@@ -2138,47 +2164,43 @@ function saveBookPage(pageIdx,html){
 function bookPageNext(){
   if(!_bookReaderOpen)return;
   if(!bookNotes[_bookReaderOpen])bookNotes[_bookReaderOpen]=[''];
-  // Save current right page content
+  var idx=_brIndices();
   var rightContent=document.getElementById('br-right-content');
-  if(rightContent)saveBookPage(_bookReaderPage,rightContent.innerHTML);
+  if(rightContent)saveBookPage(idx.rightIdx,rightContent.innerHTML);
+  var leftContent=document.getElementById('br-left-content');
+  if(leftContent&&idx.leftIdx>=0)saveBookPage(idx.leftIdx,leftContent.innerHTML);
   var spread=document.getElementById('br-spread');
   if(spread){
-    // Grab right page HTML for flip card
     var rightPg=document.getElementById('br-pg-right');
-    var flipHTML=rightPg?rightPg.querySelector('.br-page-content')?rightPg.querySelector('.br-page-content').innerHTML:'':'';
-    // Create flip card
+    var flipHTML=rightPg&&rightPg.querySelector('.br-page-content')?rightPg.querySelector('.br-page-content').innerHTML:'';
     var flip=document.createElement('div');
     flip.style.cssText='position:absolute;top:0;right:0;width:calc(50% - 1px);height:100%;background:#fff;transform-origin:left center;transform-style:preserve-3d;z-index:20;overflow:hidden;padding:32px 28px 20px;box-sizing:border-box;font-family:\'Libre Baskerville\',serif;font-size:14px;color:#1C1C1E;line-height:1.9;border-left:1px solid #E0E0E0;box-shadow:-4px 0 12px rgba(0,0,0,0.12);';
     flip.innerHTML=flipHTML;
     spread.appendChild(flip);
-    // Advance page
-    _bookReaderPage++;
-    if(_bookReaderPage>=bookNotes[_bookReaderOpen].length)bookNotes[_bookReaderOpen].push('');
+    if(_bookReaderPage<0){_bookReaderPage=0;}else{_bookReaderPage+=2;}
+    while(bookNotes[_bookReaderOpen].length<=_bookReaderPage+1)bookNotes[_bookReaderOpen].push('');
     saveTasks();scheduleSettingsSync();
     updateBrSpread();
-    // Animate flip
     flip.style.animation='brFlipFwd 0.55s cubic-bezier(0.45,0,0.55,1) forwards';
     flip.addEventListener('animationend',function(){if(flip.parentNode)flip.parentNode.removeChild(flip);});
     return;
   }
-  _bookReaderPage++;
-  if(_bookReaderPage>=bookNotes[_bookReaderOpen].length)bookNotes[_bookReaderOpen].push('');
+  if(_bookReaderPage<0){_bookReaderPage=0;}else{_bookReaderPage+=2;}
+  while(bookNotes[_bookReaderOpen].length<=_bookReaderPage+1)bookNotes[_bookReaderOpen].push('');
   saveTasks();scheduleSettingsSync();
   rBookReader();
 }
 function bookPagePrev(){
-  if(!_bookReaderOpen||_bookReaderPage<=0)return;
+  if(!_bookReaderOpen||_bookReaderPage<0)return;
+  var idx=_brIndices();
   var leftContent=document.getElementById('br-left-content');
-  if(leftContent)saveBookPage(_bookReaderPage-1,leftContent.innerHTML);
+  if(leftContent&&idx.leftIdx>=0)saveBookPage(idx.leftIdx,leftContent.innerHTML);
   var rightContent=document.getElementById('br-right-content');
-  if(rightContent)saveBookPage(_bookReaderPage,rightContent.innerHTML);
-  _bookReaderPage--;
+  if(rightContent)saveBookPage(idx.rightIdx,rightContent.innerHTML);
+  if(_bookReaderPage===0){_bookReaderPage=-1;}else{_bookReaderPage-=2;}
   saveTasks();scheduleSettingsSync();
   var spread=document.getElementById('br-spread');
-  if(spread){
-    updateBrSpread();
-    return;
-  }
+  if(spread){updateBrSpread();return;}
   rBookReader();
 }
 function brToolBold(){
@@ -2188,18 +2210,20 @@ var _brImgTimer=null;
 function brInsertImage(input){
   if(!input.files||!input.files[0])return;
   var file=input.files[0];
-  var activeEl=document.activeElement;
-  // Try Supabase upload, fallback to base64
   (async function(){
     var imgSrc='';
     try{
-      if(supabaseClient&&currentUser){
-        var ts=Date.now();
-        var path='pages/'+currentUser.id+'/'+ts+'-'+file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
-        var res=await supabaseClient.storage.from('book-covers').upload(path,file,{upsert:true});
-        if(!res.error){
-          var pub=supabaseClient.storage.from('book-covers').getPublicUrl(path);
-          imgSrc=pub.data&&pub.data.publicUrl?pub.data.publicUrl:'';
+      if(supabaseClient){
+        var authRes=await supabaseClient.auth.getUser();
+        var usr=authRes&&authRes.data&&authRes.data.user?authRes.data.user:null;
+        if(usr){
+          var ts=Date.now();
+          var path='pages/'+usr.id+'/'+ts+'-'+file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
+          var res=await supabaseClient.storage.from('book-covers').upload(path,file,{upsert:true});
+          if(!res.error){
+            var pub=supabaseClient.storage.from('book-covers').getPublicUrl(path);
+            imgSrc=pub.data&&pub.data.publicUrl?pub.data.publicUrl:'';
+          }
         }
       }
     }catch(err){}
@@ -2210,13 +2234,13 @@ function brInsertImage(input){
         fr.readAsDataURL(file);
       });
     }
-    // Find active contenteditable
     var target=document.querySelector('#br-right-content');
     if(!target)target=document.querySelector('.br-page-content');
     if(target){
       target.focus();
       document.execCommand('insertHTML',false,'<img src="'+imgSrc+'" style="max-width:100%;height:auto;border-radius:4px;margin:4px 0;">');
-      saveBookPage(_bookReaderPage,target.innerHTML);
+      var idx2=_brIndices();
+      saveBookPage(idx2.rightIdx,target.innerHTML);
     }
   })();
   input.value='';
@@ -2224,22 +2248,21 @@ function brInsertImage(input){
 
 function rhBook(b){
   var bid=String(b.id);
+  var status=b.status||'to_read';
   var cover=b.coverUrl
-    ?'<img class="book-cover" src="'+e(b.coverUrl)+'" alt="" onclick="openBookReader(\''+e(bid)+'\')" title="Ouvrir le livre" style="cursor:pointer;">'
-    :'<div class="book-cover-placeholder" onclick="openBookReader(\''+e(bid)+'\')" title="Ouvrir le livre" style="cursor:pointer;">&#9632;</div>';
-  var actions='';
-  BOOK_STATUS_ORDER.forEach(function(s){
-    if(s!==b.status) actions+='<button class="book-action" data-bid="'+b.id+'" data-bst="'+s+'" onclick="setBookStatus(+this.dataset.bid,this.dataset.bst)">'+BOOK_STATUS_LABELS[s]+'</button>';
-  });
-  actions+='<button class="book-action book-action-edit" data-bid="'+b.id+'" onclick="editBook(+this.dataset.bid)">Modifier</button>';
-  actions+='<button class="book-action book-action-del" title="Supprimer" data-bid="'+b.id+'" onclick="deleteBook(+this.dataset.bid)">&#10005;</button>';
-  return '<div class="book-drag-handle">&#8942;</div>'+cover
-    +'<div class="book-card"><div class="book-info">'
+    ?'<img class="book-cover" src="'+e(b.coverUrl)+'" alt="" onclick="openBookReader(\''+e(bid)+'\')" title="Ouvrir le livre">'
+    :'<div class="book-cover-placeholder" onclick="openBookReader(\''+e(bid)+'\')" title="Ouvrir le livre">&#9632;</div>';
+  var statusBadge='<span class="book-status-badge '+status+'">'+e(BOOK_STATUS_LABELS[status]||status)+'</span>';
+  return cover
+    +'<div class="book-card">'
     +'<div class="book-title">'+e(b.title)+'</div>'
-    +'<div class="book-author">'+e(b.author)+'</div>'
-    +(b.category?'<div class="book-cat-tag">'+e(b.category)+'</div>':'')
-    +'<div class="book-actions">'+actions+'</div>'
-    +'</div></div>';
+    +'<div class="book-author">'+e(b.author||'')+'</div>'
+    +statusBadge
+    +'<div class="book-actions" style="margin-top:6px;">'
+    +'<button class="book-action book-action-edit" data-bid="'+b.id+'" onclick="event.stopPropagation();editBook(+this.dataset.bid)">Modifier</button>'
+    +'<button class="book-action book-action-del" title="Supprimer" data-bid="'+b.id+'" onclick="event.stopPropagation();deleteBook(+this.dataset.bid)">&#10005;</button>'
+    +'</div>'
+    +'</div>';
 }
 
 
@@ -3179,14 +3202,11 @@ function rChessNav(){
   var ctm=document.getElementById('cat-treemap');
   if(ctm)ctm.style.display='none';
   var h='<div class="tab'+(currentChessBoard===null?' active':'')+'" onclick="selectChessBoard(null)">';
-  h+='<span class="tab-icon" style="background:#F0EDE8;font-size:15px;">♟</span>';
   h+='<span class="tab-label">Tous les pièges</span>';
   h+='<span class="tab-badge">'+chessData.boards.length+'</span></div>';
   chessData.boards.forEach(function(board){
-    var icon=board.side==='b'?'♚':'♔';
     var active=currentChessBoard===board.id;
     h+='<div class="tab'+(active?' active':'')+'" onclick="selectChessBoard(\''+board.id+'\''+')">';
-    h+='<span class="tab-icon" style="background:'+(active?'#5856D6':'#F0EDE8')+';color:'+(active?'#fff':'#1C1C1E')+';font-size:15px;">'+icon+'</span>';
     h+='<span class="tab-label">'+e(board.title||'Sans titre')+'</span></div>';
   });
   tabsEl.innerHTML=h;
@@ -4233,15 +4253,15 @@ function deleteProjGoal(id){
     <button class="nav-drawer-close" onclick="closeNavDrawer()">&#10005;</button>
   </div>
   <div class="nav-drawer-items">
-    <button class="nav-drawer-item" data-view="Home" onclick="navDrawerGo('Home')"><span class="nav-drawer-item-icon">⌂</span><span class="nav-drawer-item-label">Accueil</span></button>
-    <button class="nav-drawer-item" data-view="Checklist" onclick="navDrawerGo('Checklist')"><span class="nav-drawer-item-icon">☰</span><span class="nav-drawer-item-label">Checklist</span></button>
-    <button class="nav-drawer-item" data-view="Culture" onclick="navDrawerGo('Culture')"><span class="nav-drawer-item-icon">◻</span><span class="nav-drawer-item-label">Culture</span></button>
-    <button class="nav-drawer-item" data-view="Projection" onclick="navDrawerGo('Projection')"><span class="nav-drawer-item-icon">◫</span><span class="nav-drawer-item-label">Projection</span></button>
-    <button class="nav-drawer-item" data-view="Networking" onclick="navDrawerGo('Networking')"><span class="nav-drawer-item-icon">◎</span><span class="nav-drawer-item-label">Réseau</span></button>
-    <button class="nav-drawer-item" data-view="Exams" onclick="navDrawerGo('Exams')"><span class="nav-drawer-item-icon" style="font-weight:700;">E</span><span class="nav-drawer-item-label">Exams</span></button>
-    <button class="nav-drawer-item" data-view="Chess" onclick="navDrawerGo('Chess')"><span class="nav-drawer-item-icon">♟</span><span class="nav-drawer-item-label">Chess</span></button>
-    <button class="nav-drawer-item" data-view="Finances" onclick="navDrawerGo('Finances')"><span class="nav-drawer-item-icon" style="font-weight:700;">€</span><span class="nav-drawer-item-label">Finances</span></button>
-    <button class="nav-drawer-item" data-view="BOAZ" onclick="navDrawerGo('BOAZ')"><span class="nav-drawer-item-icon" style="font-weight:700;">B</span><span class="nav-drawer-item-label">BOAZ</span></button>
+    <button class="nav-drawer-item" data-view="Home" onclick="navDrawerGo('Home')"><span class="nav-drawer-item-label">Home</span></button>
+    <button class="nav-drawer-item" data-view="Checklist" onclick="navDrawerGo('Checklist')"><span class="nav-drawer-item-label">Checklist</span></button>
+    <button class="nav-drawer-item" data-view="Culture" onclick="navDrawerGo('Culture')"><span class="nav-drawer-item-label">Culture</span></button>
+    <button class="nav-drawer-item" data-view="Projection" onclick="navDrawerGo('Projection')"><span class="nav-drawer-item-label">Projection</span></button>
+    <button class="nav-drawer-item" data-view="Networking" onclick="navDrawerGo('Networking')"><span class="nav-drawer-item-label">Réseau</span></button>
+    <button class="nav-drawer-item" data-view="Exams" onclick="navDrawerGo('Exams')"><span class="nav-drawer-item-label">Exams</span></button>
+    <button class="nav-drawer-item" data-view="Chess" onclick="navDrawerGo('Chess')"><span class="nav-drawer-item-label">Chess</span></button>
+    <button class="nav-drawer-item" data-view="Finances" onclick="navDrawerGo('Finances')"><span class="nav-drawer-item-label">Finances</span></button>
+    <button class="nav-drawer-item" data-view="BOAZ" onclick="navDrawerGo('BOAZ')"><span class="nav-drawer-item-label">BOAZ</span></button>
   </div>
 </div>
 </body>
