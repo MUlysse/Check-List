@@ -439,24 +439,24 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
 .exam-card{background:#fff;border:1px solid #D0CBC3;border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:10px;position:relative;}
 .exam-card-header{display:flex;align-items:center;gap:8px;}
 .exam-card-name{font-size:14px;font-weight:600;color:#1C1C1E;flex:1;line-height:1.3;cursor:pointer;}
-.exam-card-name:hover{color:#4A90D9;}
+.exam-card-name:hover{color:#333;}
 .exam-del-btn{opacity:0;background:none;border:none;cursor:pointer;color:#FF3B30;font-size:19px;line-height:1;padding:0 2px;border-radius:4px;transition:opacity .15s;flex-shrink:0;}
 .exam-card:hover .exam-del-btn{opacity:1;}
 /* Circles row */
 .exam-steps-circles{display:flex;align-items:center;gap:0;}
 .exam-step-circ{flex:0 0 28px;display:flex;align-items:center;justify-content:center;cursor:pointer;-webkit-tap-highlight-color:transparent;}
 .exam-step-circle{width:28px;height:28px;border-radius:50%;border:2px solid #B8B2AC;background:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#8A8680;transition:all .18s;flex-shrink:0;}
-.exam-step-circ.done .exam-step-circle{background:#4A90D9;border-color:#4A90D9;color:#fff;}
+.exam-step-circ.done .exam-step-circle{background:#111;border-color:#111;color:#fff;}
 /* Labels row */
 .exam-steps-labels{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:3px;}
 .exam-step-lbl{font-size:9px;font-weight:500;color:#8A8680;text-align:center;line-height:1.2;padding:0 2px;}
-.exam-step-lbl.done{color:#4A90D9;}
+.exam-step-lbl.done{color:#333;}
 .exam-step-connector{flex:1;height:2px;background:#C8C4BE;border-radius:1px;}
-.exam-step-connector.done{background:#4A90D9;}
+.exam-step-connector.done{background:#555;}
 .exam-date-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
 .exam-date-label{font-size:11px;color:#5A5755;font-weight:500;flex-shrink:0;}
 .exam-date-input{flex:1;min-width:90px;border:1px solid #D0CBC3;border-radius:6px;padding:4px 8px;font-size:12px;color:#1C1C1E;background:#FAFAF8;outline:none;font-family:inherit;}
-.exam-date-input:focus{border-color:#4A90D9;}
+.exam-date-input:focus{border-color:#333;}
 .exam-comment-preview{width:100%;border-top:1px solid #EAE7E2;padding:8px 0 2px;font-size:12px;color:#3D3B38;font-family:inherit;line-height:1.5;cursor:pointer;min-height:36px;white-space:pre-wrap;word-break:break-word;}
 .exam-comment-preview.empty{color:#C0BDB7;font-style:italic;}
 .exam-comment-preview:hover{color:#1C1C1E;}
@@ -468,13 +468,13 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
 .exam-comment-modal-title button{background:none;border:none;cursor:pointer;color:#B0ADA8;font-size:16px;padding:2px 6px;border-radius:5px;line-height:1;}
 .exam-comment-modal-title button:hover{background:#F0EDE8;color:#5A5755;}
 .exam-comment-textarea{flex:1;min-height:260px;max-height:52vh;border:1px solid #E0DDD8;border-radius:10px;padding:12px 14px;font-size:13.5px;color:#1C1C1E;font-family:inherit;line-height:1.6;resize:none;outline:none;transition:border-color .15s;}
-.exam-comment-textarea:focus{border-color:#4A90D9;box-shadow:0 0 0 3px rgba(74,144,217,0.10);}
+.exam-comment-textarea:focus{border-color:#333;box-shadow:0 0 0 3px rgba(0,0,0,0.06);}
 .exam-comment-textarea::placeholder{color:#C0BDB7;}
 
 /* Grades tables */
 .grades-section{margin-bottom:32px;}
 .grades-semester-title{font-size:15px;font-weight:700;color:#1C1C1E;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
-.grades-badge{font-size:11px;font-weight:600;background:#4A90D9;color:#fff;padding:2px 8px;border-radius:10px;}
+.grades-badge{font-size:11px;font-weight:600;background:#111;color:#fff;padding:2px 8px;border-radius:10px;}
 .grades-table-wrap{border:1px solid #E8E5E0;border-radius:12px;overflow:hidden;background:#fff;}
 .grades-table{width:100%;border-collapse:collapse;table-layout:fixed;background:#fff;}
 .grades-table th{background:#F5F3EF;font-size:10px;font-weight:700;color:#5A5755;text-transform:uppercase;letter-spacing:0.04em;padding:6px 5px;text-align:center;border-bottom:1px solid #D8D4CE;}
@@ -495,17 +495,17 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
 .grade-input::-webkit-inner-spin-button,.grade-input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0;}
 .grade-coeff-input{-webkit-appearance:none;-moz-appearance:textfield;appearance:textfield;}
 .grade-coeff-input::-webkit-inner-spin-button,.grade-coeff-input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0;}
-.grade-input:focus{border-color:#4A90D9;background:#fff;}
+.grade-input:focus{border-color:#333;background:#fff;}
 .grade-input.has-value{font-weight:600;color:#1C1C1E;}
-.grade-input.min-needed::placeholder{color:#4A90D9;font-weight:600;}
-.grade-mean{font-size:13px;font-weight:700;color:#4A90D9;}
+.grade-input.min-needed::placeholder{color:#555;font-weight:600;}
+.grade-mean{font-size:13px;font-weight:700;color:#111;}
 .grade-mean-empty{font-size:12px;color:#B0ADA8;}
 .ects-input{width:36px;border:1px solid #E0DDD8;border-radius:6px;padding:3px 5px;font-size:12px;color:#5A5755;background:#FAFAF8;outline:none;text-align:center;font-family:inherit;}
-.ects-input:focus{border-color:#4A90D9;}
+.ects-input:focus{border-color:#333;}
 .grades-total-row td{background:#F5F3EF !important;font-weight:700;border-top:2px solid #E0DDD8;}
 .grade-add-col-cell{vertical-align:middle;}
 .grade-add-col-btn{background:none;border:1.5px dashed #D0CCC6;border-radius:8px;color:#C0BDB7;font-size:17px;font-weight:600;cursor:pointer;padding:4px 12px;font-family:inherit;line-height:1;transition:border-color .15s,color .15s,background .15s;display:block;margin:auto;}
-.grade-add-col-btn:hover{border-color:#4A90D9;color:#4A90D9;background:rgba(74,144,217,0.05);}
+.grade-add-col-btn:hover{border-color:#333;color:#333;background:rgba(0,0,0,0.04);}
 
 @media(max-width:680px){
   #exam-full-overlay{bottom:0!important;}
@@ -853,6 +853,19 @@ html,body{background:#F4F4F4;color:#111;}
 .cat-list-item.active{background:rgba(255,255,255,0.18);}
 .cat-list-item.active .cat-list-name{color:#fff;}
 .tm-label{color:#888;}
+/* Projection sidebar — dark theme overrides */
+.proj-goals-title{color:#888!important;}
+.goal-txt{color:#CCC!important;}
+.goal-row:hover{background:rgba(255,255,255,0.05)!important;}
+.goal-row.done .goal-txt{color:#555!important;}
+.goal-chk{border-color:#444!important;background:#1A1A1A!important;}
+.goal-chk:checked{background:#555!important;border-color:#444!important;}
+.goal-del{color:#555!important;}
+.proj-goal-add input{background:#1A1A1A!important;border-color:#333!important;color:#CCC!important;}
+.proj-goal-add button{background:#333!important;}
+/* Projection toolbar */
+.proj-btn{background:#111!important;}
+.proj-btn:hover{background:#333!important;}
 </style>
 </head>
 <body>
@@ -889,6 +902,7 @@ html,body{background:#F4F4F4;color:#111;}
       <button class="home-btn" id="main-home-btn" onclick="setView('Home')" title="Home" style="display:none;">Home</button>
       <button class="culture-fab" id="checklist-add-btn" onclick="openModal()" title="Ajouter une tâche" style="display:none;">+</button>
       <button class="culture-fab" id="culture-add-btn" onclick="openBookModal()" title="Ajouter un livre" style="display:none;">+</button>
+      <button class="culture-fab" id="projection-add-btn" onclick="openProjPeriodModal(null,null)" title="Ajouter une période" style="display:none;">+</button>
     </div>
     <div class="body-card">
       <div id="list"></div>
@@ -1723,7 +1737,7 @@ function render(){
   }
   // Hide sidebar for Home, Finances, BOAZ, Culture
   var sidebarEl=document.querySelector('.sidebar');
-  var SIDEBAR_HIDDEN_VIEWS=['Home','Finances','BOAZ','Culture','Exams'];
+  var SIDEBAR_HIDDEN_VIEWS=['Home','Finances','BOAZ','Culture','Exams','Networking'];
   if(sidebarEl)sidebarEl.style.display=SIDEBAR_HIDDEN_VIEWS.indexOf(currentView)>=0?'none':'';
   // Show Home button in header on all views except Home itself
   var mainHomeBtn=document.getElementById('main-home-btn');
@@ -1734,6 +1748,8 @@ function render(){
   // Culture "+" button
   var cultAddBtn=document.getElementById('culture-add-btn');
   if(cultAddBtn)cultAddBtn.style.display=currentView==='Culture'?'':'none';
+  var projAddBtn=document.getElementById('projection-add-btn');
+  if(projAddBtn)projAddBtn.style.display=currentView==='Projection'?'':'none';
   if(currentView==='Home'){
     if(bc){bc.classList.remove('proj-mode');bc.classList.remove('net-mode');}
     var mti=document.getElementById('main-title-icon');var mtt=document.getElementById('main-title-text');
@@ -2262,20 +2278,7 @@ function brCheckOverflow(el,pageIdx){
     if(nextEl){nextEl.innerHTML=bookNotes[_bookReaderOpen][nextIdx];setTimeout(function(){brCheckOverflow(nextEl,nextIdx);},0);}
     return;
   }
-  if(_bookReaderPage<0)_bookReaderPage=0;else _bookReaderPage+=2;
-  while(bookNotes[_bookReaderOpen].length<=_bookReaderPage+1)bookNotes[_bookReaderOpen].push('');
   scheduleSettingsSync();
-  updateBrSpread();
-  setTimeout(function(){
-    var newIdx=_brIndices();
-    var newEl=nextIdx===newIdx.leftIdx?document.getElementById('br-left-content'):document.getElementById('br-right-content');
-    if(newEl){
-      newEl.focus();
-      var range=document.createRange();range.selectNodeContents(newEl);range.collapse(false);
-      window.getSelection().removeAllRanges();window.getSelection().addRange(range);
-      if(newEl.scrollHeight>newEl.clientHeight)brCheckOverflow(newEl,nextIdx);
-    }
-  },100);
 }
 function brHandleInput(el,pageIdx){
   if(el.scrollHeight<=el.clientHeight)return;
@@ -4177,7 +4180,6 @@ function rProjection(){
 
   // Toolbar
   h+='<div class="proj-toolbar">'
-    +'<button class="proj-btn" onclick="openProjPeriodModal(null,null)">+ Période</button>'
     +'<button class="proj-btn-outline" onclick="openProjRowModal(null)">+ Ligne</button>'
     +'<div class="proj-legend">';
   Object.keys(PROJ_CATS).forEach(function(k){
