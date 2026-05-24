@@ -224,6 +224,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
   .sidebar{width:100vw;min-width:100vw;height:100vh;flex-direction:column;border-right:none;border-bottom:none;}
   .sidebar-header{padding:16px 18px 6px;}
   .hamburger-btn,.view-bar,.mobile-nav{display:none!important;}
+  #main-home-btn,.home-btn{display:none!important;}
   .tabs-wrap{flex:1;padding:8px 16px 8px;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;}
   .tabs{display:flex;flex-direction:column;gap:3px;}
   .tab{padding:11px 14px;font-size:15.5px;border-radius:11px;white-space:normal;}
@@ -2074,7 +2075,7 @@ function openBookReader(bookId){
   if(!book)return;
   _bookReaderOpen=String(bookId);
   if(!bookNotes[_bookReaderOpen])bookNotes[_bookReaderOpen]=[''];
-  _bookReaderPage=-1;
+  _bookReaderPage=0;
   rBookReader();
   var ov=document.getElementById('book-reader-overlay');
   if(ov)ov.style.display='flex';
@@ -2135,7 +2136,7 @@ function rBookReader(){
     +'</div>'
     +'</div>'
     +'<div class="br-bottombar">'
-    +'<button class="br-nav-btn2" id="br-prev-btn" onclick="bookPagePrev()" '+(isFirst?'disabled':'')+'>&#9664; Précédent</button>'
+    +'<button class="br-nav-btn2" id="br-prev-btn" onclick="bookPagePrev()" '+(_bookReaderPage===0?'disabled':'')+'>&lsaquo; Précédent</button>'
     +'<span class="br-pg-info" id="br-pg-info">'+pgLabel+' / '+pages.length+' p.</span>'
     +'<button class="br-nav-btn2" onclick="bookPageNext()">Suivant &#9654;</button>'
     +'</div>'
@@ -2212,7 +2213,7 @@ function bookPageNext(){
   rBookReader();
 }
 function bookPagePrev(){
-  if(!_bookReaderOpen||_bookReaderPage<0)return;
+  if(!_bookReaderOpen||_bookReaderPage<=0)return;
   var idx=_brIndices();
   var leftContent=document.getElementById('br-left-content');
   if(leftContent&&idx.leftIdx>=0)saveBookPage(idx.leftIdx,leftContent.innerHTML);
@@ -2226,14 +2227,14 @@ function bookPagePrev(){
     flip.style.cssText='position:absolute;top:0;left:0;width:calc(50% - 1px);height:100%;background:#fff;transform-origin:right center;transform-style:preserve-3d;z-index:20;overflow:hidden;padding:32px 28px 20px;box-sizing:border-box;font-family:\'Libre Baskerville\',serif;font-size:14px;color:#1C1C1E;line-height:1.9;border-right:1px solid #E0E0E0;box-shadow:4px 0 12px rgba(0,0,0,0.12);';
     flip.innerHTML=flipHTML;
     spread.appendChild(flip);
-    if(_bookReaderPage===0){_bookReaderPage=-1;}else{_bookReaderPage-=2;}
+    if(_bookReaderPage>0){_bookReaderPage-=2;}
     saveTasks();scheduleSettingsSync();
     updateBrSpread();
     flip.style.animation='brFlipBwd 0.55s cubic-bezier(0.45,0,0.55,1) forwards';
     flip.addEventListener('animationend',function(){if(flip.parentNode)flip.parentNode.removeChild(flip);});
     return;
   }
-  if(_bookReaderPage===0){_bookReaderPage=-1;}else{_bookReaderPage-=2;}
+  if(_bookReaderPage>0){_bookReaderPage-=2;}
   saveTasks();scheduleSettingsSync();
   rBookReader();
 }
@@ -2350,7 +2351,7 @@ function rDl(){var c=[];tasks.forEach(function(t){if(c.indexOf(t.cat)<0)c.push(t
 function setTab(x){var ico=getTabIcon(x);var mti=document.getElementById("main-title-icon");var mtt=document.getElementById("main-title-text");if(mti){mti.textContent=ico.icon;mti.style.background=ico.bg;mti.style.color="#fff";}if(mtt)mtt.textContent=x;if(ignoreClick){ignoreClick=false;return;}tab=x;render();pfc();saveTasks();saveSettingsRemote();if(window.innerWidth<=680)mobGoList();}
 function mobGoList(){var a=document.querySelector('.app');if(a)a.classList.add('mob-list');var fab=document.querySelector('.fab');if(fab)fab.style.display='';}
 function mobBack(){var a=document.querySelector('.app');if(a)a.classList.remove('mob-list');var fab=document.querySelector('.fab');if(fab)fab.style.display='none';}
-function setView(v){currentView=v;render();saveTasks();}
+function setView(v){if(window.innerWidth<=680&&v!=='Checklist')return;currentView=v;render();saveTasks();}
 async function tgl(id,v){var t=tasks.find(function(t){return String(t.id)===String(id);});if(t){t.done=v;if(v){t.doneAt=Date.now();scheduleAutoDelete(t);}else{delete t.doneAt;clearAutoDelete(id);}}render();saveTasks(); if(supabaseClient) await updateRemoteTask(id,{done:v,doneAt:v?t.doneAt:null});}
 async function sp(id,p){var t=tasks.find(function(t){return String(t.id)===String(id);});if(t){if(t.prio===p){t.prio='M';}else{t.prio=p;t.today=false;}t.done=false;delete t.doneAt;clearAutoDelete(id);}render();saveTasks();if(supabaseClient) await updateRemoteTask(id,{prio:t?t.prio:'M',done:false,doneAt:null,today:t?!!t.today:false});}
 async function st(id){var t=tasks.find(function(t){return String(t.id)===String(id);});if(t){t.today=!t.today;if(t.today)t.prio='M';}render();saveTasks();if(supabaseClient) await updateRemoteTask(id,{today:t.today,prio:t.prio});}
@@ -4289,15 +4290,15 @@ function deleteProjGoal(id){
     <button class="nav-drawer-close" onclick="closeNavDrawer()">&#10005;</button>
   </div>
   <div class="nav-drawer-items">
-    <button class="nav-drawer-item" data-view="Home" onclick="navDrawerGo('Home')"><span class="nav-drawer-item-label">Home</span></button>
+    <button class="nav-drawer-item" data-view="Home" onclick="navDrawerGo('Home')" style="display:none;"><span class="nav-drawer-item-label">Home</span></button>
     <button class="nav-drawer-item" data-view="Checklist" onclick="navDrawerGo('Checklist')"><span class="nav-drawer-item-label">Checklist</span></button>
-    <button class="nav-drawer-item" data-view="Culture" onclick="navDrawerGo('Culture')"><span class="nav-drawer-item-label">Culture</span></button>
-    <button class="nav-drawer-item" data-view="Projection" onclick="navDrawerGo('Projection')"><span class="nav-drawer-item-label">Projection</span></button>
-    <button class="nav-drawer-item" data-view="Networking" onclick="navDrawerGo('Networking')"><span class="nav-drawer-item-label">Réseau</span></button>
-    <button class="nav-drawer-item" data-view="Exams" onclick="navDrawerGo('Exams')"><span class="nav-drawer-item-label">Exams</span></button>
-    <button class="nav-drawer-item" data-view="Chess" onclick="navDrawerGo('Chess')"><span class="nav-drawer-item-label">Chess</span></button>
-    <button class="nav-drawer-item" data-view="Finances" onclick="navDrawerGo('Finances')"><span class="nav-drawer-item-label">Finances</span></button>
-    <button class="nav-drawer-item" data-view="BOAZ" onclick="navDrawerGo('BOAZ')"><span class="nav-drawer-item-label">BOAZ</span></button>
+    <button class="nav-drawer-item" data-view="Culture" onclick="navDrawerGo('Culture')" style="display:none;"><span class="nav-drawer-item-label">Culture</span></button>
+    <button class="nav-drawer-item" data-view="Projection" onclick="navDrawerGo('Projection')" style="display:none;"><span class="nav-drawer-item-label">Projection</span></button>
+    <button class="nav-drawer-item" data-view="Networking" onclick="navDrawerGo('Networking')" style="display:none;"><span class="nav-drawer-item-label">Réseau</span></button>
+    <button class="nav-drawer-item" data-view="Exams" onclick="navDrawerGo('Exams')" style="display:none;"><span class="nav-drawer-item-label">Exams</span></button>
+    <button class="nav-drawer-item" data-view="Chess" onclick="navDrawerGo('Chess')" style="display:none;"><span class="nav-drawer-item-label">Chess</span></button>
+    <button class="nav-drawer-item" data-view="Finances" onclick="navDrawerGo('Finances')" style="display:none;"><span class="nav-drawer-item-label">Finances</span></button>
+    <button class="nav-drawer-item" data-view="BOAZ" onclick="navDrawerGo('BOAZ')" style="display:none;"><span class="nav-drawer-item-label">BOAZ</span></button>
   </div>
 </div>
 </body>
