@@ -591,6 +591,8 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
 .home-card-sub{font-size:11px;color:#8A8680;}
 .home-btn{background:#fff;border:1px solid #E0DDD8;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;color:#4A90D9;transition:background .12s;flex-shrink:0;white-space:nowrap;}
 .home-btn:hover{background:#F5F3EF;}
+.culture-fab{width:36px;height:36px;border-radius:50%;background:#111;color:#fff;border:none;font-size:24px;font-weight:400;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,0.28);transition:transform .15s,box-shadow .15s;line-height:1;padding:0;}
+.culture-fab:hover{box-shadow:0 6px 20px rgba(0,0,0,0.38);transform:scale(1.08);}
 
 /* ── Book Reader Overlay ── */
 #book-reader-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);backdrop-filter:blur(6px);z-index:250;align-items:center;justify-content:center;}
@@ -885,7 +887,7 @@ html,body{background:#F4F4F4;color:#111;}
       <button class="mob-back-btn" onclick="mobBack()">&#8592;</button>
       <div class="main-title" id="main-title"><span class="main-title-icon" id="main-title-icon"></span><span id="main-title-text">All</span></div>
       <button class="home-btn" id="main-home-btn" onclick="setView('Home')" title="Home" style="display:none;">Home</button>
-      <button class="home-btn" id="culture-add-btn" onclick="openBookModal()" title="Ajouter un livre" style="display:none;font-size:22px;font-weight:300;line-height:1;padding:0 6px;">+</button>
+      <button class="culture-fab" id="culture-add-btn" onclick="openBookModal()" title="Ajouter un livre" style="display:none;">+</button>
     </div>
     <div class="body-card">
       <div id="list"></div>
@@ -2128,6 +2130,7 @@ function closeBookReader(){
   var ov=document.getElementById('book-reader-overlay');
   if(ov)ov.style.display='none';
   _bookReaderOpen=null;
+  if(currentView==='Culture')rCulture();
 }
 function _brPageContent(pageIdx){
   if(!bookNotes[_bookReaderOpen])return '';
@@ -2332,7 +2335,7 @@ function rhBook(b){
     ?'<img class="book-cover" src="'+e(b.coverUrl)+'" alt="" onclick="openBookReader(\''+e(bid)+'\')" title="Ouvrir le livre">'
     :'<div class="book-cover-placeholder" onclick="openBookReader(\''+e(bid)+'\')" title="Ouvrir le livre">&#9632;</div>';
   var statusBadge='<span class="book-status-badge '+status+'">'+e(BOOK_STATUS_LABELS[status]||status)+'</span>';
-  var hasNotes=bookNotes[bid]&&bookNotes[bid].some(function(p){return p&&p.trim();});
+  var hasNotes=bookNotes[bid]&&bookNotes[bid].some(function(p){return p&&p.replace(/<[^>]*>/g,'').trim();});
   var dragDots='⠿'+(hasNotes?'<span style="color:#E53935;">⠿</span>':'');
   return '<div class="book-drag-handle" title="Déplacer">'+dragDots+'</div>'
     +cover
