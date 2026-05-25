@@ -2285,6 +2285,9 @@ function brExtractOverflow(el){
       break;
     }else{el.removeChild(last);overflowNodes.unshift(last);}
   }
+  // Supprimer les <br> de fin de page (espaces visuels parasites) et de début de page suivante
+  while(el.lastChild&&el.lastChild.nodeName==='BR')el.removeChild(el.lastChild);
+  while(overflowNodes.length>0&&overflowNodes[0].nodeName==='BR')overflowNodes.shift();
   var tmp=document.createElement('div');
   overflowNodes.forEach(function(n){tmp.appendChild(n.cloneNode?n.cloneNode(true):n);});
   return tmp.innerHTML;
@@ -2354,7 +2357,7 @@ function brFlattenPasteHtml(html){
   d.innerHTML=html;
   var out='';
   var INLINE=['b','strong','i','em','u','span'];
-  var BLOCK=['p','div','h1','h2','h3','h4','h5','h6','li','blockquote','ul','ol'];
+  var HEADING_SIZES={h1:'18px',h2:'16px',h3:'15px',h4:'14px',h5:'13px',h6:'13px'};
   function proc(node){
     if(node.nodeType===3){out+=node.textContent.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');return;}
     if(node.nodeType!==1)return;
@@ -2363,13 +2366,22 @@ function brFlattenPasteHtml(html){
     if(INLINE.indexOf(tag)>=0){
       var st=node.getAttribute('style');
       out+='<'+tag+(st?' style="'+st+'"':'')+'>'; Array.from(node.childNodes).forEach(proc); out+='</'+tag+'>';
-    } else if(BLOCK.indexOf(tag)>=0){
+    } else if(HEADING_SIZES[tag]){
+      // Titres : gras + taille adaptée, espacement double après
+      out+='<b><span style="font-size:'+HEADING_SIZES[tag]+';">'; Array.from(node.childNodes).forEach(proc); out+='</span></b><br><br>';
+    } else if(tag==='p'){
+      // Paragraphes : espacement double entre eux
+      Array.from(node.childNodes).forEach(proc); out+='<br><br>';
+    } else if(tag==='li'){
+      out+='• '; Array.from(node.childNodes).forEach(proc); out+='<br>';
+    } else if(['div','blockquote','ul','ol'].indexOf(tag)>=0){
       Array.from(node.childNodes).forEach(proc); out+='<br>';
     } else {
       Array.from(node.childNodes).forEach(proc);
     }
   }
   Array.from(d.childNodes).forEach(proc);
+  out=out.replace(/(<br>){3,}/g,'<br><br>');
   return out.replace(/(<br>)+$/,'');
 }
 function brHandlePaste(e,pageIdx){
