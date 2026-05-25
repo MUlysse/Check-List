@@ -1266,7 +1266,7 @@ function rFinances(){
   h+='<div class="fin-synth-cell"><div class="fin-synth-lbl">Maman reste (prêt)</div>'
     +'<div class="fin-synth-val"><input class="fin-inp fin-inp-synth" type="text" value="'+fmtFinNum(mamanReste)+'" '
     +'onfocus="this.value=\''+String(mamanReste)+'\'" '
-    +'onblur="financesData.mamanReste=parseFinNum(this.value);saveTasks();scheduleSettingsSync();rFinances();">'
+    +'onblur="financesData.mamanReste=parseFinNum(this.value);financesData._ts=Date.now();saveTasks();scheduleSettingsSync();rFinances();">'
     +' <span class="fin-synth-eur">€</span></div></div>';
   h+='</div>'; // fin-synth-block
   h+='</div>'; // fin-wrap
@@ -1276,17 +1276,17 @@ function rFinances(){
 function updateFinances(key,idx,field,val){
   if(!financesData[key])financesData[key]=[];
   if(financesData[key][idx]!==undefined)financesData[key][idx][field]=val;
-  saveTasks();scheduleSettingsSync();rFinances();
+  financesData._ts=Date.now();saveTasks();scheduleSettingsSync();rFinances();
 }
 function addFinanceRow(key){
   if(!financesData[key])financesData[key]=[];
   financesData[key].push({label:'',amount:0});
-  saveTasks();scheduleSettingsSync();rFinances();
+  financesData._ts=Date.now();saveTasks();scheduleSettingsSync();rFinances();
 }
 function deleteFinanceRow(key,idx){
   if(!financesData[key])return;
   financesData[key].splice(idx,1);
-  saveTasks();scheduleSettingsSync();rFinances();
+  financesData._ts=Date.now();saveTasks();scheduleSettingsSync();rFinances();
 }
 
 function rBOAZ(){
@@ -1575,7 +1575,10 @@ async function loadTasksRemote(){
         if(s.chessData&&typeof s.chessData==='object')loadChessData(s.chessData);
         if(Array.isArray(s.todayOrderList)) todayOrderList=s.todayOrderList;
         if(s.bookNotes&&typeof s.bookNotes==='object') bookNotes=s.bookNotes;
-        if(s.financesData&&typeof s.financesData==='object') Object.assign(financesData,s.financesData);
+        if(s.financesData&&typeof s.financesData==='object'){
+          var remTs=s.financesData._ts||0;var locTs=financesData._ts||0;
+          if(!locTs||remTs>=locTs)Object.assign(financesData,s.financesData);
+        }
         if(s.boazData&&typeof s.boazData==='object') Object.assign(boazData,s.boazData);
       }catch(e){}
     }
@@ -2880,7 +2883,7 @@ function editBook(id){
 
 function pfc(){var sp=['All','Urgent','Completed'];document.getElementById('new-cat').value=(sp.indexOf(tab)<0&&!isTodayTab(tab))?tab:'';}
 
-document.addEventListener('keydown',function(e){if(e.ctrlKey&&e.key==='r'){e.preventDefault();var ae=document.activeElement;if(ae&&ae.tagName==='INPUT'||ae&&ae.tagName==='TEXTAREA')ae.dispatchEvent(new Event('change',{bubbles:true}));saveTasks();scheduleSettingsSync();location.reload();}if(e.key==='Escape'){closeModal();closeBookModal();closeProjPeriodModal();closeProjRowModal();closeContactModal();closeNavDrawer();closeCommentEditor();}});
+document.addEventListener('keydown',function(e){if(e.ctrlKey&&e.key==='r'){e.preventDefault();var ae=document.activeElement;if(ae&&(ae.tagName==='INPUT'||ae.tagName==='TEXTAREA'))ae.blur();saveTasks();if(supabaseClient){saveSettingsRemote().then(function(){location.reload();}).catch(function(){location.reload();});}else{location.reload();}}if(e.key==='Escape'){closeModal();closeBookModal();closeProjPeriodModal();closeProjRowModal();closeContactModal();closeNavDrawer();closeCommentEditor();}});
 window.addEventListener('resize',function(){if(currentView==='Projection')rProjection();if(currentView==='Networking')rNetworking();});
 
 // ── Pull-to-refresh (iPhone) ──
