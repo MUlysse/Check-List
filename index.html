@@ -1263,11 +1263,15 @@ function rFinances(){
     +'<div class="fin-synth-val '+(reste>=0?'fin-synth-val-in':'fin-synth-val-out')+'">'+fmtEur(reste)+'</div></div>';
   h+='<div class="fin-synth-cell"><div class="fin-synth-lbl">Disponible total</div>'
     +'<div class="fin-synth-val '+(montantRestant>=0?'fin-synth-val-in':'fin-synth-val-out')+'">'+fmtEur(montantRestant)+'</div></div>';
-  h+='<div class="fin-synth-cell"><div class="fin-synth-lbl">Maman reste (prêt)</div>'
+  h+='<div class="fin-synth-cell"><div class="fin-synth-lbl">Maman 2028</div>'
     +'<div class="fin-synth-val"><input class="fin-inp fin-inp-synth" type="text" value="'+fmtFinNum(mamanReste)+'" '
     +'onfocus="this.value=\''+String(mamanReste)+'\'" '
     +'onblur="financesData.mamanReste=parseFinNum(this.value);financesData._ts=Date.now();saveTasks();scheduleSettingsSync();rFinances();">'
     +' <span class="fin-synth-eur">€</span></div></div>';
+  var solde2028=montantRestant+mamanReste;
+  h+='<div class="fin-synth-cell"><div class="fin-synth-lbl">Reste à payer 2028</div>'
+    +'<div class="fin-synth-val '+(solde2028>=0?'fin-synth-val-in':'fin-synth-val-out')+'">'+fmtEur(solde2028)+'</div>'
+    +'<div style="font-size:10px;color:#999;margin-top:4px;">Disponible total + Maman 2028</div></div>';
   h+='</div>'; // fin-synth-block
   h+='</div>'; // fin-wrap
   el.innerHTML=h;
