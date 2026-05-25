@@ -2313,9 +2313,67 @@ function brCheckOverflow(el,pageIdx){
   scheduleSettingsSync();
 }
 function brHandleInput(el,pageIdx){
-  if(el.scrollHeight<=el.clientHeight)return;
   var _el=el,_pg=pageIdx;
-  setTimeout(function(){if(document.contains(_el))brCheckOverflow(_el,_pg);},0);
+  setTimeout(function(){
+    if(!document.contains(_el))return;
+    if(_el.scrollHeight>_el.clientHeight)brCheckOverflow(_el,_pg);
+    else brCheckUnderflow(_el,_pg);
+  },0);
+}
+function brCheckUnderflow(el,pageIdx){
+  if(!_bookReaderOpen)return;
+  if(el.scrollHeight>=el.clientHeight)return;
+  if(!bookNotes[_bookReaderOpen])return;
+  var nextIdx=pageIdx+1;
+  if(nextIdx>=bookNotes[_bookReaderOpen].length)return;
+  var nextHtml=bookNotes[_bookReaderOpen][nextIdx];
+  if(!nextHtml)return;
+  var tmp=document.createElement('div');
+  tmp.innerHTML=nextHtml;
+  if(!tmp.childNodes.length)return;
+  var changed=false;
+  while(tmp.childNodes.length>0){
+    var first=tmp.firstChild;
+    var cloned=first.cloneNode(true);
+    el.appendChild(cloned);
+    if(el.scrollHeight>el.clientHeight){
+      el.removeChild(cloned);
+      if(first.nodeType===3){
+        var text=first.textContent;
+        var lo=0,hi=text.length,best=0;
+        while(lo<=hi){
+          var mid=(lo+hi)>>1;
+          var sp=text.lastIndexOf(' ',mid);
+          var part=sp>0?text.slice(0,sp):text.slice(0,mid);
+          if(!part){hi=mid-1;continue;}
+          var tn=document.createTextNode(part);
+          el.appendChild(tn);
+          if(el.scrollHeight<=el.clientHeight){best=sp>0?sp:mid;lo=mid+1;}else hi=mid-1;
+          el.removeChild(tn);
+        }
+        if(best>0){el.appendChild(document.createTextNode(text.slice(0,best)));first.textContent=text.slice(best);changed=true;}
+      }
+      break;
+    }
+    tmp.removeChild(first);
+    changed=true;
+  }
+  if(!changed)return;
+  while(el.lastChild&&el.lastChild.nodeName==='BR')el.removeChild(el.lastChild);
+  while(tmp.firstChild&&tmp.firstChild.nodeName==='BR')tmp.removeChild(tmp.firstChild);
+  saveBookPage(pageIdx,el.innerHTML);
+  bookNotes[_bookReaderOpen][nextIdx]=tmp.innerHTML;
+  var ids=_brIndices();
+  var nextElId=nextIdx===ids.leftIdx?'br-left-content':nextIdx===ids.rightIdx?'br-right-content':null;
+  if(nextElId){
+    var nextEl=document.getElementById(nextElId);
+    if(nextEl){
+      nextEl.innerHTML=bookNotes[_bookReaderOpen][nextIdx];
+      setTimeout(function(){if(document.contains(nextEl))brCheckUnderflow(nextEl,nextIdx);},0);
+    }
+  }
+  brTrimEmptyPages(_bookReaderOpen);
+  saveTasks();scheduleSettingsSync();
 }
 function brTrimEmptyPages(bookId){
   var pages=bookNotes[bookId];
