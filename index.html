@@ -616,19 +616,21 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
 .br-nav-btn:disabled{color:#C8C0A8;cursor:default;}
 
 /* ── Finances page ── */
-.fin-wrap{padding:16px 20px 60px;max-width:1200px;margin:0 auto;}
-.fin-header{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
-.fin-cols{display:flex;gap:0;align-items:flex-start;}
-.fin-col{flex:1;min-width:0;padding:0 24px;}
-.fin-col:first-child{padding-left:0;}
-.fin-col:last-child{padding-right:0;}
-.fin-divider{width:1px;background:#D0CCC6;align-self:stretch;flex-shrink:0;margin:0 4px;}
-.fin-col-hdr{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;padding:6px 0 12px;margin-bottom:8px;border-bottom:2px solid;}
+.fin-wrap{padding:20px 24px 60px;max-width:1200px;margin:0 auto;}
+.fin-header{display:none;}
+.fin-cols{display:flex;gap:16px;align-items:flex-start;}
+.fin-col{flex:1;min-width:0;padding:20px;background:#fff;border-radius:12px;border:1px solid #E5E5E5;}
+.fin-col:first-child{padding-left:20px;}
+.fin-col:last-child{padding-right:20px;}
+.fin-divider{display:none;}
+.fin-col-hdr{font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:0.12em;padding:0 0 14px;margin-bottom:16px;border-bottom:2.5px solid;}
 .fin-col-hdr-out{color:#C62828;border-color:#FFCDD2;}
 .fin-col-hdr-in{color:#2E7D32;border-color:#C8E6C9;}
-.fin-section{margin-bottom:20px;}
-.fin-section-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#888;margin-bottom:6px;}
-.fin-row{display:flex;align-items:center;gap:8px;padding:3px 0;border-bottom:1px solid rgba(0,0,0,0.05);}
+.fin-section{margin-bottom:12px;background:#F7F6F4;border-radius:9px;padding:12px 14px;}
+.fin-section-title{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:#555;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid rgba(0,0,0,0.08);}
+.fin-section-cc{background:#EFF6EF;border:1px solid #C8E6C9;}
+.fin-section-cc .fin-section-title{color:#2E7D32;border-bottom-color:rgba(46,125,50,0.15);}
+.fin-row{display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid rgba(0,0,0,0.05);}
 .fin-row:last-of-type{border-bottom:none;}
 .fin-label{flex:1;min-width:0;}
 .fin-inp-label{border:none;background:transparent;font-size:14px;color:#1C1C1E;outline:none;width:100%;padding:2px 0;}
@@ -636,25 +638,26 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
 .fin-amount{display:flex;align-items:center;gap:4px;flex-shrink:0;white-space:nowrap;font-size:14px;font-weight:600;}
 .fin-amt-out{color:#C62828;}
 .fin-amt-in{color:#2E7D32;}
-.fin-inp{width:90px;border:1px solid #D5D2CC;border-radius:6px;padding:4px 7px;font-size:14px;font-weight:600;color:inherit;background:#fff;outline:none;text-align:right;}
-.fin-inp:focus{border-color:#333;box-shadow:0 0 0 2px rgba(0,0,0,0.06);}
-.fin-del{background:none;border:none;cursor:pointer;color:#D0CCC6;font-size:16px;line-height:1;padding:2px 4px;border-radius:4px;flex-shrink:0;transition:color .12s;}
+.fin-inp{width:90px;border:1.5px solid #E0DDD8;border-radius:6px;padding:4px 7px;font-size:14px;font-weight:600;color:inherit;background:#fff;outline:none;text-align:right;}
+.fin-inp:focus{border-color:#333;box-shadow:0 0 0 3px rgba(0,0,0,0.07);}
+.fin-del{background:none;border:none;cursor:pointer;color:#CCC;font-size:16px;line-height:1;padding:2px 4px;border-radius:4px;flex-shrink:0;transition:color .12s;}
 .fin-del:hover{color:#C62828;}
-.fin-add-row{background:none;border:1.5px dashed #D0CCC6;border-radius:7px;color:#999;font-size:12px;cursor:pointer;padding:4px 10px;transition:all .12s;margin-top:4px;display:block;}
-.fin-add-row:hover{border-color:#555;color:#555;}
-.fin-row-total{font-size:12px;font-weight:700;padding:6px 0 0;border-top:1px solid rgba(0,0,0,0.08);margin-top:4px;}
+.fin-add-row{background:none;border:1.5px dashed #CCC;border-radius:7px;color:#999;font-size:12px;cursor:pointer;padding:4px 10px;transition:all .12s;margin-top:6px;display:block;}
+.fin-add-row:hover{border-color:#444;color:#333;}
+.fin-row-total{font-size:12px;font-weight:800;padding:8px 0 0;border-top:1.5px solid rgba(0,0,0,0.10);margin-top:6px;}
 .fin-row-total-out{color:#C62828;}
 .fin-row-total-in{color:#2E7D32;}
-.fin-synth-block{display:flex;margin-top:24px;border-radius:10px;overflow:hidden;border:1px solid #E0E0E0;background:#F8F8F8;}
-.fin-synth-cell{flex:1;padding:16px 18px;border-right:1px solid #E0E0E0;}
+.fin-synth-block{display:flex;margin-top:20px;border-radius:12px;overflow:hidden;background:#111;border:none;}
+.fin-synth-cell{flex:1;padding:18px 20px;border-right:1px solid rgba(255,255,255,0.09);}
 .fin-synth-cell:last-child{border-right:none;}
-.fin-synth-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#888;margin-bottom:8px;}
-.fin-synth-val{font-size:20px;font-weight:800;color:#1C1C1E;}
-.fin-synth-val-out{color:#C62828;}
-.fin-synth-val-in{color:#2E7D32;}
-.fin-inp-synth{width:110px;font-size:18px;}
-.fin-synth-eur{font-size:16px;font-weight:700;color:#555;}
-@media(max-width:700px){.fin-cols{flex-direction:column;}.fin-divider{width:100%;height:1px;margin:16px 0;align-self:auto;}.fin-col{padding:0;}.fin-synth-block{flex-direction:column;}.fin-synth-cell{border-right:none;border-bottom:1px solid #E0E0E0;}.fin-synth-cell:last-child{border-bottom:none;}.fin-wrap{padding:10px;}}
+.fin-synth-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.45);margin-bottom:10px;}
+.fin-synth-val{font-size:22px;font-weight:800;color:#fff;}
+.fin-synth-val-out{color:#FF6B6B;}
+.fin-synth-val-in{color:#4ADE80;}
+.fin-inp-synth{width:110px;font-size:18px;background:rgba(255,255,255,0.08);border:1.5px solid rgba(255,255,255,0.18);color:#fff;border-radius:6px;}
+.fin-inp-synth:focus{border-color:rgba(255,255,255,0.45);box-shadow:none;}
+.fin-synth-eur{font-size:16px;font-weight:700;color:rgba(255,255,255,0.5);}
+@media(max-width:700px){.fin-cols{flex-direction:column;}.fin-divider{display:none;}.fin-synth-block{flex-direction:column;}.fin-synth-cell{border-right:none;border-bottom:1px solid rgba(255,255,255,0.09);}.fin-synth-cell:last-child{border-bottom:none;}.fin-wrap{padding:10px;}}
 
 /* ── BOAZ page ── */
 .boaz-wrap{display:flex;flex-direction:column;height:100%;}
@@ -794,11 +797,13 @@ html,body{background:#F4F4F4;color:#111;}
 .book-action-edit{color:#AAA;}
 .book-action-del{color:#CCC;}
 .book-drag-handle{color:#CCC;}
-.fin-divider{background:#DDD;}
+.fin-col{background:#fff;border-color:#E5E5E5;}
+.fin-section{background:#F2F2F2;}
+.fin-section-cc{background:#EBF5EB;border-color:#C8DCC8;}
 .fin-add-row{border-color:#CCC;color:#888;}
-.fin-add-row:hover{border-color:#555;color:#555;}
-.fin-synth-block{border-color:#E5E5E5;background:#F5F5F5;}
-.fin-synth-cell{border-color:#E5E5E5;}
+.fin-add-row:hover{border-color:#444;color:#333;}
+.fin-synth-block{background:#111;border:none;}
+.fin-synth-cell{border-color:rgba(255,255,255,0.09);}
 .home-hal-title{color:#111;}
 .home-card{background:#F5F5F5;border:1px solid #E5E5E5;}
 .home-card:hover{background:#EBEBEB;box-shadow:0 4px 16px rgba(0,0,0,0.08);}
@@ -1214,7 +1219,6 @@ function rFinances(){
       +'</div>';
   }
   var h='<div class="fin-wrap">';
-  h+='<div class="fin-header"><button class="home-btn" onclick="setView(\'Home\')">Home</button></div>';
   h+='<div class="fin-cols">';
   // LEFT — Sorties
   h+='<div class="fin-col fin-col-out">';
@@ -1245,7 +1249,7 @@ function rFinances(){
   h+='<button class="fin-add-row" onclick="addFinanceRow(\'ressources\')">+ Ajouter</button>';
   h+='<div class="fin-row-total fin-row-total-in">Total : <strong>'+fmtEur(totalRes)+'</strong></div>';
   h+='</div>';
-  h+='<div class="fin-section"><div class="fin-section-title">Comptes courants</div>';
+  h+='<div class="fin-section fin-section-cc"><div class="fin-section-title">Comptes courants</div>';
   fd.comptesCourants.forEach(function(d,i){h+=finRow('comptesCourants',i,d,'fin-amt-in');});
   h+='<button class="fin-add-row" onclick="addFinanceRow(\'comptesCourants\')">+ Ajouter</button>';
   h+='<div class="fin-row-total fin-row-total-in">Total : <strong>'+fmtEur(totalCC)+'</strong></div>';
