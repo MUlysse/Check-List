@@ -2322,12 +2322,20 @@ function brHandleInput(el,pageIdx){
 }
 function brCheckUnderflow(el,pageIdx){
   if(!_bookReaderOpen)return;
-  if(el.scrollHeight>=el.clientHeight)return;
   if(!bookNotes[_bookReaderOpen])return;
   var nextIdx=pageIdx+1;
   if(nextIdx>=bookNotes[_bookReaderOpen].length)return;
   var nextHtml=bookNotes[_bookReaderOpen][nextIdx];
-  if(!nextHtml)return;
+  if(!nextHtml||!nextHtml.trim())return;
+  var pageH=el.clientHeight,pageW=el.clientWidth;
+  if(!pageH||!pageW)return;
+  var probe=document.createElement('div');
+  probe.style.cssText='position:fixed;left:-9999px;top:0;width:'+pageW+'px;font-size:14px;font-family:\'Libre Baskerville\',serif;line-height:1.9;word-break:break-word;box-sizing:border-box;';
+  probe.innerHTML=el.innerHTML;
+  document.body.appendChild(probe);
+  var contentH=probe.scrollHeight;
+  document.body.removeChild(probe);
+  if(contentH>=pageH)return;
   var tmp=document.createElement('div');
   tmp.innerHTML=nextHtml;
   if(!tmp.childNodes.length)return;
