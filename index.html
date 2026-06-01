@@ -1112,6 +1112,8 @@ var todayOrderList=[];
 var bookNotes={};
 var financesData={depenses:[{label:'Loyer Nice',amount:650},{label:'Claude',amount:21.49},{label:'MGCN',amount:25},{label:'Assurance',amount:26.20}],ressources:[{label:'Papa',amount:450},{label:'Maman',amount:400},{label:'CAF',amount:100}],epargne:[{label:'Livret A',amount:30},{label:'Livret Jeune',amount:1689.15},{label:'Livret d\'épargne populaire',amount:6101.71}],comptesCourants:[{label:'Fortuneo',amount:2.53},{label:'Crédit Mutuel',amount:174.69}],depensesAvenir:[{label:'Prêt to',amount:40000}],autresSorties:[{label:'Fortuneo',amount:100},{label:'Livret A',amount:85.20}],mamanReste:15000};
 var boazData={pages:[''],toc:[]};
+var _settingsLocalTs=0;
+var _inRemoteLoad=false;
 var _bookReaderOpen=null;
 var _bookReaderPage=0;
 var SUPABASE_TABLE_CONTACTS='contacts';
@@ -1453,6 +1455,9 @@ function loadTasks(){
       if(data.bookNotes&&typeof data.bookNotes==='object') bookNotes=data.bookNotes;
       if(data.financesData&&typeof data.financesData==='object') Object.assign(financesData,data.financesData);
       if(data.boazData&&typeof data.boazData==='object') Object.assign(boazData,data.boazData);
+      if(data.chessData&&typeof data.chessData==='object') loadChessData(data.chessData);
+      if(data.examData&&typeof data.examData==='object') loadExamData(data.examData);
+      if(data._settingsLocalTs) _settingsLocalTs=data._settingsLocalTs;
     }catch(e){}
   }
   // Ensure all task categories are in TABS
@@ -1464,7 +1469,8 @@ function loadTasks(){
   tasks.forEach(function(t){ if(t.today && t.prio==='U') t.prio='M'; });
 }
 function saveTasks(){
-  try{localStorage.setItem(STORAGE_KEY, JSON.stringify({tasks:tasks.filter(function(t){return t.cat!==SETTINGS_CAT;}),nid:nid,tab:tab,tabs:TABS,books:books,contacts:contacts,view:currentView,projRows:projRows,projPeriods:projPeriods,projDataVersion:PROJ_DATA_VERSION,projGoals:projGoals,todayOrderList:todayOrderList,bookNotes:bookNotes,financesData:financesData,boazData:boazData}));}catch(e){}
+  if(!_inRemoteLoad)_settingsLocalTs=Date.now();
+  try{localStorage.setItem(STORAGE_KEY, JSON.stringify({tasks:tasks.filter(function(t){return t.cat!==SETTINGS_CAT;}),nid:nid,tab:tab,tabs:TABS,books:books,contacts:contacts,view:currentView,projRows:projRows,projPeriods:projPeriods,projDataVersion:PROJ_DATA_VERSION,projGoals:projGoals,todayOrderList:todayOrderList,bookNotes:bookNotes,financesData:financesData,boazData:boazData,chessData:{boards:chessData.boards},examData:{subjects:examData.subjects,s1NumExams:examData.s1NumExams,s2NumExams:examData.s2NumExams,s1Grades:examData.s1Grades,s2Grades:examData.s2Grades},_settingsLocalTs:_settingsLocalTs}));}catch(e){}
 }
 function clearAutoDelete(id){
   if(deleteTimers[id]){ clearTimeout(deleteTimers[id]); delete deleteTimers[id]; }
@@ -1570,25 +1576,32 @@ async function loadTasksRemote(){
       settingsId = settingsTask.id;
       try{
         var s = JSON.parse(settingsTask.text);
-        if(Array.isArray(s.tabs)) TABS = s.tabs;
-        if(TABS.indexOf('All')<0) TABS.unshift('All');
-        if(TABS.indexOf(TODAY_TAB)<0) TABS.splice(1,0,TODAY_TAB);
-        if(TABS.indexOf('Urgent')<0) TABS.splice(2,0,'Urgent');
-        if(typeof s.tab === 'string') tab = s.tab;
-        CO = TABS.filter(function(x){return !['All','Urgent','Completed',TODAY_TAB].includes(x);});
-        if(Array.isArray(s.projRows)&&s.projRows.length) projRows=s.projRows;
-        if(Array.isArray(s.projPeriods)&&s.projPeriods.length&&s.projDataVersion===PROJ_DATA_VERSION) projPeriods=s.projPeriods;
-        if(Array.isArray(s.projGoals)) projGoals=s.projGoals;
-        if(s.examData&&typeof s.examData==='object'){loadExamData(s.examData);examData._loaded=true;}
-        if(s.companyLogos&&typeof s.companyLogos==='object'){Object.assign(companyLogos,s.companyLogos);}
-        if(s.chessData&&typeof s.chessData==='object')loadChessData(s.chessData);
-        if(Array.isArray(s.todayOrderList)) todayOrderList=s.todayOrderList;
-        if(s.bookNotes&&typeof s.bookNotes==='object') bookNotes=s.bookNotes;
-        if(s.financesData&&typeof s.financesData==='object'){
-          var remTs=s.financesData._ts||0;var locTs=financesData._ts||0;
-          if(!locTs||remTs>=locTs)Object.assign(financesData,s.financesData);
+        var remSettingsTs = s._settingsTs || 0;
+        // Only apply remote settings if they are strictly newer than what we have locally.
+        // This prevents a stale Supabase copy (delayed by up to 1500ms) from overwriting
+        // changes the user just made and saved to localStorage.
+        if(remSettingsTs >= _settingsLocalTs){
+          _settingsLocalTs = remSettingsTs;
+          if(Array.isArray(s.tabs)) TABS = s.tabs;
+          if(TABS.indexOf('All')<0) TABS.unshift('All');
+          if(TABS.indexOf(TODAY_TAB)<0) TABS.splice(1,0,TODAY_TAB);
+          if(TABS.indexOf('Urgent')<0) TABS.splice(2,0,'Urgent');
+          if(typeof s.tab === 'string') tab = s.tab;
+          CO = TABS.filter(function(x){return !['All','Urgent','Completed',TODAY_TAB].includes(x);});
+          if(Array.isArray(s.projRows)&&s.projRows.length) projRows=s.projRows;
+          if(Array.isArray(s.projPeriods)&&s.projPeriods.length&&s.projDataVersion===PROJ_DATA_VERSION) projPeriods=s.projPeriods;
+          if(Array.isArray(s.projGoals)) projGoals=s.projGoals;
+          if(s.examData&&typeof s.examData==='object'){loadExamData(s.examData);examData._loaded=true;}
+          if(s.companyLogos&&typeof s.companyLogos==='object'){Object.assign(companyLogos,s.companyLogos);}
+          if(s.chessData&&typeof s.chessData==='object')loadChessData(s.chessData);
+          if(Array.isArray(s.todayOrderList)) todayOrderList=s.todayOrderList;
+          if(s.bookNotes&&typeof s.bookNotes==='object') bookNotes=s.bookNotes;
+          if(s.financesData&&typeof s.financesData==='object') Object.assign(financesData,s.financesData);
+          if(s.boazData&&typeof s.boazData==='object') Object.assign(boazData,s.boazData);
+        } else {
+          // Local is newer — push local settings to Supabase to keep it in sync
+          setTimeout(saveSettingsRemote,0);
         }
-        if(s.boazData&&typeof s.boazData==='object') Object.assign(boazData,s.boazData);
       }catch(e){}
     }
     var merged = rows.map(function(rt){
@@ -1621,7 +1634,7 @@ async function loadTasksRemote(){
     });
     remoteCats.forEach(function(c){ if(TABS.indexOf(c)<0 && c!=='Completed') TABS.push(c); });
     CO = TABS.filter(function(x){return SYSTEM_TABS.indexOf(x)<0;});
-    saveTasks();
+    _inRemoteLoad=true; saveTasks(); _inRemoteLoad=false;
     render();
     scheduleAllAutoDelete();
   }
@@ -1939,13 +1952,21 @@ var _settingsSyncTimer=null;
 function scheduleSettingsSync(){
   if(!supabaseClient)return;
   if(_settingsSyncTimer)clearTimeout(_settingsSyncTimer);
-  _settingsSyncTimer=setTimeout(function(){saveSettingsRemote();},1500);
+  _settingsSyncTimer=setTimeout(function(){_settingsSyncTimer=null;saveSettingsRemote();},1500);
 }
+function flushSettingsSync(){
+  if(!_settingsSyncTimer)return;
+  clearTimeout(_settingsSyncTimer);
+  _settingsSyncTimer=null;
+  saveSettingsRemote();
+}
+document.addEventListener('visibilitychange',function(){if(document.visibilityState==='hidden')flushSettingsSync();});
+window.addEventListener('pagehide',flushSettingsSync);
 async function saveSettingsRemote(){
   if(!supabaseClient) return;
   const { data: { user } } = await supabaseClient.auth.getUser();
   if (!user) return;
-  var settingsData = JSON.stringify({tabs: TABS, tab: tab, projRows: projRows, projPeriods: projPeriods, projDataVersion: PROJ_DATA_VERSION, projGoals: projGoals, examData:{subjects:examData.subjects,s1NumExams:examData.s1NumExams,s2NumExams:examData.s2NumExams,s1Grades:examData.s1Grades,s2Grades:examData.s2Grades}, companyLogos:companyLogos, chessData:{boards:chessData.boards}, todayOrderList:todayOrderList, bookNotes:bookNotes, financesData:financesData, boazData:boazData});
+  var settingsData = JSON.stringify({tabs: TABS, tab: tab, projRows: projRows, projPeriods: projPeriods, projDataVersion: PROJ_DATA_VERSION, projGoals: projGoals, examData:{subjects:examData.subjects,s1NumExams:examData.s1NumExams,s2NumExams:examData.s2NumExams,s1Grades:examData.s1Grades,s2Grades:examData.s2Grades}, companyLogos:companyLogos, chessData:{boards:chessData.boards}, todayOrderList:todayOrderList, bookNotes:bookNotes, financesData:financesData, boazData:boazData, _settingsTs:_settingsLocalTs});
   var payload={cat:SETTINGS_CAT,text:settingsData,prio:'L',done:true,user_id:user.id};
   if(settingsId){
     await updateRemoteTask(settingsId,{text:settingsData});
@@ -2302,15 +2323,13 @@ function brCheckOverflow(el,pageIdx){
   if(!bookNotes[_bookReaderOpen])bookNotes[_bookReaderOpen]=[''];
   while(bookNotes[_bookReaderOpen].length<=nextIdx)bookNotes[_bookReaderOpen].push('');
   bookNotes[_bookReaderOpen][nextIdx]=overflow+(bookNotes[_bookReaderOpen][nextIdx]||'');
-  saveTasks();
+  saveTasks();scheduleSettingsSync();
   var idx=_brIndices();
   var nextElId=nextIdx===idx.leftIdx?'br-left-content':nextIdx===idx.rightIdx?'br-right-content':null;
   if(nextElId){
     var nextEl=document.getElementById(nextElId);
     if(nextEl){nextEl.innerHTML=bookNotes[_bookReaderOpen][nextIdx];setTimeout(function(){brCheckOverflow(nextEl,nextIdx);},0);}
-    return;
   }
-  scheduleSettingsSync();
 }
 function brHandleInput(el,pageIdx){
   var _el=el,_pg=pageIdx;
@@ -2327,39 +2346,55 @@ function brCheckUnderflow(el,pageIdx){
   if(nextIdx>=bookNotes[_bookReaderOpen].length)return;
   var nextHtml=bookNotes[_bookReaderOpen][nextIdx];
   if(!nextHtml||!nextHtml.trim())return;
-  var pageH=el.clientHeight,pageW=el.clientWidth;
-  if(!pageH||!pageW)return;
-  var probe=document.createElement('div');
-  probe.style.cssText='position:fixed;left:-9999px;top:0;width:'+pageW+'px;font-size:14px;font-family:\'Libre Baskerville\',serif;line-height:1.9;word-break:break-word;box-sizing:border-box;';
-  probe.innerHTML=el.innerHTML;
-  document.body.appendChild(probe);
-  var contentH=probe.scrollHeight;
-  document.body.removeChild(probe);
-  if(contentH>=pageH)return;
+  if(!el.clientHeight)return;
+  var _sel=window.getSelection();
+  var _an=_sel&&_sel.anchorNode,_ao=_sel&&_sel.anchorOffset;
+  var _fn=_sel&&_sel.focusNode,_fo=_sel&&_sel.focusOffset;
   var tmp=document.createElement('div');
   tmp.innerHTML=nextHtml;
+  // Strip leading BRs from next page content
+  while(tmp.firstChild&&tmp.firstChild.nodeName==='BR')tmp.removeChild(tmp.firstChild);
   if(!tmp.childNodes.length)return;
+  var BLOCK_TAGS=['DIV','P','H1','H2','H3','H4','H5','H6','UL','OL','LI','BLOCKQUOTE'];
   var changed=false;
   while(tmp.childNodes.length>0){
     var first=tmp.firstChild;
+    // Skip BR nodes between lines in the next page
+    if(first.nodeName==='BR'){tmp.removeChild(first);continue;}
+    // Block elements (div, p…) provide their own line break — no <br> needed
+    // Inline elements and text nodes need a <br> separator when el already has content
+    var isBlock=first.nodeType===1&&BLOCK_TAGS.indexOf(first.nodeName)>=0;
+    var sep=((!isBlock)&&el.innerHTML.trim().length>0)?document.createElement('br'):null;
+    if(sep)el.appendChild(sep);
     var cloned=first.cloneNode(true);
     el.appendChild(cloned);
     if(el.scrollHeight>el.clientHeight){
       el.removeChild(cloned);
+      if(sep&&el.lastChild===sep)el.removeChild(sep);
+      // Try word-level split for text nodes
       if(first.nodeType===3){
         var text=first.textContent;
+        var hasContent=el.innerHTML.trim().length>0;
         var lo=0,hi=text.length,best=0;
         while(lo<=hi){
           var mid=(lo+hi)>>1;
           var sp=text.lastIndexOf(' ',mid);
           var part=sp>0?text.slice(0,sp):text.slice(0,mid);
           if(!part){hi=mid-1;continue;}
+          var brTest=hasContent?document.createElement('br'):null;
           var tn=document.createTextNode(part);
+          if(brTest)el.appendChild(brTest);
           el.appendChild(tn);
           if(el.scrollHeight<=el.clientHeight){best=sp>0?sp:mid;lo=mid+1;}else hi=mid-1;
           el.removeChild(tn);
+          if(brTest)el.removeChild(brTest);
         }
-        if(best>0){el.appendChild(document.createTextNode(text.slice(0,best)));first.textContent=text.slice(best);changed=true;}
+        if(best>0){
+          if(hasContent)el.appendChild(document.createElement('br'));
+          el.appendChild(document.createTextNode(text.slice(0,best)));
+          first.textContent=text.slice(best);
+          changed=true;
+        }
       }
       break;
     }
@@ -2381,6 +2416,9 @@ function brCheckUnderflow(el,pageIdx){
     }
   }
   brTrimEmptyPages(_bookReaderOpen);
+  if(_an&&document.contains(_an)&&el.contains(_an)){
+    try{var r=document.createRange();r.setStart(_an,_ao);r.setEnd(_fn,_fo);_sel.removeAllRanges();_sel.addRange(r);}catch(e){}
+  }
   saveTasks();scheduleSettingsSync();
 }
 function brTrimEmptyPages(bookId){
@@ -3580,7 +3618,7 @@ var currentChessBoard=null;
 var CHESS_UNI={w:{k:'♔',q:'♕',r:'♖',b:'♗',n:'♘',p:'♙'},b:{k:'♚',q:'♛',r:'♜',b:'♝',n:'♞',p:'♟'}};
 
 function loadChessData(d){if(d&&Array.isArray(d.boards))chessData.boards=d.boards;}
-function saveChessData(){scheduleSettingsSync();}
+function saveChessData(){saveTasks();scheduleSettingsSync();}
 
 function openChessModal(){
   document.getElementById('chess-bd').classList.add('open');
@@ -3843,6 +3881,7 @@ function loadExamData(remoteData){
 
 function saveExamData(){
   try{localStorage.setItem(EXAM_DATA_KEY,JSON.stringify(examData));}catch(e){}
+  saveTasks();
   scheduleSettingsSync();
 }
 
