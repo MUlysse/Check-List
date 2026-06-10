@@ -339,9 +339,9 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
 .net-search{padding:7px 11px;border:1px solid #E0DDD8;border-radius:8px;font-size:13px;background:#FAFAF8;color:#1C1C1E;outline:none;flex:1;min-width:0;transition:border-color .15s,box-shadow .15s;}
 .net-search:focus{border-color:#4A90D9;box-shadow:0 0 0 3px rgba(74,144,217,0.10);}
 /* Flat contacts grid */
-.net-contacts-flat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:12px 16px 24px;}
+.net-contacts-flat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;padding:16px 16px 24px;}
 @media(max-width:1100px){.net-contacts-flat-grid{grid-template-columns:repeat(2,1fr);}}
-.net-co-tag{display:inline-flex;align-items:center;gap:3px;font-size:9px;font-weight:700;color:#C0BDB7;letter-spacing:0.08em;text-transform:uppercase;margin-top:3px;}
+.net-co-tag{display:inline-flex;align-items:center;gap:3px;font-size:9px;font-weight:700;color:#3D3B38;letter-spacing:0.08em;text-transform:uppercase;margin-top:3px;}
 .net-co-tag-logo{width:12px;height:12px;border-radius:2px;object-fit:contain;}
 .net-co-logo-blk{width:44px;height:auto;align-self:stretch;min-height:44px;border-radius:8px;background:#fff;border:1px solid rgba(0,0,0,0.09);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;font-size:15px;font-weight:700;color:#8A8680;text-transform:uppercase;}
 .net-co-logo-blk img{width:100%;height:100%;object-fit:contain;padding:6px;box-sizing:border-box;display:block;}
@@ -350,7 +350,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
 .net-contact-dragging{opacity:.5;box-shadow:0 8px 24px rgba(0,0,0,0.14)!important;}
 .net-contact-drag-over{border-color:#4A90D9!important;box-shadow:0 0 0 2px rgba(74,144,217,.25)!important;}
 /* Contact card */
-.net-contact-row{display:flex;align-items:stretch;gap:9px;padding:10px 11px;border-radius:9px;background:#FAFAF8;border:1px solid rgba(0,0,0,0.07);cursor:pointer;transition:box-shadow .12s,border-color .12s,background .12s;}
+.net-contact-row{display:flex;align-items:stretch;gap:9px;padding:10px 11px;border-radius:9px;background:#FAFAF8;border:1px solid rgba(0,0,0,0.13);cursor:pointer;transition:box-shadow .12s,border-color .12s,background .12s;box-shadow:0 1px 4px rgba(0,0,0,0.06);}
 .net-contact-row:last-child{border-bottom:1px solid rgba(0,0,0,0.07);}
 .net-contact-row:hover{background:#fff;box-shadow:0 2px 10px rgba(0,0,0,0.07);border-color:rgba(0,0,0,0.10);}
 .net-photo{width:60px;height:60px;align-self:center;border-radius:8px;overflow:hidden;background:#E8EDF5;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#4A90D9;flex-shrink:0;}
@@ -358,7 +358,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text'
 .net-contact-info{flex:1;min-width:0;}
 .net-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:5px;margin-bottom:1px;}
 .net-name{font-size:12.5px;font-weight:600;color:#1C1C1E;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.net-pos{font-size:11px;color:#B0ADA8;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.net-pos{font-size:11px;color:#3D3B38;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .net-contact-notes-preview{font-size:10.5px;color:#C0BDB7;margin-top:3px;display:-webkit-box;-webkit-line-clamp:1;line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;line-height:1.4;}
 .net-card-footer{display:flex;align-items:center;justify-content:space-between;margin-top:7px;}
 .net-contact-right{display:flex;align-items:center;gap:8px;flex-shrink:0;}
@@ -1054,7 +1054,8 @@ html,body{background:#F4F4F4;color:#111;}
     <div class="modal-row">
       <input type="text" id="ct-linkedin" placeholder="URL LinkedIn" autocomplete="off">
     </div>
-    <div class="modal-row" style="gap:6px;">
+    <div class="modal-row" style="gap:6px;align-items:center;">
+      <img id="ct-photo-preview" style="width:48px;height:48px;border-radius:8px;object-fit:cover;flex-shrink:0;display:none;border:1px solid #E0DDD8;" alt="">
       <input type="text" id="ct-photo" placeholder="URL photo de profil" autocomplete="off" style="flex:1;min-width:0;">
       <label style="flex-shrink:0;padding:8px 12px;border-radius:8px;border:1px solid #E0DDD8;background:#FAFAF8;cursor:pointer;font-size:12px;color:#8A8680;white-space:nowrap;display:flex;align-items:center;gap:4px;" title="Importer une photo">&#128247; Photo<input type="file" id="ct-photo-file" accept="image/*" style="display:none" onchange="handleContactPhotoFile(this)"></label>
     </div>
@@ -3300,6 +3301,8 @@ function openContactModal(id){
     document.getElementById('ct-phone').value=c.phone||'';
     document.getElementById('ct-linkedin').value=c.linkedin||'';
     document.getElementById('ct-photo').value=c.photo||'';
+    var _prevEdit=document.getElementById('ct-photo-preview');
+    if(_prevEdit){if(c.photo){_prevEdit.src=c.photo;_prevEdit.style.display='block';}else{_prevEdit.style.display='none';}}
     document.getElementById('ct-company-logo').value=c.company_logo||(c.company?companyLogos[c.company]||'':'');
     document.getElementById('ct-notes').value=c.notes||'';
     if(titleEl)titleEl.childNodes[0].textContent='Modifier le contact ';
@@ -3316,6 +3319,8 @@ function openContactModal(id){
     document.getElementById('ct-phone').value='';
     document.getElementById('ct-linkedin').value='';
     document.getElementById('ct-photo').value='';
+    var _prevNew=document.getElementById('ct-photo-preview');
+    if(_prevNew)_prevNew.style.display='none';
     document.getElementById('ct-company-logo').value='';
     document.getElementById('ct-notes').value='';
     if(titleEl)titleEl.childNodes[0].textContent='Nouveau contact ';
@@ -3411,11 +3416,19 @@ async function handleContactPhotoFile(inp){
   if(!dataUrl)return;
   var el=document.getElementById('ct-photo');
   if(!el)return;
-  if(supabaseClient){
-    var uploadedUrl=await uploadContactPhoto(file,'photos');
-    if(uploadedUrl){el.value=uploadedUrl;return;}
-  }
+  // Set data URL immediately so saving always works even if Supabase upload is slow or fails
   el.value=dataUrl;
+  var prev=document.getElementById('ct-photo-preview');
+  if(prev){prev.src=dataUrl;prev.style.display='block';}
+  if(supabaseClient){
+    try{
+      var uploadedUrl=await uploadContactPhoto(file,'photos');
+      if(uploadedUrl){
+        el.value=uploadedUrl;
+        if(prev)prev.src=uploadedUrl;
+      }
+    }catch(e){}
+  }
 }
 async function uploadContactPhoto(file,folder){
   if(!supabaseClient||!file)return'';
