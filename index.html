@@ -884,6 +884,33 @@ html,body{background:#F4F4F4;color:#111;}
 /* Projection toolbar */
 .proj-btn{background:#111!important;}
 .proj-btn:hover{background:#333!important;}
+
+/* ── Transfert Page ── */
+.transfert-container{padding:20px;max-width:900px;margin:0 auto;}
+.drop-zone{border:2px dashed #4A90D9;border-radius:12px;padding:40px 20px;text-align:center;cursor:pointer;transition:all .2s;background:#F5F5F5;margin-bottom:20px;}
+.drop-zone:hover{background:#EEF4FF;border-color:#34C759;}
+.drop-zone.drag-over{background:#E3F2FD;border-color:#34C759;background-color:rgba(74,144,217,0.1);}
+.drop-zone-icon{font-size:48px;margin-bottom:10px;}
+.drop-zone-text{font-size:16px;color:#1C1C1E;margin-bottom:5px;}
+.drop-zone-subtext{font-size:13px;color:#8A8680;}
+.file-input{display:none;}
+.transfers-list{display:flex;flex-direction:column;gap:8px;}
+.transfer-item{display:flex;align-items:center;gap:12px;padding:12px;background:#F9F9F9;border-radius:9px;border:1px solid #E0DDD8;transition:background .15s;}
+.transfer-item:hover{background:#F0EFED;}
+.transfer-item-icon{font-size:28px;flex-shrink:0;}
+.transfer-item-info{flex:1;min-width:0;}
+.transfer-item-name{font-weight:600;color:#1C1C1E;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.transfer-item-meta{font-size:12px;color:#8A8680;margin-top:2px;}
+.transfer-item-actions{display:flex;gap:6px;flex-shrink:0;}
+.transfer-btn{padding:6px 12px;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;transition:background .15s;}
+.transfer-btn.download{background:#34C759;color:#fff;}
+.transfer-btn.download:hover{background:#2EBE50;}
+.transfer-btn.delete{background:#FF9500;color:#fff;}
+.transfer-btn.delete:hover{background:#FB9C3A;}
+.transfers-empty{text-align:center;padding:40px 20px;color:#8A8680;}
+.transfers-title{font-size:16px;font-weight:600;color:#1C1C1E;margin-bottom:12px;}
+.loading-spinner{display:inline-block;width:16px;height:16px;border:2px solid #E0DDD8;border-top-color:#4A90D9;border-radius:50%;animation:spin .6s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
 </style>
 </head>
 <body>
@@ -932,6 +959,7 @@ html,body{background:#F4F4F4;color:#111;}
 <nav class="mobile-nav" id="mobile-nav">
   <button class="mobile-nav-btn" data-view="Home" onclick="setView('Home')" style="display:none;"><span class="mobile-nav-icon" style="font-size:12px;font-weight:700;">H</span><span>Home</span></button>
   <button class="mobile-nav-btn" data-view="Checklist" onclick="setView('Checklist')"><span class="mobile-nav-icon">☰</span><span>Liste</span></button>
+  <button class="mobile-nav-btn" data-view="Transfert" onclick="setView('Transfert')"><span class="mobile-nav-icon">📤</span><span>Transfert</span></button>
   <button class="mobile-nav-btn" data-view="Culture" onclick="setView('Culture')" style="display:none;"><span class="mobile-nav-icon">◻</span><span>Culture</span></button>
   <button class="mobile-nav-btn" data-view="Networking" onclick="setView('Networking')" style="display:none;"><span class="mobile-nav-icon">◎</span><span>Réseau</span></button>
   <button class="mobile-nav-btn" data-view="Finances" onclick="setView('Finances')" style="display:none;"><span class="mobile-nav-icon">€</span><span>Finances</span></button>
@@ -1106,8 +1134,11 @@ var SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsI
 var SUPABASE_TABLE='tasks';
 var SUPABASE_TABLE_BOOKS='books';
 var SUPABASE_BUCKET='book-covers';
+var SUPABASE_TABLE_TRANSFERS='transfers';
+var SUPABASE_BUCKET_TRANSFERS='file-transfers';
 var books=[];
 var contacts=[];
+var transfers=[];
 var currentView='Home';
 var todayOrderList=[];
 var bookNotes={};
@@ -1849,6 +1880,15 @@ function render(){
     if(mti){mti.textContent='';mti.style.background='transparent';mti.style.boxShadow='none';mti.style.width='0';mti.style.padding='0';}
     if(mtt)mtt.textContent='BOAZ';
     rBOAZ();
+  } else if(currentView==='Transfert'){
+    if(bc){bc.classList.remove('proj-mode');bc.classList.remove('net-mode');}
+    var twt=document.getElementById('tabs-wrap');
+    if(twt){twt.style.display='none';}
+    var ctmt=document.getElementById('cat-treemap');if(ctmt)ctmt.style.display='none';
+    var mti=document.getElementById('main-title-icon');var mtt=document.getElementById('main-title-text');
+    if(mti){mti.textContent='📤';mti.style.background='#34C759';mti.style.color='#fff';}
+    if(mtt)mtt.textContent='Transfert';
+    rTransfert();
   } else {
     if(appEl)appEl.classList.remove('proj-view');
     var tw2=document.getElementById('tabs-wrap');
@@ -2790,7 +2830,7 @@ function rDl(){var c=[];tasks.forEach(function(t){if(c.indexOf(t.cat)<0)c.push(t
 function setTab(x){var ico=getTabIcon(x);var mti=document.getElementById("main-title-icon");var mtt=document.getElementById("main-title-text");if(mti){mti.textContent=ico.icon;mti.style.background=ico.bg;mti.style.color="#fff";}if(mtt)mtt.textContent=x;if(ignoreClick){ignoreClick=false;return;}tab=x;render();pfc();saveTasks();saveSettingsRemote();if(window.innerWidth<=680)mobGoList();}
 function mobGoList(){var a=document.querySelector('.app');if(a)a.classList.add('mob-list');}
 function mobBack(){var a=document.querySelector('.app');if(a)a.classList.remove('mob-list');}
-function setView(v){if(window.innerWidth<=680&&v!=='Checklist')return;currentView=v;render();saveTasks();}
+function setView(v){if(window.innerWidth<=680&&v!=='Checklist'&&v!=='Transfert')return;currentView=v;render();saveTasks();}
 async function tgl(id,v){var t=tasks.find(function(t){return String(t.id)===String(id);});if(t){t.done=v;if(v){t.doneAt=Date.now();scheduleAutoDelete(t);}else{delete t.doneAt;clearAutoDelete(id);}}render();saveTasks(); if(supabaseClient) await updateRemoteTask(id,{done:v,doneAt:v?t.doneAt:null});}
 async function sp(id,p){var t=tasks.find(function(t){return String(t.id)===String(id);});if(t){if(t.prio===p){t.prio='M';}else{t.prio=p;t.today=false;}t.done=false;delete t.doneAt;clearAutoDelete(id);}render();saveTasks();if(supabaseClient) await updateRemoteTask(id,{prio:t?t.prio:'M',done:false,doneAt:null,today:t?!!t.today:false});}
 async function st(id){var t=tasks.find(function(t){return String(t.id)===String(id);});if(t){t.today=!t.today;if(t.today)t.prio='M';}render();saveTasks();if(supabaseClient) await updateRemoteTask(id,{today:t.today,prio:t.prio});}
@@ -4709,6 +4749,148 @@ function deleteProjGoal(id){
   projGoals=projGoals.filter(function(x){return x.id!==id;});
   saveTasks();saveSettingsRemote();rProjectionGoals();
 }
+
+/* ── TRANSFERT PAGE ── */
+function getFileIcon(filename){
+  var ext=filename.split('.').pop().toLowerCase();
+  var icons={
+    pdf:'📄',doc:'📝',docx:'📝',xls:'📊',xlsx:'📊',
+    ppt:'🎬',pptx:'🎬',txt:'📋',zip:'📦',
+    jpg:'🖼️',jpeg:'🖼️',png:'🖼️',gif:'🖼️'
+  };
+  return icons[ext]||'📎';
+}
+
+function formatFileSize(bytes){
+  if(bytes===0)return '0 B';
+  var k=1024,sizes=['B','KB','MB','GB'];
+  var i=Math.floor(Math.log(bytes)/Math.log(k));
+  return Math.round(bytes/Math.pow(k,i)*100)/100+' '+sizes[i];
+}
+
+function formatDate(date){
+  var d=new Date(date);
+  return d.toLocaleDateString('fr-FR')+' '+d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+}
+
+async function loadTransfers(){
+  if(!supabaseClient)return;
+  try{
+    var user=await supabaseClient.auth.getUser();
+    if(!user.data.user)return;
+    var res=await supabaseClient.from(SUPABASE_TABLE_TRANSFERS).select().eq('user_id',user.data.user.id).order('created_at',{ascending:false});
+    if(res.error)throw res.error;
+    transfers=res.data||[];
+    renderTransfertUI();
+  }catch(err){console.error('Error loading transfers',err);}
+}
+
+async function handleFileUpload(files){
+  if(!supabaseClient||!files||files.length===0)return;
+  try{
+    var user=await supabaseClient.auth.getUser();
+    if(!user.data.user)return;
+    for(var i=0;i<files.length;i++){
+      var file=files[i];
+      var timestamp=Date.now();
+      var filename=timestamp+'_'+file.name;
+      var path='transfers/'+user.data.user.id+'/'+filename;
+      var uploadRes=await supabaseClient.storage.from(SUPABASE_BUCKET_TRANSFERS).upload(path,file,{upsert:false});
+      if(uploadRes.error)throw uploadRes.error;
+      var transferData={
+        user_id:user.data.user.id,
+        original_filename:file.name,
+        stored_filename:filename,
+        file_size:file.size,
+        file_type:file.type,
+        path:path,
+        created_at:new Date().toISOString()
+      };
+      var insertRes=await supabaseClient.from(SUPABASE_TABLE_TRANSFERS).insert([transferData]).select();
+      if(insertRes.error)throw insertRes.error;
+    }
+    await loadTransfers();
+  }catch(err){alert('Erreur lors de l\'upload: '+err.message);}
+}
+
+async function downloadFile(transfer){
+  if(!supabaseClient)return;
+  try{
+    var url=supabaseClient.storage.from(SUPABASE_BUCKET_TRANSFERS).getPublicUrl(transfer.path);
+    var link=document.createElement('a');
+    link.href=url.data.publicUrl;
+    link.download=transfer.original_filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }catch(err){alert('Erreur lors du téléchargement: '+err.message);}
+}
+
+async function deleteTransfer(id){
+  if(!supabaseClient)return;
+  if(!confirm('Êtes-vous sûr de vouloir supprimer ce fichier?'))return;
+  try{
+    var transfer=transfers.find(function(x){return x.id===id;});
+    if(!transfer)return;
+    await supabaseClient.storage.from(SUPABASE_BUCKET_TRANSFERS).remove([transfer.path]);
+    var delRes=await supabaseClient.from(SUPABASE_TABLE_TRANSFERS).delete().eq('id',id);
+    if(delRes.error)throw delRes.error;
+    await loadTransfers();
+  }catch(err){alert('Erreur lors de la suppression: '+err.message);}
+}
+
+function renderTransfertUI(){
+  var bc=document.querySelector('.body-card');
+  if(!bc)return;
+  var html='<div class="transfert-container">';
+  html+='<div class="drop-zone" id="drop-zone" ondrop="handleFileDrop(event)" ondragover="event.preventDefault();this.classList.add(\'drag-over\');" ondragleave="this.classList.remove(\'drag-over\');"><div class="drop-zone-icon">📤</div><div class="drop-zone-text">Déposez vos fichiers ici</div><div class="drop-zone-subtext">ou cliquez pour sélectionner</div><input type="file" id="file-input" class="file-input" multiple onchange="handleFileUpload(this.files)"></div>';
+  if(transfers.length>0){
+    html+='<div class="transfers-title">Historique des fichiers transférés</div>';
+    html+='<div class="transfers-list">';
+    transfers.forEach(function(t){
+      var icon=getFileIcon(t.original_filename);
+      var size=formatFileSize(t.file_size);
+      var date=formatDate(t.created_at);
+      html+='<div class="transfer-item" data-transfer-id="'+t.id+'"><div class="transfer-item-icon">'+icon+'</div><div class="transfer-item-info"><div class="transfer-item-name">'+e(t.original_filename)+'</div><div class="transfer-item-meta">'+size+' · '+date+'</div></div><div class="transfer-item-actions"><button class="transfer-btn download" onclick="handleDownload(this)">Télécharger</button><button class="transfer-btn delete" onclick="handleDelete(this)">Supprimer</button></div></div>';
+    });
+    html+='</div>';
+  }else{
+    html+='<div class="transfers-empty">Aucun fichier transféré pour le moment</div>';
+  }
+  html+='</div>';
+  bc.innerHTML=html;
+  var dz=document.getElementById('drop-zone');
+  if(dz){
+    dz.onclick=function(){document.getElementById('file-input').click();};
+  }
+}
+
+function handleDownload(btn){
+  var item=btn.closest('.transfer-item');
+  var id=item.getAttribute('data-transfer-id');
+  var transfer=transfers.find(function(x){return x.id==id;});
+  if(transfer)downloadFile(transfer);
+}
+
+function handleDelete(btn){
+  var item=btn.closest('.transfer-item');
+  var id=item.getAttribute('data-transfer-id');
+  deleteTransfer(id);
+}
+
+function rTransfert(){
+  renderTransfertUI();
+  loadTransfers();
+}
+
+function handleFileDrop(e){
+  e.preventDefault();
+  e.stopPropagation();
+  var dz=document.getElementById('drop-zone');
+  if(dz)dz.classList.remove('drag-over');
+  var files=e.dataTransfer.files;
+  handleFileUpload(files);
+}
 </script>
 
 <!-- BOOK READER OVERLAY -->
@@ -4741,6 +4923,7 @@ function deleteProjGoal(id){
   <div class="nav-drawer-items">
     <button class="nav-drawer-item" data-view="Home" onclick="navDrawerGo('Home')" style="display:none;"><span class="nav-drawer-item-label">Home</span></button>
     <button class="nav-drawer-item" data-view="Checklist" onclick="navDrawerGo('Checklist')"><span class="nav-drawer-item-label">Checklist</span></button>
+    <button class="nav-drawer-item" data-view="Transfert" onclick="navDrawerGo('Transfert')"><span class="nav-drawer-item-label">Transfert</span></button>
     <button class="nav-drawer-item" data-view="Culture" onclick="navDrawerGo('Culture')" style="display:none;"><span class="nav-drawer-item-label">Culture</span></button>
     <button class="nav-drawer-item" data-view="Projection" onclick="navDrawerGo('Projection')" style="display:none;"><span class="nav-drawer-item-label">Projection</span></button>
     <button class="nav-drawer-item" data-view="Networking" onclick="navDrawerGo('Networking')" style="display:none;"><span class="nav-drawer-item-label">Réseau</span></button>
