@@ -1780,6 +1780,141 @@ function sc(a,b){var ai=CO.indexOf(a.cat),bi=CO.indexOf(b.cat);if(ai<0&&bi<0)ret
 function normalizeTab(x){return String(x||'').replace(/[\u2018\u2019\u201B\u2032]/g, "'");}
 function isTodayTab(x){return normalizeTab(x)===TODAY_TAB;}
 
+/* ── TRANSFERT FUNCTIONS (must be before render()) ── */
+function formatFileSize(bytes){
+  if(bytes===0)return '0 B';
+  var k=1024,sizes=['B','KB','MB','GB'];
+  var i=Math.floor(Math.log(bytes)/Math.log(k));
+  return Math.round(bytes/Math.pow(k,i)*100)/100+' '+sizes[i];
+}
+function formatDate(date){
+  var d=new Date(date);
+  return d.toLocaleDateString('fr-FR')+' '+d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+}
+async function loadTransfersRemote(){
+  if(!supabaseClient)return;
+  try{
+    var user=await supabaseClient.auth.getUser();
+    if(!user.data.user)return;
+    var res=await supabaseClient.storage.from(SUPABASE_BUCKET_TRANSFERS).list('transfers/'+user.data.user.id+'/');
+    if(res.error)throw res.error;
+    transfers=[];
+    (res.data||[]).forEach(function(f){
+      if(f.name){
+        transfers.push({
+          id:f.id||f.name,
+          original_filename:f.name.replace(/^\d+_/,''),
+          stored_filename:f.name,
+          file_size:f.metadata&&f.metadata.size?f.metadata.size:0,
+          path:'transfers/'+user.data.user.id+'/'+f.name,
+          created_at:f.created_at||new Date().toISOString()
+        });
+      }
+    });
+    transfers.sort(function(a,b){return new Date(b.created_at)-new Date(a.created_at);});
+    if(currentView==='Transfert')renderTransfertUI();
+  }catch(err){console.error('Error loading transfers from storage',err);}
+}
+async function handleFileUpload(files){
+  if(!files||files.length===0)return;
+  try{
+    if(supabaseClient){
+      var user=await supabaseClient.auth.getUser();
+      if(!user.data.user)return;
+      for(var i=0;i<files.length;i++){
+        var file=files[i];
+        var timestamp=Date.now();
+        var filename=timestamp+'_'+file.name;
+        var path='transfers/'+user.data.user.id+'/'+filename;
+        var uploadRes=await supabaseClient.storage.from(SUPABASE_BUCKET_TRANSFERS).upload(path,file,{upsert:false});
+        if(uploadRes.error)throw uploadRes.error;
+      }
+      await loadTransfersRemote();
+    }
+  }catch(err){alert('Erreur lors de l\'upload: '+err.message);renderTransfertUI();}
+}
+async function downloadFile(transfer){
+  if(!supabaseClient)return;
+  try{
+    var url=supabaseClient.storage.from(SUPABASE_BUCKET_TRANSFERS).getPublicUrl(transfer.path);
+    var link=document.createElement('a');
+    link.href=url.data.publicUrl;
+    link.download=transfer.original_filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }catch(err){alert('Erreur lors du téléchargement: '+err.message);}
+}
+async function deleteTransfer(id){
+  if(!supabaseClient)return;
+  if(!confirm('Etes-vous sur de vouloir supprimer ce fichier?'))return;
+  try{
+    var transfer=transfers.find(function(x){return x.id===id;});
+    if(!transfer)return;
+    await supabaseClient.storage.from(SUPABASE_BUCKET_TRANSFERS).remove([transfer.path]);
+    await loadTransfersRemote();
+  }catch(err){alert('Erreur lors de la suppression: '+err.message);}
+}
+function renderTransfertUI(){
+  var bc=document.querySelector('.body-card');
+  if(!bc)return;
+  var html='<div class="transfert-container">';
+  html+='<div class="drop-zone" id="drop-zone" ondrop="handleFileDrop(event)" ondragover="event.preventDefault();this.classList.add(\'drag-over\');" ondragleave="this.classList.remove(\'drag-over\');">';
+  html+='<div class="drop-zone-content"><div class="drop-zone-icon">⬇</div><div class="drop-zone-text">Déposez vos fichiers ici</div><div class="drop-zone-subtext">ou cliquez pour sélectionner</div></div>';
+  html+='<input type="file" id="file-input" class="file-input" multiple onchange="handleFileUpload(this.files)"></div>';
+  if(transfers.length>0){
+    html+='<div class="transfers-title">Fichiers</div>';
+    html+='<div class="transfers-list">';
+    transfers.forEach(function(t){
+      var size=formatFileSize(t.file_size);
+      var date=formatDate(t.created_at);
+      html+='<div class="transfer-item" data-transfer-id="'+t.id+'">';
+      html+='<div class="transfer-item-content">';
+      html+='<div class="transfer-item-name">'+e(t.original_filename)+'</div>';
+      html+='<div class="transfer-item-meta">'+size+' · '+date+'</div>';
+      html+='</div>';
+      html+='<div class="transfer-item-actions">';
+      html+='<button class="transfer-btn" onclick="handleDownload(this)" title="Télécharger">⬇</button>';
+      html+='<button class="transfer-btn del" onclick="handleDelete(this)" title="Supprimer">✕</button>';
+      html+='</div>';
+      html+='</div>';
+    });
+    html+='</div>';
+  }else{
+    html+='<div class="transfers-empty">Aucun fichier pour le moment</div>';
+  }
+  html+='</div>';
+  bc.innerHTML=html;
+  var dz=document.getElementById('drop-zone');
+  if(dz){
+    dz.onclick=function(){document.getElementById('file-input').click();};
+  }
+}
+function handleDownload(btn){
+  var item=btn.closest('.transfer-item');
+  var id=item.getAttribute('data-transfer-id');
+  var transfer=transfers.find(function(x){return x.id==id;});
+  if(transfer)downloadFile(transfer);
+}
+function handleDelete(btn){
+  var item=btn.closest('.transfer-item');
+  var id=item.getAttribute('data-transfer-id');
+  deleteTransfer(id);
+}
+function rTransfert(){
+  renderTransfertUI();
+  if(supabaseClient)loadTransfersRemote();
+}
+function handleFileDrop(e){
+  e.preventDefault();
+  e.stopPropagation();
+  var dz=document.getElementById('drop-zone');
+  if(dz)dz.classList.remove('drag-over');
+  var files=e.dataTransfer.files;
+  handleFileUpload(files);
+}
+/* ── END TRANSFERT FUNCTIONS ── */
+
 function otabs(){var c=[],r=TABS.slice();tasks.forEach(function(t){if(c.indexOf(t.cat)<0)c.push(t.cat);});c.forEach(function(x){if(r.indexOf(x)<0&&x!=='Completed')r.push(x);});r.push('Completed');return r;}
 function vtabs(){return otabs().filter(function(x){if(x==='All')return true;if(isTodayTab(x))return true;if(x==='Urgent')return tasks.some(function(t){return t.prio==='U'&&!t.done;});if(x==='Completed')return tasks.some(function(t){return t.done;});return tasks.some(function(t){return t.cat===x&&!t.done;});});}
 function tc(x){if(x==='All')return tasks.filter(function(t){return!t.done;}).length;if(isTodayTab(x))return tasks.filter(function(t){return t.today&&!t.done;}).length;if(x==='Urgent')return tasks.filter(function(t){return t.prio==='U'&&!t.done;}).length;if(x==='Completed')return tasks.filter(function(t){return t.done;}).length;return tasks.filter(function(t){return t.cat===x&&!t.done;}).length;}
