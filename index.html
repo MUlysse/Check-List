@@ -886,29 +886,27 @@ html,body{background:#F4F4F4;color:#111;}
 .proj-btn:hover{background:#333!important;}
 
 /* ── Transfert Page ── */
-.transfert-container{padding:20px;max-width:900px;margin:0 auto;}
-.drop-zone{border:2px dashed #4A90D9;border-radius:12px;padding:40px 20px;text-align:center;cursor:pointer;transition:all .2s;background:#F5F5F5;margin-bottom:20px;}
-.drop-zone:hover{background:#EEF4FF;border-color:#34C759;}
-.drop-zone.drag-over{background:#E3F2FD;border-color:#34C759;background-color:rgba(74,144,217,0.1);}
-.drop-zone-icon{font-size:48px;margin-bottom:10px;}
-.drop-zone-text{font-size:16px;color:#1C1C1E;margin-bottom:5px;}
+.transfert-container{padding:20px 28px;max-width:1200px;margin:0 auto;height:100%;}
+.drop-zone{border:2px dashed #C8C5BF;border-radius:12px;padding:48px 24px;text-align:center;cursor:pointer;transition:all .2s;background:transparent;margin-bottom:28px;}
+.drop-zone:hover,.drop-zone.drag-over{border-color:#4A90D9;background:rgba(74,144,217,0.04);}
+.drop-zone-content{pointer-events:none;}
+.drop-zone-icon{font-size:40px;margin-bottom:12px;opacity:0.6;}
+.drop-zone-text{font-size:15px;color:#1C1C1E;margin-bottom:6px;font-weight:500;}
 .drop-zone-subtext{font-size:13px;color:#8A8680;}
 .file-input{display:none;}
-.transfers-list{display:flex;flex-direction:column;gap:8px;}
-.transfer-item{display:flex;align-items:center;gap:12px;padding:12px;background:#F9F9F9;border-radius:9px;border:1px solid #E0DDD8;transition:background .15s;}
-.transfer-item:hover{background:#F0EFED;}
-.transfer-item-icon{font-size:28px;flex-shrink:0;}
-.transfer-item-info{flex:1;min-width:0;}
-.transfer-item-name{font-weight:600;color:#1C1C1E;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.transfer-item-meta{font-size:12px;color:#8A8680;margin-top:2px;}
+.transfers-list{display:flex;flex-direction:column;gap:0;}
+.transfer-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid rgba(0,0,0,0.04);transition:background .1s;}
+.transfer-item:last-child{border-bottom:none;}
+.transfer-item:hover{background:rgba(0,0,0,0.02);}
+.transfer-item-content{flex:1;min-width:0;}
+.transfer-item-name{font-size:14px;font-weight:500;color:#1C1C1E;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.transfer-item-meta{font-size:11.5px;color:#8A8680;margin-top:3px;}
 .transfer-item-actions{display:flex;gap:6px;flex-shrink:0;}
-.transfer-btn{padding:6px 12px;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;transition:background .15s;}
-.transfer-btn.download{background:#34C759;color:#fff;}
-.transfer-btn.download:hover{background:#2EBE50;}
-.transfer-btn.delete{background:#FF9500;color:#fff;}
-.transfer-btn.delete:hover{background:#FB9C3A;}
-.transfers-empty{text-align:center;padding:40px 20px;color:#8A8680;}
-.transfers-title{font-size:16px;font-weight:600;color:#1C1C1E;margin-bottom:12px;}
+.transfer-btn{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:none;border-radius:6px;font-size:14px;cursor:pointer;background:transparent;color:#8A8680;transition:all .12s;}
+.transfer-btn:hover{background:rgba(0,0,0,0.06);color:#4A90D9;}
+.transfer-btn.del:hover{color:#FF3B30;background:rgba(255,59,48,0.06);}
+.transfers-empty{text-align:center;padding:60px 20px;color:#8A8680;font-size:13px;}
+.transfers-title{font-size:11.5px;font-weight:600;color:#8A8680;letter-spacing:0.08em;text-transform:uppercase;padding:14px 0 8px;margin-bottom:4px;}
 .loading-spinner{display:inline-block;width:16px;height:16px;border:2px solid #E0DDD8;border-top-color:#4A90D9;border-radius:50%;animation:spin .6s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg);}}
 </style>
@@ -1801,9 +1799,9 @@ function render(){
     if(_eo)_eo.style.display='none';
     if(appEl)appEl.classList.remove('exam-view');
   }
-  // Hide sidebar for Home, Finances, BOAZ, Culture
+  // Hide sidebar for Home, Finances, BOAZ, Culture, Transfert
   var sidebarEl=document.querySelector('.sidebar');
-  var SIDEBAR_HIDDEN_VIEWS=['Home','Finances','BOAZ','Culture','Exams','Networking'];
+  var SIDEBAR_HIDDEN_VIEWS=['Home','Finances','BOAZ','Culture','Exams','Networking','Transfert'];
   if(sidebarEl)sidebarEl.style.display=SIDEBAR_HIDDEN_VIEWS.indexOf(currentView)>=0?'none':'';
   // Show Home button in header on all views except Home itself
   var mainHomeBtn=document.getElementById('main-home-btn');
@@ -4780,12 +4778,24 @@ async function loadTransfersRemote(){
   try{
     var user=await supabaseClient.auth.getUser();
     if(!user.data.user)return;
-    var res=await supabaseClient.from(SUPABASE_TABLE_TRANSFERS).select().eq('user_id',user.data.user.id).order('created_at',{ascending:false});
+    var res=await supabaseClient.storage.from(SUPABASE_BUCKET_TRANSFERS).list('transfers/'+user.data.user.id+'/');
     if(res.error)throw res.error;
-    transfers=res.data||[];
-    saveTasks();
+    transfers=[];
+    (res.data||[]).forEach(function(f){
+      if(f.name){
+        transfers.push({
+          id:f.id||f.name,
+          original_filename:f.name.replace(/^\d+_/,''),
+          stored_filename:f.name,
+          file_size:f.metadata&&f.metadata.size?f.metadata.size:0,
+          path:'transfers/'+user.data.user.id+'/'+f.name,
+          created_at:f.created_at||new Date().toISOString()
+        });
+      }
+    });
+    transfers.sort(function(a,b){return new Date(b.created_at)-new Date(a.created_at);});
     if(currentView==='Transfert')renderTransfertUI();
-  }catch(err){console.error('Error loading transfers from Supabase',err);}
+  }catch(err){console.error('Error loading transfers from storage',err);}
 }
 
 async function handleFileUpload(files){
@@ -4801,22 +4811,8 @@ async function handleFileUpload(files){
         var path='transfers/'+user.data.user.id+'/'+filename;
         var uploadRes=await supabaseClient.storage.from(SUPABASE_BUCKET_TRANSFERS).upload(path,file,{upsert:false});
         if(uploadRes.error)throw uploadRes.error;
-        var transferData={
-          id:newId(),
-          user_id:user.data.user.id,
-          original_filename:file.name,
-          stored_filename:filename,
-          file_size:file.size,
-          file_type:file.type,
-          path:path,
-          created_at:new Date().toISOString()
-        };
-        transfers.unshift(transferData);
-        saveTasks();
-        var insertRes=await supabaseClient.from(SUPABASE_TABLE_TRANSFERS).insert([transferData]).select();
-        if(insertRes.error)throw insertRes.error;
       }
-      renderTransfertUI();
+      await loadTransfersRemote();
     }
   }catch(err){alert('Erreur lors de l\'upload: '+err.message);renderTransfertUI();}
 }
@@ -4841,8 +4837,6 @@ async function deleteTransfer(id){
     var transfer=transfers.find(function(x){return x.id===id;});
     if(!transfer)return;
     await supabaseClient.storage.from(SUPABASE_BUCKET_TRANSFERS).remove([transfer.path]);
-    var delRes=await supabaseClient.from(SUPABASE_TABLE_TRANSFERS).delete().eq('id',id);
-    if(delRes.error)throw delRes.error;
     await loadTransfersRemote();
   }catch(err){alert('Erreur lors de la suppression: '+err.message);}
 }
@@ -4851,19 +4845,29 @@ function renderTransfertUI(){
   var bc=document.querySelector('.body-card');
   if(!bc)return;
   var html='<div class="transfert-container">';
-  html+='<div class="drop-zone" id="drop-zone" ondrop="handleFileDrop(event)" ondragover="event.preventDefault();this.classList.add(\'drag-over\');" ondragleave="this.classList.remove(\'drag-over\');"><div class="drop-zone-icon">[UPLOAD]</div><div class="drop-zone-text">Deposez vos fichiers ici</div><div class="drop-zone-subtext">ou cliquez pour selectionner</div><input type="file" id="file-input" class="file-input" multiple onchange="handleFileUpload(this.files)"></div>';
+  html+='<div class="drop-zone" id="drop-zone" ondrop="handleFileDrop(event)" ondragover="event.preventDefault();this.classList.add(\'drag-over\');" ondragleave="this.classList.remove(\'drag-over\');">';
+  html+='<div class="drop-zone-content"><div class="drop-zone-icon">⬇</div><div class="drop-zone-text">Déposez vos fichiers ici</div><div class="drop-zone-subtext">ou cliquez pour sélectionner</div></div>';
+  html+='<input type="file" id="file-input" class="file-input" multiple onchange="handleFileUpload(this.files)"></div>';
   if(transfers.length>0){
-    html+='<div class="transfers-title">Historique des fichiers transférés</div>';
+    html+='<div class="transfers-title">Fichiers</div>';
     html+='<div class="transfers-list">';
     transfers.forEach(function(t){
-      var icon=getFileIcon(t.original_filename);
       var size=formatFileSize(t.file_size);
       var date=formatDate(t.created_at);
-      html+='<div class="transfer-item" data-transfer-id="'+t.id+'"><div class="transfer-item-icon">'+icon+'</div><div class="transfer-item-info"><div class="transfer-item-name">'+e(t.original_filename)+'</div><div class="transfer-item-meta">'+size+' · '+date+'</div></div><div class="transfer-item-actions"><button class="transfer-btn download" onclick="handleDownload(this)">Télécharger</button><button class="transfer-btn delete" onclick="handleDelete(this)">Supprimer</button></div></div>';
+      html+='<div class="transfer-item" data-transfer-id="'+t.id+'">';
+      html+='<div class="transfer-item-content">';
+      html+='<div class="transfer-item-name">'+e(t.original_filename)+'</div>';
+      html+='<div class="transfer-item-meta">'+size+' · '+date+'</div>';
+      html+='</div>';
+      html+='<div class="transfer-item-actions">';
+      html+='<button class="transfer-btn" onclick="handleDownload(this)" title="Télécharger">⬇</button>';
+      html+='<button class="transfer-btn del" onclick="handleDelete(this)" title="Supprimer">✕</button>';
+      html+='</div>';
+      html+='</div>';
     });
     html+='</div>';
   }else{
-    html+='<div class="transfers-empty">Aucun fichier transféré pour le moment</div>';
+    html+='<div class="transfers-empty">Aucun fichier pour le moment</div>';
   }
   html+='</div>';
   bc.innerHTML=html;
