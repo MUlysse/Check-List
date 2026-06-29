@@ -959,7 +959,7 @@ html,body{background:#F4F4F4;color:#111;}
 <nav class="mobile-nav" id="mobile-nav">
   <button class="mobile-nav-btn" data-view="Home" onclick="setView('Home')" style="display:none;"><span class="mobile-nav-icon" style="font-size:12px;font-weight:700;">H</span><span>Home</span></button>
   <button class="mobile-nav-btn" data-view="Checklist" onclick="setView('Checklist')"><span class="mobile-nav-icon">☰</span><span>Liste</span></button>
-  <button class="mobile-nav-btn" data-view="Transfert" onclick="setView('Transfert')"><span class="mobile-nav-icon">📤</span><span>Transfert</span></button>
+  <button class="mobile-nav-btn" data-view="Transfert" onclick="setView('Transfert')"><span class="mobile-nav-icon">T</span><span>Transfert</span></button>
   <button class="mobile-nav-btn" data-view="Culture" onclick="setView('Culture')" style="display:none;"><span class="mobile-nav-icon">◻</span><span>Culture</span></button>
   <button class="mobile-nav-btn" data-view="Networking" onclick="setView('Networking')" style="display:none;"><span class="mobile-nav-icon">◎</span><span>Réseau</span></button>
   <button class="mobile-nav-btn" data-view="Finances" onclick="setView('Finances')" style="display:none;"><span class="mobile-nav-icon">€</span><span>Finances</span></button>
@@ -1490,6 +1490,7 @@ function loadTasks(){
       if(data.boazData&&typeof data.boazData==='object') Object.assign(boazData,data.boazData);
       if(data.chessData&&typeof data.chessData==='object') loadChessData(data.chessData);
       if(data.examData&&typeof data.examData==='object') loadExamData(data.examData);
+      if(Array.isArray(data.transfers)) transfers=data.transfers;
       if(data._settingsLocalTs) _settingsLocalTs=data._settingsLocalTs;
     }catch(e){}
   }
@@ -1503,7 +1504,7 @@ function loadTasks(){
 }
 function saveTasks(){
   if(!_inRemoteLoad)_settingsLocalTs=Date.now();
-  try{localStorage.setItem(STORAGE_KEY, JSON.stringify({tasks:tasks.filter(function(t){return t.cat!==SETTINGS_CAT;}),nid:nid,tab:tab,tabs:TABS,books:books,contacts:contacts,view:currentView,projRows:projRows,projPeriods:projPeriods,projDataVersion:PROJ_DATA_VERSION,projGoals:projGoals,todayOrderList:todayOrderList,bookNotes:bookNotes,financesData:financesData,boazData:boazData,chessData:{boards:chessData.boards},examData:{subjects:examData.subjects,s1NumExams:examData.s1NumExams,s2NumExams:examData.s2NumExams,s1Grades:examData.s1Grades,s2Grades:examData.s2Grades},_settingsLocalTs:_settingsLocalTs}));}catch(e){}
+  try{localStorage.setItem(STORAGE_KEY, JSON.stringify({tasks:tasks.filter(function(t){return t.cat!==SETTINGS_CAT;}),nid:nid,tab:tab,tabs:TABS,books:books,contacts:contacts,view:currentView,projRows:projRows,projPeriods:projPeriods,projDataVersion:PROJ_DATA_VERSION,projGoals:projGoals,todayOrderList:todayOrderList,bookNotes:bookNotes,financesData:financesData,boazData:boazData,chessData:{boards:chessData.boards},examData:{subjects:examData.subjects,s1NumExams:examData.s1NumExams,s2NumExams:examData.s2NumExams,s1Grades:examData.s1Grades,s2Grades:examData.s2Grades},transfers:transfers,_settingsLocalTs:_settingsLocalTs}));}catch(e){}
 }
 function clearAutoDelete(id){
   if(deleteTimers[id]){ clearTimeout(deleteTimers[id]); delete deleteTimers[id]; }
@@ -1543,7 +1544,7 @@ function setSyncState(state){
 function initSupabase(){
   if(!supabaseClient) return;
   setSyncState('syncing');
-  Promise.all([loadTasksRemote(), loadBooksRemote(), loadContactsRemote()]).then(function(){ setSyncState(); }).catch(function(e){ console.warn('Supabase load failed',e); setSyncState('error'); }).finally(function(){ subscribeToRemoteChanges(); });
+  Promise.all([loadTasksRemote(), loadBooksRemote(), loadContactsRemote(), loadTransfersRemote()]).then(function(){ setSyncState(); }).catch(function(e){ console.warn('Supabase load failed',e); setSyncState('error'); }).finally(function(){ subscribeToRemoteChanges(); });
 }
 async function loadBooksRemote(){
   if(!supabaseClient) return;
@@ -1887,7 +1888,7 @@ function render(){
     if(twt){twt.style.display='none';}
     var ctmt=document.getElementById('cat-treemap');if(ctmt)ctmt.style.display='none';
     var mti=document.getElementById('main-title-icon');var mtt=document.getElementById('main-title-text');
-    if(mti){mti.textContent='📤';mti.style.background='#34C759';mti.style.color='#fff';}
+    if(mti){mti.textContent='T';mti.style.background='#34C759';mti.style.color='#fff';}
     if(mtt)mtt.textContent='Transfert';
     rTransfert();
   } else {
@@ -4755,11 +4756,11 @@ function deleteProjGoal(id){
 function getFileIcon(filename){
   var ext=filename.split('.').pop().toLowerCase();
   var icons={
-    pdf:'📄',doc:'📝',docx:'📝',xls:'📊',xlsx:'📊',
-    ppt:'🎬',pptx:'🎬',txt:'📋',zip:'📦',
-    jpg:'🖼️',jpeg:'🖼️',png:'🖼️',gif:'🖼️'
+    pdf:'[PDF]',doc:'[DOC]',docx:'[DOC]',xls:'[XLS]',xlsx:'[XLS]',
+    ppt:'[PPT]',pptx:'[PPT]',txt:'[TXT]',zip:'[ZIP]',
+    jpg:'[IMG]',jpeg:'[IMG]',png:'[IMG]',gif:'[IMG]'
   };
-  return icons[ext]||'📎';
+  return icons[ext]||'[FILE]';
 }
 
 function formatFileSize(bytes){
@@ -4774,7 +4775,7 @@ function formatDate(date){
   return d.toLocaleDateString('fr-FR')+' '+d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
 }
 
-async function loadTransfers(){
+async function loadTransfersRemote(){
   if(!supabaseClient)return;
   try{
     var user=await supabaseClient.auth.getUser();
@@ -4782,36 +4783,42 @@ async function loadTransfers(){
     var res=await supabaseClient.from(SUPABASE_TABLE_TRANSFERS).select().eq('user_id',user.data.user.id).order('created_at',{ascending:false});
     if(res.error)throw res.error;
     transfers=res.data||[];
-    renderTransfertUI();
-  }catch(err){console.error('Error loading transfers',err);}
+    saveTasks();
+    if(currentView==='Transfert')renderTransfertUI();
+  }catch(err){console.error('Error loading transfers from Supabase',err);}
 }
 
 async function handleFileUpload(files){
-  if(!supabaseClient||!files||files.length===0)return;
+  if(!files||files.length===0)return;
   try{
-    var user=await supabaseClient.auth.getUser();
-    if(!user.data.user)return;
-    for(var i=0;i<files.length;i++){
-      var file=files[i];
-      var timestamp=Date.now();
-      var filename=timestamp+'_'+file.name;
-      var path='transfers/'+user.data.user.id+'/'+filename;
-      var uploadRes=await supabaseClient.storage.from(SUPABASE_BUCKET_TRANSFERS).upload(path,file,{upsert:false});
-      if(uploadRes.error)throw uploadRes.error;
-      var transferData={
-        user_id:user.data.user.id,
-        original_filename:file.name,
-        stored_filename:filename,
-        file_size:file.size,
-        file_type:file.type,
-        path:path,
-        created_at:new Date().toISOString()
-      };
-      var insertRes=await supabaseClient.from(SUPABASE_TABLE_TRANSFERS).insert([transferData]).select();
-      if(insertRes.error)throw insertRes.error;
+    if(supabaseClient){
+      var user=await supabaseClient.auth.getUser();
+      if(!user.data.user)return;
+      for(var i=0;i<files.length;i++){
+        var file=files[i];
+        var timestamp=Date.now();
+        var filename=timestamp+'_'+file.name;
+        var path='transfers/'+user.data.user.id+'/'+filename;
+        var uploadRes=await supabaseClient.storage.from(SUPABASE_BUCKET_TRANSFERS).upload(path,file,{upsert:false});
+        if(uploadRes.error)throw uploadRes.error;
+        var transferData={
+          id:newId(),
+          user_id:user.data.user.id,
+          original_filename:file.name,
+          stored_filename:filename,
+          file_size:file.size,
+          file_type:file.type,
+          path:path,
+          created_at:new Date().toISOString()
+        };
+        transfers.unshift(transferData);
+        saveTasks();
+        var insertRes=await supabaseClient.from(SUPABASE_TABLE_TRANSFERS).insert([transferData]).select();
+        if(insertRes.error)throw insertRes.error;
+      }
+      renderTransfertUI();
     }
-    await loadTransfers();
-  }catch(err){alert('Erreur lors de l\'upload: '+err.message);}
+  }catch(err){alert('Erreur lors de l\'upload: '+err.message);renderTransfertUI();}
 }
 
 async function downloadFile(transfer){
@@ -4829,14 +4836,14 @@ async function downloadFile(transfer){
 
 async function deleteTransfer(id){
   if(!supabaseClient)return;
-  if(!confirm('Êtes-vous sûr de vouloir supprimer ce fichier?'))return;
+  if(!confirm('Etes-vous sur de vouloir supprimer ce fichier?'))return;
   try{
     var transfer=transfers.find(function(x){return x.id===id;});
     if(!transfer)return;
     await supabaseClient.storage.from(SUPABASE_BUCKET_TRANSFERS).remove([transfer.path]);
     var delRes=await supabaseClient.from(SUPABASE_TABLE_TRANSFERS).delete().eq('id',id);
     if(delRes.error)throw delRes.error;
-    await loadTransfers();
+    await loadTransfersRemote();
   }catch(err){alert('Erreur lors de la suppression: '+err.message);}
 }
 
@@ -4844,7 +4851,7 @@ function renderTransfertUI(){
   var bc=document.querySelector('.body-card');
   if(!bc)return;
   var html='<div class="transfert-container">';
-  html+='<div class="drop-zone" id="drop-zone" ondrop="handleFileDrop(event)" ondragover="event.preventDefault();this.classList.add(\'drag-over\');" ondragleave="this.classList.remove(\'drag-over\');"><div class="drop-zone-icon">📤</div><div class="drop-zone-text">Déposez vos fichiers ici</div><div class="drop-zone-subtext">ou cliquez pour sélectionner</div><input type="file" id="file-input" class="file-input" multiple onchange="handleFileUpload(this.files)"></div>';
+  html+='<div class="drop-zone" id="drop-zone" ondrop="handleFileDrop(event)" ondragover="event.preventDefault();this.classList.add(\'drag-over\');" ondragleave="this.classList.remove(\'drag-over\');"><div class="drop-zone-icon">[UPLOAD]</div><div class="drop-zone-text">Deposez vos fichiers ici</div><div class="drop-zone-subtext">ou cliquez pour selectionner</div><input type="file" id="file-input" class="file-input" multiple onchange="handleFileUpload(this.files)"></div>';
   if(transfers.length>0){
     html+='<div class="transfers-title">Historique des fichiers transférés</div>';
     html+='<div class="transfers-list">';
@@ -4881,7 +4888,7 @@ function handleDelete(btn){
 
 function rTransfert(){
   renderTransfertUI();
-  loadTransfers();
+  if(supabaseClient)loadTransfersRemote();
 }
 
 function handleFileDrop(e){
